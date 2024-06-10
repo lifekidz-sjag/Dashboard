@@ -60,7 +60,7 @@ export default defineConfig({
       },
     },
   },
-  base: "/Attendance-System",
+  base: "/Dashboard",
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),

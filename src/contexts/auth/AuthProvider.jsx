@@ -233,7 +233,7 @@ const AuthProvider = ({ children, sharedState }) => {
 
           reset(["accessToken", "refreshToken", "expiration"]);
 
-          window.location.href = `/Attendance-System/user/login?redirectUrl=${window.location.pathname}`;
+          window.location.href = `/Dashboard/user/login?redirectUrl=${window.location.pathname}`;
         }
 
         return axios(config);

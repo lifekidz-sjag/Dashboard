@@ -123,7 +123,7 @@ const router = createBrowserRouter(
       ],
     },
   ],
-  { basename: "/Attendance-System" },
+  { basename: "/Dashboard" },
 );
 
 const App = () => <RouterProvider router={router} />;

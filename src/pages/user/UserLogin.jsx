@@ -44,7 +44,7 @@ const UserLogin = () => {
 
   const STATE_MACHINE_NAME = "State Machine 1";
   const { rive, RiveComponent } = useRive({
-    src: "/Attendance-System/login_screen_character.riv",
+    src: "/Dashboard/login_screen_character.riv",
     autoplay: true,
     stateMachines: STATE_MACHINE_NAME,
   });
@@ -125,7 +125,7 @@ const UserLogin = () => {
         >
           <RiveComponent
             style={{ width: "150px", height: "150px" }}
-            src="/Attendance-System/login_screen_character.riv"
+            src="/Dashboard/login_screen_character.riv"
           />
         </Box>
       </Box>
