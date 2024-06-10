@@ -10,7 +10,6 @@ import AdminLayoutLanding from "./pages/AdminLayoutLanding";
 import Dashboard from "./pages/Dashboard";
 import Error404 from "./pages/Error404";
 import ReportsLayoutLanding from "./pages/ReportsLayoutLanding";
-import RootLayoutLanding from "./pages/RootLayoutLanding";
 import UserLogin from "./pages/user/UserLogin";
 import UserLogout from "./pages/user/UserLogout";
 import UserLayoutLanding from "./pages/UserLayoutLanding";
@@ -63,10 +62,6 @@ const router = createBrowserRouter(
           children: [
             {
               index: true,
-              element: <RootLayoutLanding />,
-            },
-            {
-              path: "dashboard",
               element: <Dashboard />,
             },
             {
