@@ -375,6 +375,13 @@ const MainNavigation = ({
       }, 100);
     }
   }, [isMobileMenuExpanded]);
+
+  useEffect(() => {
+    if (isMobileMenuExpanded) {
+      setIsMobileMenuExpanded(false);
+    }
+  }, [location.pathname]);
+
   return (
     <>
       {isSmallScreen ? (
