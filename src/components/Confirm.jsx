@@ -15,8 +15,8 @@ const Confirm = ({
   confirm,
   cancel,
   isOpen,
-  onClose,
-  zIndex,
+  onClose = null,
+  zIndex = 1501,
 }) => {
   let confirmTextNormal;
   let confirmTextStaging;
@@ -95,11 +95,6 @@ Confirm.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func,
   zIndex: PropTypes.number,
-};
-
-Confirm.defaultProps = {
-  onClose: null,
-  zIndex: 1501,
 };
 
 export default Confirm;

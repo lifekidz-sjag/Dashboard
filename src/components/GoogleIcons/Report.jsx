@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import "./GoogleIcons.css";
 
 const Report = props => {
-  const { fontSize, color, currentpage } = props;
+  const { fontSize = "24px", color = "inherit", currentpage = "false" } = props;
   return (
     <span
       className={
@@ -22,12 +22,6 @@ Report.propTypes = {
   fontSize: PropTypes.string,
   color: PropTypes.string,
   currentpage: PropTypes.string,
-};
-
-Report.defaultProps = {
-  fontSize: "24px",
-  color: "inherit",
-  currentpage: "false",
 };
 
 export default Report;

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import {
   Box,
   Grid,
@@ -26,7 +26,7 @@ const Dashboard = () => {
       title: {
         enabled: true,
         display: true,
-        name: `Welcome back, ${user.username}.`,
+        name: `Welcome back, ${user.name}.`,
       },
     });
     loader.end();
@@ -126,7 +126,7 @@ const Dashboard = () => {
         </Grid>
         <Grid container item xs={12} lg={6}>
           <Grid item xs={6} />
-          {user.role === "admin" && (
+          {user.role === "superadmin" && (
             <Box
               sx={{
                 backgroundColor: "#FFF",

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import "./GoogleIcons.css";
 
 const ValidateError = props => {
-  const { fontSize, color } = props;
+  const { fontSize = "24px", color = "white" } = props;
   return (
     <span className="material-symbols-outlined" style={{ fontSize, color }}>
       error
@@ -14,11 +14,6 @@ const ValidateError = props => {
 ValidateError.propTypes = {
   fontSize: PropTypes.string,
   color: PropTypes.string,
-};
-
-ValidateError.defaultProps = {
-  fontSize: "20px",
-  color: "white",
 };
 
 export default ValidateError;

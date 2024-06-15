@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import "./GoogleIcons.css";
 
 const AddBox = props => {
-  const { fontSize, color } = props;
+  const { fontSize = "24px", color = "white" } = props;
   return (
     <span className="material-symbols-outlined" style={{ fontSize, color }}>
       add_box
@@ -14,11 +14,6 @@ const AddBox = props => {
 AddBox.propTypes = {
   fontSize: PropTypes.string,
   color: PropTypes.string,
-};
-
-AddBox.defaultProps = {
-  fontSize: "20px",
-  color: "white",
 };
 
 export default AddBox;

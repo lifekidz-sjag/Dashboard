@@ -21,12 +21,12 @@ const subNavigationWidth = 220;
 const SubNavigation = ({
   CustomizedListItemButton,
   CustomizedListItemText,
-  subNav,
-  currentSubpage,
-  currentChild,
-  projectMobileSubNav,
-  setProjectMobileSubNav,
+  subNav = [],
+  currentSubpage = {},
+  currentChild = {},
   mobileSubNav,
+  setMobileSubNav,
+  mobileSubNavList,
 }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
@@ -58,7 +58,7 @@ const SubNavigation = ({
     return (
       <Drawer
         anchor="bottom"
-        open={!!(mobileSubNav && mobileSubNav.length && projectMobileSubNav)}
+        open={!!(mobileSubNavList && mobileSubNavList.length && mobileSubNav)}
         sx={{
           zIndex: "1299",
           "& .MuiDrawer-paper": {
@@ -69,12 +69,12 @@ const SubNavigation = ({
           },
         }}
         onClose={() => {
-          setProjectMobileSubNav(false);
+          setMobileSubNav(false);
         }}
       >
-        {mobileSubNav &&
-          mobileSubNav.length > 0 &&
-          mobileSubNav.map(item => {
+        {mobileSubNavList &&
+          mobileSubNavList.length > 0 &&
+          mobileSubNavList.map(item => {
             return (
               <Box key={item.name}>
                 <CustomizedListItemButton
@@ -90,11 +90,11 @@ const SubNavigation = ({
                     } else {
                       if (item.path) {
                         navigate(item.path);
-                        setProjectMobileSubNav(false);
+                        setMobileSubNav(false);
                       }
                       if (item.target === "popup") {
                         navigate(item.path);
-                        setProjectMobileSubNav(false);
+                        setMobileSubNav(false);
                       }
                       setExpandChild(prevState => {
                         return {
@@ -153,7 +153,7 @@ const SubNavigation = ({
                                   window.open(fPath, "_blank", "noreferrer");
                                 } else {
                                   navigate(fPath);
-                                  setProjectMobileSubNav(false);
+                                  setMobileSubNav(false);
                                 }
                               }}
                             >
@@ -340,15 +340,9 @@ SubNavigation.propTypes = {
   subNav: PropTypes.arrayOf(PropTypes.shape()),
   currentSubpage: PropTypes.shape(),
   currentChild: PropTypes.shape(),
-  projectMobileSubNav: PropTypes.bool.isRequired,
-  setProjectMobileSubNav: PropTypes.func.isRequired,
-  mobileSubNav: PropTypes.arrayOf(PropTypes.shape()).isRequired,
-};
-
-SubNavigation.defaultProps = {
-  subNav: [],
-  currentChild: {},
-  currentSubpage: {},
+  mobileSubNav: PropTypes.bool.isRequired,
+  setMobileSubNav: PropTypes.func.isRequired,
+  mobileSubNavList: PropTypes.arrayOf(PropTypes.shape()).isRequired,
 };
 
 export default SubNavigation;

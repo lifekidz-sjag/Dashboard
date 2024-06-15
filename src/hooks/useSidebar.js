@@ -35,7 +35,7 @@ const useSidebar = () => {
 
   const close = useCallback(
     func => {
-      if (func) {
+      if (func && typeof func === "function") {
         func();
       }
       toggleSidebar(false);

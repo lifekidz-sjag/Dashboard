@@ -2,7 +2,7 @@ import { Box, Drawer, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import PropTypes from "prop-types";
 
-const Sidebar = ({ sidebar, isOpen, close, dependencies }) => {
+const Sidebar = ({ sidebar = null, isOpen, close, dependencies = {} }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
   const anchor = isSmallScreen ? "bottom" : "right";
@@ -42,10 +42,6 @@ Sidebar.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
   dependencies: PropTypes.shape(),
-};
-Sidebar.defaultProps = {
-  sidebar: null,
-  dependencies: {},
 };
 
 export default Sidebar;

@@ -18,10 +18,13 @@ import { styled } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import PropTypes from "prop-types";
 
-import Admin from "./GoogleIcons/Admin";
+import ChildCare from "./GoogleIcons/ChildCare";
 import Dashboard from "./GoogleIcons/Dashboard";
-import Register from "./GoogleIcons/Register";
+import Groups from "./GoogleIcons/Groups";
+import MoreHoriz from "./GoogleIcons/MoreHoriz";
 import Report from "./GoogleIcons/Report";
+import School from "./GoogleIcons/School";
+import ShieldPerson from "./GoogleIcons/ShieldPerson";
 import SubNavigation from "./SubNavigation";
 
 // Main Navigation component is a combination of mini variant and permanent menu, with hover on expand feature
@@ -90,7 +93,7 @@ const Drawer = styled(MuiDrawer, {
 const CustomizedListItemButton = styled(ListItemButton)(props => ({
   paddingLeft: "16px",
   borderRadius:
-    props.projectmainnav === "true" || props.projectsubnav === "true"
+    props.mainnav === "true" || props.projectsubnav === "true"
       ? "50px"
       : "50px 0px 0px 50px",
   "&.main-navi": {
@@ -162,7 +165,6 @@ const matchNestedPath = (items, url) => {
 
 const navigationProps = (navigationItems, pathname) => {
   const path = matchNestedPath(navigationItems, pathname);
-
   const currentPage = path[0] ? path[0].id : "";
   const currentSubpage = path[1] ? path[1] : null;
   const currentChild = path[2] ? path[2] : null;
@@ -180,7 +182,7 @@ const navigationProps = (navigationItems, pathname) => {
     });
   }
 
-  console.log("currentPage", currentPage);
+  // console.log("currentPage", currentPage);
   // console.log("currentSubpage", currentSubpage);
   // console.log("currentChild", currentChild);
 
@@ -227,56 +229,32 @@ const mobileNavigationProps = (navigationItems, pathname) => {
     mobileClickedPage: currentPage,
     mobileClickedSubpage: currentSubpage,
     mobileClickedChild: currentChild,
-    mobileSubNav: subNav,
+    mobileSubNavList: subNav,
     mobileSubChild: subChild,
   };
 };
 
-const navigationItems = () => {
-  return [
+const navigationItems = user => {
+  const list = [];
+
+  list.push(
     {
       id: "ce7f9d92-8c48-49e4-b3af-6305c427e893",
       name: "Dashboard",
-      path: `/dashboard`,
+      path: `/`,
       icon: currentPage => {
         return <Dashboard currentpage={currentPage.toString()} />;
       },
       mobile: "first",
     },
     {
-      id: "3e234c2f-4320-4941-8c7b-4b43d4f79266",
-      name: "Clock In / Out",
-      path: `/manage`,
+      id: "9ee19422-c1cb-4998-81af-b7b837d72106",
+      name: "Students",
+      path: `/students`,
       icon: currentPage => {
-        return <Register currentpage={currentPage.toString()} />;
+        return <ChildCare currentpage={currentPage.toString()} />;
       },
       mobile: "first",
-    },
-    {
-      id: "98e292f8-ee5b-4437-ab96-4b24a990a8d4",
-      name: "Admin",
-      path: `/admin`,
-      icon: currentPage => {
-        return <Admin currentpage={currentPage.toString()} />;
-      },
-      mobile: "first",
-      subNav: [
-        {
-          id: "f511c60f-04e5-48f0-a865-a7ec7d55838e",
-          name: "Teachers",
-          path: `/admin/teachers`,
-        },
-        {
-          id: "f511c60f-04e5-48f0-a865-a7ec7d55838f",
-          name: "Classes",
-          path: `/admin/classes`,
-        },
-        {
-          id: "f511c60f-04e5-48f0-a865-a7ec7d55838g",
-          name: "Students",
-          path: `/admin/students`,
-        },
-      ],
     },
     {
       id: "59993f82-a00f-430c-be43-13e51c7e8ef3",
@@ -304,7 +282,39 @@ const navigationItems = () => {
         // },
       ],
     },
-  ];
+    {
+      id: "344d925d-7397-4cd9-bd97-689d07a37dc7",
+      name: "Teachers",
+      path: `/teachers`,
+      icon: currentPage => {
+        return <School currentpage={currentPage.toString()} />;
+      },
+      mobile: "second",
+    },
+  );
+  if (user.role === "superadmin") {
+    list.push(
+      {
+        id: "3e234c2f-4320-4941-8c7b-4b43d4f79266",
+        name: "Classes",
+        path: `/classes`,
+        icon: currentPage => {
+          return <Groups currentpage={currentPage.toString()} />;
+        },
+        mobile: "second",
+      },
+      {
+        id: "31a62c4b-13ff-4f86-af3f-b316fb8c9b8d",
+        name: "Admins",
+        path: `/admins`,
+        icon: currentPage => {
+          return <ShieldPerson currentpage={currentPage.toString()} />;
+        },
+        mobile: "second",
+      },
+    );
+  }
+  return list;
 };
 
 const BottomNavigationAction = styled(MuiBottomNavigationAction)(props => ({
@@ -327,16 +337,17 @@ const BottomNavigationAction = styled(MuiBottomNavigationAction)(props => ({
   },
 }));
 const MainNavigation = ({
-  projectMainNav,
-  handleProjectMainNav,
-  projectMobileSubNav,
-  handleProjectMobileSubNav,
-  setProjectMobileSubNav,
+  mainNav,
+  handleMainNav,
+  mobileSubNav,
+  handleMobileSubNav,
+  setMobileSubNav,
+  user,
 }) => {
   const location = useLocation();
 
   const { currentPage, currentSubpage, currentChild, subNav } = navigationProps(
-    navigationItems(),
+    navigationItems(user),
     location.pathname,
   );
   let mobileClickedSubpage;
@@ -348,13 +359,22 @@ const MainNavigation = ({
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   const [pageLoaded, setPageLoaded] = useState(false);
-  useState(false);
-  const [mobileSubNav, setMobileSubNav] = useState([]);
+  const [isMobileMenuExpanded, setIsMobileMenuExpanded] = useState(false);
+  const [isDelayedMobileMenuExpanded, setIsDelayedMobileMenuExpanded] =
+    useState(false);
+  const [mobileSubNavList, setMobileSubNavList] = useState([]);
 
   useEffect(() => {
     setPageLoaded(true);
   }, []);
 
+  useEffect(() => {
+    if (!isMobileMenuExpanded) {
+      setTimeout(() => {
+        setIsDelayedMobileMenuExpanded(false);
+      }, 100);
+    }
+  }, [isMobileMenuExpanded]);
   return (
     <>
       {isSmallScreen ? (
@@ -368,7 +388,7 @@ const MainNavigation = ({
             zIndex: 1299,
             boxShadow:
               "0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px rgba(0, 0, 0, 0.14), 0px 1px 8px rgba(0, 0, 0, 0.12)",
-            height: "75px",
+            height: isMobileMenuExpanded ? "150px" : "75px",
             transition: "height 0.6s",
           }}
           elevation={3}
@@ -384,7 +404,7 @@ const MainNavigation = ({
               zIndex: 1,
             }}
           >
-            {navigationItems()
+            {navigationItems(user)
               .filter(item => {
                 return item.mobile === "first";
               })
@@ -394,15 +414,15 @@ const MainNavigation = ({
                   label={item.name}
                   onClick={() => {
                     const obj = mobileNavigationProps(
-                      navigationItems(),
+                      navigationItems(user),
                       item.path,
                     );
                     mobileClickedSubpage = obj.mobileClickedSubpage;
                     mobileClickedChild = obj.mobileClickedChild;
 
-                    if (obj.mobileSubNav) {
-                      setMobileSubNav(obj.mobileSubNav);
-                      handleProjectMobileSubNav(true);
+                    if (obj.mobileSubNavList) {
+                      setMobileSubNavList(obj.mobileSubNavList);
+                      handleMobileSubNav(true);
                     } else {
                       navigate(item.path);
                     }
@@ -411,41 +431,103 @@ const MainNavigation = ({
                   icon={item.icon(currentPage === item.id)}
                 />
               ))}
+            <BottomNavigationAction
+              label="Show more"
+              onClick={() => {
+                setIsMobileMenuExpanded(true);
+                setIsDelayedMobileMenuExpanded(true);
+              }}
+              sx={{
+                opacity: isMobileMenuExpanded ? "0" : "100",
+                cursor: isMobileMenuExpanded ? "none" : "pointer",
+              }}
+              icon={<MoreHoriz currentPage={false} />}
+            />
+          </BottomNavigation>
+          {/* Second row */}
+          <BottomNavigation
+            showLabels
+            sx={{
+              height: "75px",
+              background: "#fff",
+              padding: "0px 0px 8px 0px",
+              transition: "all ",
+            }}
+          >
+            {navigationItems(user)
+              .filter(item => {
+                return item.mobile === "second";
+              })
+              .map(item => (
+                <BottomNavigationAction
+                  key={item.name}
+                  label={item.name}
+                  onClick={() => {
+                    const obj = mobileNavigationProps(
+                      navigationItems(user),
+                      item.path,
+                    );
+                    mobileClickedSubpage = obj.mobileClickedSubpage;
+                    mobileClickedChild = obj.mobileClickedChild;
+
+                    if (obj.mobileSubNav) {
+                      setMobileSubNav(obj.mobileSubNav);
+                      handleMobileSubNav(true);
+                    } else {
+                      navigate(item.path);
+                    }
+                  }}
+                  highlightlabel={(currentPage === item.id).toString()}
+                  icon={item.icon(currentPage === item.id)}
+                />
+              ))}
+
+            <BottomNavigationAction
+              label="Show less"
+              onClick={() => {
+                setIsMobileMenuExpanded(false);
+              }}
+              sx={{
+                opacity: !isDelayedMobileMenuExpanded ? "0" : "100",
+                cursor: !isDelayedMobileMenuExpanded ? "none" : "pointer",
+              }}
+              icon={<MoreHoriz currentPage={false} />}
+            />
           </BottomNavigation>
         </Paper>
       ) : (
         <Drawer
           variant="permanent"
           anchor="left"
-          open={projectMainNav}
+          open={mainNav}
           issmallscreen={isSmallScreen.toString()}
           ispageloaded={pageLoaded.toString()}
           onMouseEnter={() => {
-            handleProjectMainNav(true);
+            handleMainNav(true);
           }}
           onMouseLeave={() => {
-            handleProjectMainNav(false);
+            handleMainNav(false);
           }}
           sx={{ zIndex: 3000 }}
         >
           <Toolbar sx={{ height: "72px" }} />
           <List
             sx={{
-              padding: projectMainNav ? "16px 8px 0px 8px" : "16px 0px 0px 8px",
+              padding: mainNav ? "16px 8px 0px 8px" : "16px 0px 0px 8px",
             }}
           >
-            {navigationItems().map(item => (
+            {navigationItems(user).map(item => (
               <ListItem key={item.name} disablePadding>
                 <CustomizedListItemButton
                   className="main-navi"
-                  projectmainnav={projectMainNav.toString()}
+                  mainnav={mainNav.toString()}
                   selected={currentPage === item.id}
                   onClick={() => {
                     if (item.target === "new") {
                       window.open(item.path, "_blank", "noreferrer");
                     } else if (item.path) {
                       navigate(item.path);
-                      handleProjectMainNav(false);
+                      handleMainNav(false);
                     } else if (item.action) {
                       item.action();
                     }
@@ -453,7 +535,7 @@ const MainNavigation = ({
                 >
                   <CustomizedListItemIcon
                     selected={currentPage === item.id}
-                    open={projectMainNav}
+                    open={mainNav}
                     sx={{
                       minWidth: 0,
                       mr: "24px",
@@ -483,11 +565,11 @@ const MainNavigation = ({
           currentSubpage={currentSubpage}
           currentChild={currentChild}
           subNav={subNav}
-          projectMobileSubNav={projectMobileSubNav}
-          setProjectMobileSubNav={setProjectMobileSubNav}
+          mobileSubNav={mobileSubNav}
+          setMobileSubNav={setMobileSubNav}
           mobileClickedSubpage={mobileClickedSubpage}
           mobileClickedChild={mobileClickedChild}
-          mobileSubNav={mobileSubNav}
+          mobileSubNavList={mobileSubNavList}
         />
       
       {/* eslint-enable */}
@@ -495,10 +577,11 @@ const MainNavigation = ({
   );
 };
 MainNavigation.propTypes = {
-  projectMainNav: PropTypes.bool.isRequired,
-  handleProjectMainNav: PropTypes.func.isRequired,
-  projectMobileSubNav: PropTypes.bool.isRequired,
-  handleProjectMobileSubNav: PropTypes.func.isRequired,
-  setProjectMobileSubNav: PropTypes.func.isRequired,
+  mainNav: PropTypes.bool.isRequired,
+  handleMainNav: PropTypes.func.isRequired,
+  mobileSubNav: PropTypes.bool.isRequired,
+  handleMobileSubNav: PropTypes.func.isRequired,
+  setMobileSubNav: PropTypes.func.isRequired,
+  user: PropTypes.shape().isRequired,
 };
 export default MainNavigation;

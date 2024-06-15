@@ -8,12 +8,12 @@ import PropTypes from "prop-types";
 
 const FormSelect = ({
   name,
-  variant,
+  variant = "standard",
   control,
   label,
-  options,
-  disabled,
-  customOnChange,
+  options = [],
+  disabled = false,
+  customOnChange = () => {},
 }) => {
   const generateOptions = () => {
     return (
@@ -81,10 +81,4 @@ FormSelect.propTypes = {
   customOnChange: PropTypes.func,
 };
 
-FormSelect.defaultProps = {
-  variant: "standard",
-  disabled: false,
-  options: [],
-  customOnChange: () => {},
-};
 export default FormSelect;

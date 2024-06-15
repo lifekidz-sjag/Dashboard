@@ -5,43 +5,51 @@ import {
   useNavigate,
   useOutletContext,
 } from "react-router-dom";
-import { Box, Fab, Typography, useMediaQuery } from "@mui/material";
+import {
+  Box,
+  Fab,
+  IconButton,
+  Paper,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import PropTypes from "prop-types";
 
 import Appbar from "../components/Appbar";
 import Add from "../components/GoogleIcons/Add";
+import ArrowBack from "../components/GoogleIcons/ArrowBack";
 import Download from "../components/GoogleIcons/Download";
+import Search from "../components/GoogleIcons/Search";
 import MainNavigation from "../components/MainNavigation";
-// import ProjectMainNavigation from "../components/ProjectMainNavigation";
 import { useAuth } from "../contexts/auth";
 
 const RootLayout = () => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
-
   const location = useLocation();
-  const { isAuthenticated, checkAuthenticated, user, getUserExecute } =
-    useAuth();
   const navigate = useNavigate();
 
-  const [accountMainNav, setAccountMainNav] = useState(false);
+  // Authetication stuffs
+  const { isAuthenticated, checkAuthenticated, user, getUserExecute } =
+    useAuth();
 
-  const [projectMainNav, setProjectMainNav] = useState(false);
-  const handleProjectMainNav = bool => {
-    setProjectMainNav(bool);
+  // Local state
+  const [mainNav, setMainNav] = useState(false);
+  const handleMainNav = bool => {
+    setMainNav(bool);
   };
 
-  const [projectMobileSubNav, setProjectMobileSubNav] = useState(false);
-  const handleProjectMobileSubNav = bool => {
-    setProjectMobileSubNav(bool);
+  const [mobileSubNav, setMobileSubNav] = useState(false);
+  const handleMobileSubNav = bool => {
+    setMobileSubNav(bool);
   };
 
   const props = useOutletContext();
-  const { project, actionBar, setActionBar } = props;
-
+  const { loader, actionBarDefault, actionBar, setActionBar } = props;
   const ab = actionBar;
   const sab = setActionBar;
+
   useEffect(() => {
     if (!checkAuthenticated()) {
       navigate("/user");
@@ -51,35 +59,135 @@ const RootLayout = () => {
   }, [isAuthenticated, user]);
 
   useEffect(() => {
-    props.loader.start();
+    sab(actionBarDefault);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    loader.start();
   }, []);
 
   useEffect(() => {
     if (user && user.userId) {
       // do something
-      props.loader.start();
+      loader.start();
     }
 
     return () => {};
   }, [user]);
+
+  // Search Panel
+  const renderSearchButton = () => {
+    if (ab.search.enabled) {
+      return (
+        !ab.search.isOpen &&
+        ab.search.display && (
+          <Fab
+            variant="unboxed"
+            onClick={() => {
+              sab({
+                search: {
+                  ...ab.search,
+                  isOpen: true,
+                },
+              });
+            }}
+          >
+            <Search color="inherit" />
+          </Fab>
+        )
+      );
+    }
+    return null;
+  };
+
+  const renderSearchPanel = () => {
+    if (ab.search.enabled) {
+      return (
+        ab.search.isOpen && (
+          <Box
+            component="form"
+            noValidate
+            onSubmit={ab.search.submitFunc(ab.search.searchFunc)}
+            sx={{
+              position: "sticky",
+              top: "72px",
+              height: "auto",
+              zIndex: 2,
+              left: "24px",
+              right: "24px",
+            }}
+          >
+            <Paper
+              elevation={6}
+              sx={{
+                background: "#FFFFFF",
+                padding: { xs: "16px", md: "8px 16px" },
+                borderRadius: "16px",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: "16px",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                }}
+              >
+                <IconButton
+                  sx={{ marginTop: "4px" }}
+                  onClick={() => {
+                    sab({
+                      ...ab,
+                      title: {
+                        ...ab.title,
+                        display: true,
+                      },
+                      description: {
+                        ...ab.description,
+                        display: true,
+                      },
+
+                      search: {
+                        ...ab.search,
+                        isOpen: false,
+                      },
+                    });
+                    ab.search.backFunc();
+                  }}
+                >
+                  <ArrowBack color="inherit" />
+                </IconButton>
+                {ab.search.renderContent()}
+                <IconButton type="submit" sx={{ marginTop: "4px" }}>
+                  <Search color="inherit" />
+                </IconButton>
+              </Box>
+            </Paper>
+          </Box>
+        )
+      );
+    }
+    return null;
+  };
 
   return (
     isAuthenticated &&
     user && (
       <Box
         sx={{
-          opacity: props.loader.loading === -1 ? "0" : "1",
+          opacity: loader.loading === -1 ? "0" : "1",
           transition: "var(--trans)",
           backgroundColor: "#E9F2FF",
         }}
       >
-        <Appbar loader={props.loader} />
+        <Appbar loader={loader} />
         <MainNavigation
-          projectMainNav={projectMainNav}
-          handleProjectMainNav={handleProjectMainNav}
-          projectMobileSubNav={projectMobileSubNav}
-          handleProjectMobileSubNav={handleProjectMobileSubNav}
-          setProjectMobileSubNav={setProjectMobileSubNav}
+          mainNav={mainNav}
+          handleMainNav={handleMainNav}
+          mobileSubNav={mobileSubNav}
+          handleMobileSubNav={handleMobileSubNav}
+          setMobileSubNav={setMobileSubNav}
+          user={user}
         />
 
         <Box
@@ -99,7 +207,8 @@ const RootLayout = () => {
               padding: "104px 24px 120px",
             }}
           >
-            {!ab.search.isOpen && ab.multiSelect.selected === 0 && (
+            {renderSearchPanel()}
+            {!ab.search.isOpen && (
               <>
                 <Box sx={{ padding: { xs: "0", md: "0px" } }}>
                   {ab.title.enabled && (
@@ -144,35 +253,18 @@ const RootLayout = () => {
                 <Box
                   sx={{
                     display: "flex",
-                    justifyContent: "space-between",
+                    justifyContent: "flex-end",
                     alignItems: "center",
                     position: "relative",
-                    padding: { xs: "0 24px", md: "0px" },
+                    padding: "0px",
                   }}
                 >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      width: "100%",
-                      alignItems: "flex-end",
-                      flex: 1,
-                    }}
-                  >
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      {/* {renderViewButton()}
-                      {renderFileTypeButton()}
-                      <Box sx={{ marginLeft: "8px" }}>
-                        {renderSearchButton()}
-                      </Box> */}
-                    </Box>
-                  </Box>
+                  {renderSearchButton()}
 
                   {ab.fab.enabled &&
                     (ab.fab.export ? (
                       <Fab
                         variant="contained"
-                        isSmallScreen
                         onClick={e => {
                           ab.fab.action(e);
                         }}
@@ -189,7 +281,6 @@ const RootLayout = () => {
                     ) : (
                       <Fab
                         variant="contained"
-                        isSmallScreen
                         aria-label="add"
                         onClick={e => {
                           ab.fab.action(e);
@@ -216,8 +307,9 @@ const RootLayout = () => {
               <Outlet
                 context={{
                   ...props,
-                  projectMainNav,
-                  handleProjectMainNav,
+                  user,
+                  mainNav,
+                  handleMainNav,
 
                   contentPadding: {
                     padding: { xs: "0px 36px 164px 36px", md: "0px" },
@@ -233,9 +325,8 @@ const RootLayout = () => {
 };
 RootLayout.propTypes = {
   loader: PropTypes.shape(),
-};
-
-RootLayout.defaultProps = {
-  loader: {},
+  actionBar: PropTypes.shape(),
+  actionBarDefault: PropTypes.shape(),
+  setActionBar: PropTypes.func,
 };
 export default RootLayout;

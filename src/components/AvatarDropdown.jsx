@@ -98,10 +98,10 @@ const AvatarDropdown = () => {
               backgroundColor: user.colorProfile,
             }}
           >
-            {user.username[0].toUpperCase()}
+            {user.name[0].toUpperCase()}
           </Avatar>
         }
-        label={user.username}
+        label={user.name}
       />
       <Menu
         // TODO

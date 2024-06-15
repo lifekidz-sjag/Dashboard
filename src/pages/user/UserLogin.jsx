@@ -2,12 +2,15 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useOutletContext } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Grid, Typography } from "@mui/material";
 import { useRive, useStateMachineInput } from "rive-react";
 import * as yup from "yup";
 
 import { FormTextField } from "../../components/FormInput";
-import ArrowForwardIcon from "../../components/GoogleIcons/ArrowForward";
+import ArrowForward from "../../components/GoogleIcons/ArrowForward";
+import ChildCare from "../../components/GoogleIcons/ChildCare";
+import School from "../../components/GoogleIcons/School";
+import ShieldPerson from "../../components/GoogleIcons/ShieldPerson";
 import useAuth from "../../contexts/auth/useAuth";
 
 const UserLogin = () => {
@@ -19,15 +22,17 @@ const UserLogin = () => {
   // 1. User Login Schema
   // 2. User OTP Schema
   const userLoginSchema = yup.object({
-    username: yup.string().required("Please enter your name"),
+    name: yup.string().required("Please enter your name"),
     password: yup.string().required("Please enter your phone number"),
+    role: yup.string(),
   });
 
   // React Hook Form Set Up
-  const { control, handleSubmit, watch } = useForm({
+  const { control, handleSubmit, watch, setValue } = useForm({
     defaultValues: {
-      username: "",
+      name: "",
       password: "",
+      role: "",
     },
     resolver: yupResolver(userLoginSchema),
   });
@@ -35,7 +40,7 @@ const UserLogin = () => {
   // API Setup
   const { SJAGLogin } = useAuth();
   const onSubmit = async data => {
-    SJAGLogin({ username: data.username, password: data.password });
+    SJAGLogin({ name: data.name, password: data.password, role: data.role });
   };
 
   useEffect(() => {
@@ -82,8 +87,8 @@ const UserLogin = () => {
     setHandUp(false);
     setCheck(true);
     let nbChars = 0;
-    if (watch("username")) {
-      nbChars = parseFloat(watch("username").split("").length);
+    if (watch("name")) {
+      nbChars = parseFloat(watch("name").split("").length);
     }
 
     const ratio = nbChars / parseFloat(41);
@@ -96,7 +101,7 @@ const UserLogin = () => {
 
   useEffect(() => {
     setLook();
-  }, [watch("username")]);
+  }, [watch("name")]);
 
   const triggerSuccess = () => {
     if (stateSuccess) {
@@ -129,41 +134,82 @@ const UserLogin = () => {
           />
         </Box>
       </Box>
-      <Box component="form" noValidate onSubmit={handleSubmit(onSubmit)}>
-        <FormTextField
-          required
-          name="username"
-          control={control}
-          label="Name"
-          sx={{ marginBottom: "24px" }}
-        />
-        <FormTextField
-          required
-          name="password"
-          type="password"
-          control={control}
-          label="Phone Number"
-          customOnChange={() => {
-            setHandUp(true);
-          }}
-        />
+      {watch("role") === "" ? (
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Button
+              fullWidth
+              variant="contained"
+              endIcon={<ShieldPerson fontSize="32px" color="white" />}
+              onClick={() => {
+                setValue("role", "admin");
+              }}
+            >
+              Login as admin
+            </Button>
+          </Grid>
+          <Grid item xs={12}>
+            <Button
+              fullWidth
+              variant="contained"
+              endIcon={<School fontSize="32px" color="white" />}
+              onClick={() => {
+                setValue("role", "teacher");
+              }}
+            >
+              Login as teacher
+            </Button>
+          </Grid>
+          <Grid item xs={12}>
+            <Button
+              fullWidth
+              variant="contained"
+              endIcon={<ChildCare fontSize="32px" color="white" />}
+              onClick={() => {
+                setValue("role", "children");
+              }}
+            >
+              Login as student
+            </Button>
+          </Grid>
+        </Grid>
+      ) : (
+        <Box component="form" noValidate onSubmit={handleSubmit(onSubmit)}>
+          <FormTextField
+            required
+            name="name"
+            control={control}
+            label="Name"
+            sx={{ marginBottom: "24px" }}
+          />
+          <FormTextField
+            required
+            name="password"
+            type="password"
+            control={control}
+            label="Phone Number"
+            customOnChange={() => {
+              setHandUp(true);
+            }}
+          />
 
-        <Box
-          sx={{
-            marginTop: "32px",
-            display: "flex",
-            justifyContent: "flex-end",
-          }}
-        >
-          <Button
-            type="submit"
-            variant="contained"
-            endIcon={<ArrowForwardIcon />}
+          <Box
+            sx={{
+              marginTop: "32px",
+              display: "flex",
+              justifyContent: "flex-end",
+            }}
           >
-            Login
-          </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              endIcon={<ArrowForward />}
+            >
+              Login
+            </Button>
+          </Box>
         </Box>
-      </Box>
+      )}
     </Box>
   );
 };

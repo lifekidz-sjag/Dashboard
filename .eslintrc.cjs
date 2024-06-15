@@ -14,6 +14,7 @@ module.exports = {
   settings: { react: { version: "18.2" } },
   plugins: ["react", "prettier", "simple-import-sort", "react-refresh"],
   rules: {
+    "react/require-default-props": ["error", { "functions": "ignore" }],
     "react-hooks/exhaustive-deps": "off",
     "react-refresh/only-export-components": [
       "warn",

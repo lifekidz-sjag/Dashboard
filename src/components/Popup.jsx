@@ -14,14 +14,14 @@ import Close from "./GoogleIcons/Close";
 const Popup = props => {
   const {
     popupButton,
-    children,
+    children = null,
     title,
     popup,
     cancel,
     isOpen,
-    onClose,
-    type,
-    zIndex,
+    onClose = null,
+    type = null,
+    zIndex = 2002,
   } = props;
   const headerWithBorder = {
     borderBottom: "1px solid #E8E8E8",
@@ -179,13 +179,6 @@ Popup.propTypes = {
   onClose: PropTypes.func,
   type: PropTypes.string,
   zIndex: PropTypes.number,
-};
-
-Popup.defaultProps = {
-  onClose: null,
-  children: null,
-  type: null,
-  zIndex: 2002,
 };
 
 export default Popup;

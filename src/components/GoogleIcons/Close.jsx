@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import "./GoogleIcons.css";
 
 const Close = props => {
-  const { fontSize, color } = props;
+  const { fontSize = "24px", color = "white" } = props;
   return (
     <span className="material-symbols-outlined" style={{ fontSize, color }}>
       close
@@ -14,11 +14,6 @@ const Close = props => {
 Close.propTypes = {
   fontSize: PropTypes.string,
   color: PropTypes.string,
-};
-
-Close.defaultProps = {
-  fontSize: "20px",
-  color: "white",
 };
 
 export default Close;

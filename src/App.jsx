@@ -2,11 +2,10 @@ import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
 import { AuthProvider } from "./contexts/auth";
 import useSJAG from "./hooks/useSJAG";
-import AdminLayout from "./layouts/AdminLayout";
 import ReportsLayout from "./layouts/ReportsLayout";
 import RootLayout from "./layouts/RootLayout";
 import UserLayout from "./layouts/UserLayout";
-import AdminLayoutLanding from "./pages/AdminLayoutLanding";
+import Classes from "./pages/Classes";
 import Dashboard from "./pages/Dashboard";
 import Error404 from "./pages/Error404";
 import ReportsLayoutLanding from "./pages/ReportsLayoutLanding";
@@ -65,33 +64,24 @@ const router = createBrowserRouter(
               element: <Dashboard />,
             },
             {
-              path: "manage",
+              path: "admins",
               element: <Dashboard />,
             },
             {
-              path: "admin",
-              element: <AdminLayout />,
-              children: [
-                {
-                  index: true,
-                  element: <AdminLayoutLanding />,
-                },
-                {
-                  index: true,
-                  path: "teachers",
-                  element: <Dashboard />,
-                },
-                {
-                  index: true,
-                  path: "classes",
-                  element: <Dashboard />,
-                },
-                {
-                  index: true,
-                  path: "students",
-                  element: <Dashboard />,
-                },
-              ],
+              path: "classes",
+              element: <Classes />,
+            },
+            {
+              path: "teachers",
+              element: <Dashboard />,
+            },
+            {
+              path: "students",
+              element: <Dashboard />,
+            },
+            {
+              path: "admins",
+              element: <Dashboard />,
             },
             {
               path: "reports",

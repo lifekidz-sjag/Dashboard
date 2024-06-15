@@ -1,19 +1,21 @@
 import { useCallback, useState } from "react";
 
 import Confirm from "../components/Confirm";
+import NoPermissionConfirm from "../components/NoPermissionConfirm";
 import Popup from "../components/Popup";
 import Sidebar from "../components/Sidebar";
 import Snackbar from "../components/Snackbar";
 
 import useConfirm from "./useConfirm";
 import useLoader from "./useLoader";
+import useNoPermissionConfirm from "./useNoPermissionConfirm";
 import usePaging from "./usePaging";
 import usePopup from "./usePopup";
 import useSidebar from "./useSidebar";
 import useSnackbar from "./useSnackbar";
 
-const useXTOPIA = () => {
-  const [actionBar, setActionBarDefault] = useState({
+const useSJAG = () => {
+  const actionBarDefault = {
     title: { enabled: false, name: "", display: false },
     description: { enabled: false, name: "", display: false },
     fab: {
@@ -21,13 +23,6 @@ const useXTOPIA = () => {
       enabled: false,
       display: false,
       action: () => {},
-    },
-    breadcrumb: {
-      enabled: false,
-      display: false,
-      homeClick: () => {},
-      nextLevelClick: () => {},
-      items: [],
     },
     search: {
       enabled: false,
@@ -39,18 +34,8 @@ const useXTOPIA = () => {
       submitFunc: () => {},
       backFunc: () => {},
     },
-    multiSelect: {
-      enabled: false,
-      display: false,
-      isOpen: false,
-      selected: 0,
-    },
-    viewButton: {
-      enabled: false,
-      display: false,
-      selected: "list",
-    },
-  });
+  };
+  const [actionBar, setActionBarDefault] = useState(actionBarDefault);
 
   const setActionBar = useCallback(
     params => {
@@ -65,6 +50,7 @@ const useXTOPIA = () => {
   );
 
   const confirm = useConfirm();
+  const noPermissionConfirm = useNoPermissionConfirm();
 
   const sidebar = useSidebar();
   const snackbar = useSnackbar();
@@ -78,6 +64,7 @@ const useXTOPIA = () => {
   const render = () => {
     return (
       <>
+        <NoPermissionConfirm {...noPermissionConfirm} />
         <Confirm {...confirm} />
         <Snackbar {...snackbar} />
         <Sidebar {...sidebar} />
@@ -91,14 +78,15 @@ const useXTOPIA = () => {
     sharedState: {
       loader,
       confirm,
-      sideBar: sidebar,
+      sidebar,
       snackbar,
       popup,
       paging: useSetPaging,
+      actionBarDefault,
       actionBar,
       setActionBar,
     },
   };
 };
 
-export default useXTOPIA;
+export default useSJAG;

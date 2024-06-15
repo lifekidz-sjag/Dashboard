@@ -85,8 +85,9 @@ const AuthProvider = ({ children, sharedState }) => {
   const SJAGLogin = data => {
     if (data) {
       loginExecute({
-        username: data.username,
+        name: data.name,
         password: data.password,
+        role: data.role,
       });
     }
   };
@@ -141,7 +142,7 @@ const AuthProvider = ({ children, sharedState }) => {
     if (getUserData) {
       setUser({
         ...getUserData,
-        colorProfile: stringToHslColor(getUserData.username, 40, 60),
+        colorProfile: stringToHslColor(getUserData.name, 40, 60),
       });
     }
   }, [getUserData]);
@@ -225,15 +226,20 @@ const AuthProvider = ({ children, sharedState }) => {
         // eslint-disable-next-line no-underscore-dangle
         config._retry = true;
 
-        const newAccessToken = await SJAGRefreshAccessToken();
-        if (!newAccessToken) {
-          logoutExecute({
-            refreshToken: retrieveAuthKeyValue("refreshToken"),
-          });
+        if (config.url !== "Auth/Refresh1") {
+          const newAccessToken = await SJAGRefreshAccessToken();
+          if (!newAccessToken) {
+            logoutExecute({
+              refreshToken: retrieveAuthKeyValue("refreshToken"),
+            });
 
-          reset(["accessToken", "refreshToken", "expiration"]);
+            reset(["accessToken", "refreshToken", "expiration"]);
 
-          window.location.href = `/Dashboard/user/login?redirectUrl=${window.location.pathname}`;
+            window.location.href = `/Dashboard/user/login?redirectUrl=${window.location.pathname.replace(
+              "Dashboard",
+              "",
+            )}`;
+          }
         }
 
         return axios(config);

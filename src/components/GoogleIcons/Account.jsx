@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import "./GoogleIcons.css";
 
 const AccountIcon = props => {
-  const { fontSize, color, currentpage } = props;
+  const { fontSize = "24px", color = "inherit", currentpage = "false" } = props;
   return (
     <span
       className={
@@ -22,12 +22,6 @@ AccountIcon.propTypes = {
   fontSize: PropTypes.string,
   color: PropTypes.string,
   currentpage: PropTypes.string,
-};
-
-AccountIcon.defaultProps = {
-  fontSize: "24px",
-  color: "inherit",
-  currentpage: "false",
 };
 
 export default AccountIcon;

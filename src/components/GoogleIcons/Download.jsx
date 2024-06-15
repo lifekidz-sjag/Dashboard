@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import "./GoogleIcons.css";
 
 const Download = props => {
-  const { fontSize, color } = props;
+  const { fontSize = "24px", color = "white" } = props;
   return (
     <span className="material-symbols-outlined" style={{ fontSize, color }}>
       download
@@ -14,11 +14,6 @@ const Download = props => {
 Download.propTypes = {
   fontSize: PropTypes.string,
   color: PropTypes.string,
-};
-
-Download.defaultProps = {
-  fontSize: "20px",
-  color: "white",
 };
 
 export default Download;

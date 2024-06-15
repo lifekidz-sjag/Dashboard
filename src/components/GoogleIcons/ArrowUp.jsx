@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import "./GoogleIcons.css";
 
 const ArrowUp = props => {
-  const { fontSize, color } = props;
+  const { fontSize = "24px", color = "white" } = props;
   return (
     <span className="material-symbols-outlined" style={{ fontSize, color }}>
       keyboard_arrow_up
@@ -14,11 +14,6 @@ const ArrowUp = props => {
 ArrowUp.propTypes = {
   fontSize: PropTypes.string,
   color: PropTypes.string,
-};
-
-ArrowUp.defaultProps = {
-  fontSize: "20px",
-  color: "white",
 };
 
 export default ArrowUp;

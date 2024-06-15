@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import "./GoogleIcons.css";
 
 const Register = props => {
-  const { fontSize, color, currentpage } = props;
+  const { fontSize = "24px", color = "inherit", currentpage = "false" } = props;
   return (
     <span
       className={
@@ -22,12 +22,6 @@ Register.propTypes = {
   fontSize: PropTypes.string,
   color: PropTypes.string,
   currentpage: PropTypes.string,
-};
-
-Register.defaultProps = {
-  fontSize: "24px",
-  color: "inherit",
-  currentpage: "false",
 };
 
 export default Register;
