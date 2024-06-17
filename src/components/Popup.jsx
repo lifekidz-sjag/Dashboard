@@ -50,7 +50,6 @@ const Popup = props => {
         return "xl"; // 1530px
     }
   };
-  /* eslint-disable */
   return (
     <Box>
       <Dialog
@@ -59,13 +58,13 @@ const Popup = props => {
         disableEscapeKeyDown
         onBackdropClick={() => {}}
         fullWidth
-        maxWidth={getWidth(type)}
-        PaperProps={{ sx: {  background: "white" } }}
-        sx={{ zIndex: zIndex }}
+        maxWidth="xs"
+        PaperProps={{ sx: { background: "white" } }}
+        sx={{ zIndex }}
       >
-        {(type !== "OTPLayout" || type !== "AddMedia")  && (
+        {(type !== "OTPLayout" || type !== "AddMedia") && (
           <DialogTitle
-            className="popup"          
+            className="popup"
             style={
               type === "headerBorder" ? headerWithBorder : headerWithoutBorder
             }
@@ -85,20 +84,6 @@ const Popup = props => {
                   alignItems: "center",
                 }}
               >
-                <Button
-                  className="XyanButton"
-                  onClick={null}
-                  variant="contained"
-                  style={{
-                    display:
-                      popup.position && popup.position !== "bottom"
-                        ? "block"
-                        : "none",
-                  }}
-                  sx={{ borderRadius: "20px", fontWeight: "600" }}
-                >
-                  {popup.text}
-                </Button>
                 <IconButton
                   sx={{ marginRight: "-16px", marginLeft: "16px" }}
                   aria-label="close"
@@ -108,9 +93,7 @@ const Popup = props => {
                     }
                   }}
                 >
-                  <Close
-                    sx={{ fontSize: "30px", strokeWidth: 1, stroke: "#ffffff" }}
-                  />
+                  <Close color="inherit" />
                 </IconButton>
               </Box>
             </Box>
@@ -119,17 +102,12 @@ const Popup = props => {
 
         <DialogContent
           sx={{
-            padding: "0px 40px",
+            padding: "0px 0px 16px !important",
             display: "flex",
+            justifyContent: "center",
             alignItems: "start",
           }}
-          style={
-            type === "headerBorder"
-              ? contentWithoutSpacing
-              : type === "OTPLayout"
-                ? contentWithFullSpacing
-                : contentWithSpacing
-          }
+          style={contentWithFullSpacing}
         >
           {children}
         </DialogContent>

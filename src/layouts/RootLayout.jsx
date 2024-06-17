@@ -16,6 +16,8 @@ import {
 import { useTheme } from "@mui/material/styles";
 import PropTypes from "prop-types";
 
+import ClockIn from "../assets/time.png";
+import ClockOut from "../assets/time-out.png";
 import Appbar from "../components/Appbar";
 import Add from "../components/GoogleIcons/Add";
 import ArrowBack from "../components/GoogleIcons/ArrowBack";
@@ -259,6 +261,50 @@ const RootLayout = () => {
                     padding: "0px",
                   }}
                 >
+                  {ab.fabClock.enabled && (
+                    <Box sx={{ marginRight: "8px" }}>
+                      <Fab
+                        variant="clockin"
+                        aria-label="clock"
+                        onClick={e => {
+                          ab.fabClock.actionClockIn(e);
+                        }}
+                        sx={{
+                          position: isSmallScreen ? "fixed" : "relative",
+                          top: isSmallScreen ? "auto" : "auto",
+                          right: isSmallScreen ? "120px" : "auto",
+                          bottom: isSmallScreen ? "96px" : "auto",
+                          marginLeft: "8px",
+                        }}
+                      >
+                        <Box
+                          component="img"
+                          src={ClockIn}
+                          sx={{ width: "16px", height: "16px" }}
+                        />
+                      </Fab>
+                      <Fab
+                        variant="clockout"
+                        aria-label="clock"
+                        onClick={e => {
+                          ab.fabClock.actionClockOut(e);
+                        }}
+                        sx={{
+                          position: isSmallScreen ? "fixed" : "relative",
+                          top: isSmallScreen ? "auto" : "auto",
+                          right: isSmallScreen ? "72px" : "auto",
+                          bottom: isSmallScreen ? "96px" : "auto",
+                          marginLeft: "8px",
+                        }}
+                      >
+                        <Box
+                          component="img"
+                          src={ClockOut}
+                          sx={{ width: "16px", height: "16px" }}
+                        />
+                      </Fab>
+                    </Box>
+                  )}
                   {renderSearchButton()}
 
                   {ab.fab.enabled &&

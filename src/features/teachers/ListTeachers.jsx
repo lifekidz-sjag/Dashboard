@@ -125,6 +125,7 @@ const ListTeachers = ({
             Phone: <b>{data.phone}</b>, Class:{" "}
             <b>
               {classes &&
+                classes.data &&
                 classes.data.filter(c => {
                   return c.id === data.class;
                 })[0].name}

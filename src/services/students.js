@@ -17,7 +17,7 @@ const useStudents = () => {
   ] = useAxios(
     {
       url: getStudentByNameEndpoint,
-      method: "POST",
+      method: "GET",
     },
     { manual: true },
   );

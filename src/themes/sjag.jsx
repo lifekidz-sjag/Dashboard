@@ -74,6 +74,28 @@ const generateFABCSS = props => {
 
   // Variant
   switch (props.ownerState.variant) {
+    case "clockin":
+      cssProps = {
+        ...cssProps,
+        background: props.theme.palette.success.main,
+        color: "#fff",
+        boxShadow: "none",
+        "&:hover": {
+          backgroundColor: props.theme.palette.success.dark,
+        },
+      };
+      break;
+    case "clockout":
+      cssProps = {
+        ...cssProps,
+        background: props.theme.palette.warning.main,
+        color: "#fff",
+        boxShadow: "none",
+        "&:hover": {
+          backgroundColor: props.theme.palette.warning.dark,
+        },
+      };
+      break;
     case "contained":
       cssProps = {
         ...cssProps,

@@ -19,7 +19,11 @@ const useSJAG = () => {
     title: { enabled: false, name: "", display: false },
     description: { enabled: false, name: "", display: false },
     fab: {
-      type: "",
+      enabled: false,
+      display: false,
+      action: () => {},
+    },
+    fabClock: {
       enabled: false,
       display: false,
       action: () => {},

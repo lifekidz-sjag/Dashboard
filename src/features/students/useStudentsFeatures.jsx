@@ -3,13 +3,15 @@ import { useEffect, useState } from "react";
 import useNewItemAnimation from "../../hooks/useNewItemAnimation";
 
 import useAddStudent from "./useAddStudent";
+import useClockInStudent from "./useClockInStudent";
+import useClockOutStudent from "./useClockOutStudent";
 import useDeleteStudent from "./useDeleteStudent";
 import useFetchStudents from "./useFetchStudents";
 import useSearchStudents from "./useSearchStudents";
 import useSortStudents from "./useSortStudents";
 import useUpdateStudent from "./useUpdateStudent";
 
-const useStudentsFeatures = ({ contextProps }) => {
+const useStudentsFeatures = ({ contextProps, popupClockIn, popupClockOut }) => {
   // DONE
   // List
   // Add
@@ -23,6 +25,7 @@ const useStudentsFeatures = ({ contextProps }) => {
     snackbar,
     sidebar,
     confirm,
+    popup,
     noPermissionConfirm,
     paging,
     setActionBar,
@@ -98,6 +101,21 @@ const useStudentsFeatures = ({ contextProps }) => {
     sharedFunction,
   });
 
+  const clockInStudent = useClockInStudent({
+    popupClockIn,
+    loader,
+    snackbar,
+    sharedFunction,
+  });
+
+  const clockOutStudent = useClockOutStudent({
+    popupClockOut,
+    loader,
+    popup,
+    snackbar,
+    sharedFunction,
+  });
+
   // dependencies
   useEffect(() => {
     setActionBar({
@@ -120,6 +138,8 @@ const useStudentsFeatures = ({ contextProps }) => {
       updateStudent,
       deleteStudent,
       newItemAnimate,
+      clockInStudent,
+      clockOutStudent,
     },
     state: {
       searchStatus,

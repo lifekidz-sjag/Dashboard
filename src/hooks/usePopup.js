@@ -48,6 +48,7 @@ const usePopup = () => {
     [setPopup],
   );
   return {
+    setPopup,
     popupContent: popup.popupContent,
     isOpen: popup.isOpen,
     open,
