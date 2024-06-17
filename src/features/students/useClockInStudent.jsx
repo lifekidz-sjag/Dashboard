@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Box } from "@mui/material";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { Html5QrcodeScanner, Html5QrcodeScanType } from "html5-qrcode";
 
 import useAttendances from "../../services/attendances";
 
@@ -43,10 +43,8 @@ const useClockInStudent = ({
         `You have clocked in ${studentInfo.studentName} successfully.`,
         false,
       );
-      document.getElementById("html5-qrcode-button-camera-stop").click();
-      setTimeout(() => {
-        popupClockIn.close();
-      }, 1000);
+      popupClockIn.close();
+
       setStudentInfo({});
     }
 
@@ -57,11 +55,8 @@ const useClockInStudent = ({
   useEffect(() => {
     if (clockInError) {
       loader.end();
-      document.getElementById("html5-qrcode-button-camera-stop").click();
-      setTimeout(() => {
-        popupClockIn.close();
-      }, 1000);
       setStudentInfo({});
+      popupClockIn.close();
 
       switch (clockInError.response.data) {
         case "INVALID_STUDENT_NAME":
@@ -99,6 +94,7 @@ const useClockInStudent = ({
             height: 250,
           },
           fps: 5,
+          supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
         });
 
         let isScanning = true;

@@ -244,21 +244,22 @@ body{
 	align-items: center;
 	justify-content: center;
 }
-#html5-qrcode-button-camera-permission, #html5-qrcode-button-camera-start, #html5-qrcode-button-camera-stop{
-	background-color:#0098EA;
+ */
+
+ #html5-qrcode-button-camera-permission, #html5-qrcode-button-camera-start, #html5-qrcode-button-camera-stop{
+	/* background-color:#0098EA;
 	border-radius:28px;
 	border: none;
 	cursor:pointer;
 	color:#ffffff;
 	font-family:Arial;
-	font-size:17px;
-	padding:16px 31px;
-	text-decoration:none;
+	font-size:16px;
+	padding: 15px 20px;
+	text-decoration:none; */
 	margin-bottom: 16px;
 }
 #html5-qrcode-button-camera-permission:hover, #html5-qrcode-button-camera-start:hover, #html5-qrcode-button-camera-stop:hover {
-	background-color:#2c397f;
-} */
-
+	/* background-color:#2c397f; */
+}
 
 
