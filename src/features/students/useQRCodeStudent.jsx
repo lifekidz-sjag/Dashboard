@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 
 import useStudents from "../../services/students";
 
-const useQRCodeStudent = ({ loader, confirm, snackbar }) => {
+const useQRCodeStudent = ({ loader, confirm }) => {
   // API Services
   const { getStudentByName } = useStudents();
 
@@ -46,13 +46,12 @@ const useQRCodeStudent = ({ loader, confirm, snackbar }) => {
         </Box>,
         {
           text: "DOWNLOAD",
-          onClick: async () => {
-            const link = document.createElement("a");
-            link.href = `https://drive.google.com/thumbnail?id=${gId}&sz=w200`;
-            link.download = "student_qr_code.jpg"; // You can set the default file name here
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+          onClick: () => {
+            window.open(
+              `https://drive.google.com/thumbnail?id=${gId}&sz=w200`,
+              "_blank",
+              "noopener,noreferrer",
+            );
           },
         },
         {
