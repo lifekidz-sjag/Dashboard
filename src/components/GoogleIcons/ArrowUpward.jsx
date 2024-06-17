@@ -1,3 +1,4 @@
+import { Box } from "@mui/material";
 import PropTypes from "prop-types";
 
 import "./GoogleIcons.css";
@@ -5,12 +6,13 @@ import "./GoogleIcons.css";
 const ArrowUpward = props => {
   const { fontSize = "24px", color = "white", className, sx = {} } = props;
   return (
-    <span
+    <Box
+      component="span"
       className={`material-symbols-outlined ${className}`}
-      style={{ fontSize, color, ...sx }}
+      sx={{ fontSize, color, ...sx }}
     >
       arrow_upward
-    </span>
+    </Box>
   );
 };
 

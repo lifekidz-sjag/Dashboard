@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 
-import useClasses from "../../services/classes";
+import useStudents from "../../services/students";
 
-const useDeleteClass = ({
+const useDeleteStudent = ({
   loader,
   sidebar,
   snackbar,
@@ -14,25 +14,25 @@ const useDeleteClass = ({
   sharedFunction,
 }) => {
   // API service
-  const { del: deleteClass } = useClasses();
+  const { del: deleteStudent } = useStudents();
   const [
-    { data: deleteClassData, error: deleteClassError },
-    deleteClassExecute,
-  ] = deleteClass;
+    { data: deleteStudentData, error: deleteStudentError },
+    deleteStudentExecute,
+  ] = deleteStudent;
 
   const onDelete = ({ id, name }) => {
     if (user && user.role.indexOf("admin") >= 0) {
       sharedFunction.setAction("Delete");
       sharedFunction.setId(id);
       confirm.open(
-        "Delete Class",
-        `Are you sure you want delete "${name}?"`,
+        "Delete Student",
+        `Are you sure you want to delete "${name}?"`,
         {
           text: "Delete",
           onClick: async () => {
             confirm.close();
             loader.start();
-            await deleteClassExecute(id);
+            await deleteStudentExecute(id);
           },
         },
         {
@@ -47,7 +47,7 @@ const useDeleteClass = ({
 
   // Side Effects
   useEffect(() => {
-    if (deleteClassData) {
+    if (deleteStudentData) {
       confirm.close();
       sharedFunction.setAction("deleteComplete");
       fetchList({
@@ -56,7 +56,7 @@ const useDeleteClass = ({
             ? sharedState.searchParams
             : { sort: "-updatedAt" },
         cb: () => {
-          snackbar.open("Class deleted successfully.", false);
+          snackbar.open("Student deleted successfully.", false);
           sharedFunction.setAction("View");
           sharedFunction.setId("");
         },
@@ -65,13 +65,13 @@ const useDeleteClass = ({
     }
 
     return () => {};
-  }, [deleteClassData]);
+  }, [deleteStudentData]);
 
   // Side Effects
   useEffect(() => {
-    if (deleteClassError) {
+    if (deleteStudentError) {
       loader.end();
-      switch (deleteClassError.response.data) {
+      switch (deleteStudentError.response.data) {
         case "INVALID_ID":
           snackbar.open("Something went wrong. Plaese try again later", true);
           break;
@@ -82,11 +82,11 @@ const useDeleteClass = ({
     }
     loader.end();
     return () => {};
-  }, [deleteClassError]);
+  }, [deleteStudentError]);
 
   useEffect(() => {
-    if (deleteClassError) {
-      switch (deleteClassError.response.data) {
+    if (deleteStudentError) {
+      switch (deleteStudentError.response.data) {
         case "ADMIN_ACTIONS_NOT_ALLOWED":
           snackbar.open("Something went wrong. Plaese try again later", true);
           break;
@@ -102,13 +102,13 @@ const useDeleteClass = ({
       loader.end();
     }
     return () => {};
-  }, [deleteClassError]);
+  }, [deleteStudentError]);
 
   return {
     onDelete,
   };
 };
 
-useDeleteClass.propTypes = {};
+useDeleteStudent.propTypes = {};
 
-export default useDeleteClass;
+export default useDeleteStudent;

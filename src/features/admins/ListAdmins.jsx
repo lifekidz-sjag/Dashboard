@@ -1,5 +1,6 @@
 import {
   Box,
+  Chip,
   Divider,
   IconButton,
   List,
@@ -18,8 +19,8 @@ import ArrowUpward from "../../components/GoogleIcons/ArrowUpward";
 import Delete from "../../components/GoogleIcons/Delete";
 import EditNote from "../../components/GoogleIcons/EditNote";
 
-const nameWidth = "0 0 210px";
-const descriptionWidth = "1";
+const nameWidth = "0 0 300px";
+const phoneWidth = "1";
 const lastModifiedWidth = "0 0 210px";
 const moreActionWidth = "0 0 40px";
 
@@ -46,7 +47,7 @@ const CustomizedDivider = styled(() => (
   <Divider orientation="vertical" variant="middle" flexItem />
 ))(() => ({}));
 
-const ListClasses = ({
+const ListAdmins = ({
   user,
   newItemAnimation,
   className,
@@ -119,7 +120,7 @@ const ListClasses = ({
               textOverflow: "ellipsis",
             }}
           >
-            Description: <b>{data.description}</b>
+            Phone: <b>{data.phone}</b>
           </Typography>
           <Typography
             variant="body2"
@@ -130,7 +131,6 @@ const ListClasses = ({
     }
     return null;
   };
-
   const renderMobileList = () => {
     if (Array.isArray(list)) {
       return null;
@@ -187,6 +187,23 @@ const ListClasses = ({
                   >
                     <Typography variant="body1">{item.name}</Typography>
                   </Box>
+                  {item.role === "superadmin" && (
+                    <Chip
+                      label="Superadmin"
+                      sx={{
+                        marginLeft: "8px",
+                        backgroundColor: theme.palette.success.main,
+                        color: theme.palette.secondary.contrastText,
+                        width: "auto",
+                        height: "24px",
+                        "& .MuiChip-label": {
+                          overflow: "unset !important",
+                          paddingX: "0px !important",
+                        },
+                        paddingX: "8px !important",
+                      }}
+                    />
+                  )}
                 </Box>
               </CustomizedListItemText>
             </CustomizedListItemButton>
@@ -278,7 +295,7 @@ const ListClasses = ({
                   },
                 }}
               >
-                {/* Class Name */}
+                {/* Admin Name */}
                 <CustomizedListItemText
                   disableTypography
                   sx={{ flex: nameWidth }}
@@ -302,14 +319,32 @@ const ListClasses = ({
                     >
                       <Typography variant="body1">{item.name}</Typography>
                     </Box>
+                    {item.role === "superadmin" && (
+                      <Chip
+                        label="Superadmin"
+                        sx={{
+                          marginLeft: "8px",
+                          backgroundColor: theme.palette.success.main,
+                          color: theme.palette.secondary.contrastText,
+                          width: "auto",
+                          height: "24px",
+                          "& .MuiChip-label": {
+                            overflow: "unset !important",
+                            paddingX: "0px !important",
+                          },
+                          paddingX: "8px !important",
+                        }}
+                      />
+                    )}
                   </Box>
                 </CustomizedListItemText>
-                {/* Class Description */}
+
+                {/* Admin Phone */}
                 <CustomizedListItemText
                   disableTypography
                   sx={{
-                    flex: descriptionWidth,
-                    display: { xs: "none", lg: "block" },
+                    flex: phoneWidth,
+                    display: { xs: "none", md: "block" },
                   }}
                 >
                   <Box
@@ -323,14 +358,14 @@ const ListClasses = ({
                       WebkitBoxOrient: "vertical",
                     }}
                   >
-                    <Typography variant="body1">{item.description}</Typography>
+                    <Typography variant="body1">{item.phone}</Typography>
                   </Box>
                 </CustomizedListItemText>
 
                 <CustomizedListItemText
                   sx={{
                     flex: lastModifiedWidth,
-                    display: { xs: "none", md: "block" },
+                    display: { xs: "none", lg: "block" },
                   }}
                 >
                   <Typography variant="body1" sx={{ fontSize: "14px" }}>
@@ -351,7 +386,10 @@ const ListClasses = ({
                 {/* Lock & More action */}
                 <CustomizedListItemText
                   disableTypography
-                  sx={{ flex: moreActionWidth }}
+                  sx={{
+                    flex: moreActionWidth,
+                    display: { xs: "none", md: "block" },
+                  }}
                 >
                   <Box>
                     <ActionDropdown
@@ -484,7 +522,7 @@ const ListClasses = ({
                       minHeight: "50px",
                     }}
                   >
-                    {/* Class name */}
+                    {/* Admin Name */}
                     <CustomizedListItemText
                       disableTypography
                       sx={{
@@ -532,13 +570,11 @@ const ListClasses = ({
                       </Box>
                     </CustomizedListItemText>
                     <CustomizedDivider />
-                    {/* Class Description */}
+                    {/* Admin Phone */}
                     <CustomizedListItemText
                       disableTypography
                       sx={{
-                        flex: descriptionWidth,
-                        display: { xs: "none", lg: "block" },
-
+                        flex: phoneWidth,
                         cursor: "pointer",
                         ".downward": {
                           transform: "rotate(180deg)",
@@ -551,14 +587,14 @@ const ListClasses = ({
                         },
                       }}
                     >
-                      <Typography variant="body1">Description</Typography>
+                      <Typography variant="body1">Phone</Typography>
                     </CustomizedListItemText>
                     <CustomizedDivider />
 
                     <CustomizedListItemText
                       sx={{
                         flex: lastModifiedWidth,
-                        display: { xs: "none", md: "block" },
+                        display: { xs: "none", lg: "block" },
                         cursor: "pointer",
                         ".downward": {
                           transform: "rotate(180deg)",
@@ -641,7 +677,7 @@ const ListClasses = ({
   );
 };
 
-ListClasses.propTypes = {
+ListAdmins.propTypes = {
   user: PropTypes.shape().isRequired,
   newItemAnimation: PropTypes.shape().isRequired,
   className: PropTypes.func.isRequired,
@@ -658,4 +694,4 @@ ListClasses.propTypes = {
   searchStatus: PropTypes.string.isRequired,
 };
 
-export default ListClasses;
+export default ListAdmins;

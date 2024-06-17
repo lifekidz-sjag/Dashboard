@@ -292,7 +292,7 @@ const navigationItems = user => {
       mobile: "second",
     },
   );
-  if (user.role === "superadmin") {
+  if (user.role.indexOf("admin") >= 0) {
     list.push(
       {
         id: "3e234c2f-4320-4941-8c7b-4b43d4f79266",

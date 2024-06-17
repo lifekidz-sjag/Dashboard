@@ -16,9 +16,9 @@ import * as yup from "yup";
 import formBg from "../../assets/form-bg.png";
 import { FormTextField } from "../../components/FormInput";
 import ArrowBack from "../../components/GoogleIcons/ArrowBack";
-import useClasses from "../../services/classes";
+import useAdmins from "../../services/admins";
 
-const useAddClass = ({
+const useAddAdmin = ({
   loader,
   sidebar,
   snackbar,
@@ -32,15 +32,14 @@ const useAddClass = ({
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   // API service
-  const { post: postClass } = useClasses();
-  const [{ data: postClassData, error: postClassError }, postClassExecute] =
-    postClass;
+  const { post: postAdmin } = useAdmins();
+  const [{ data: postAdminData, error: postAdminError }, postAdminExecute] =
+    postAdmin;
 
   // React Hook Form Set Up
-
-  const createClassSchema = yup.object({
-    name: yup.string().required("Please enter name of the class"),
-    description: yup.string().required("Please enter description of the class"),
+  const createAdminSchema = yup.object({
+    name: yup.string().required("Please enter name of the admin"),
+    phone: yup.string().required("Please enter phone number of the admin"),
   });
 
   const {
@@ -50,14 +49,16 @@ const useAddClass = ({
   } = useForm({
     defaultValues: {
       name: "",
-      description: "",
+      phone: "",
     },
-    resolver: yupResolver(createClassSchema),
+    resolver: yupResolver(createAdminSchema),
   });
 
   const handleAdd = async data => {
+    const modifiedData = data;
+    modifiedData.role = "admin";
     loader.start();
-    postClassExecute(data);
+    postAdminExecute(modifiedData);
   };
 
   const sideCreate = () => {
@@ -95,7 +96,7 @@ const useAddClass = ({
                   </IconButton>
                 </Box>
                 <Box sx={{ marginLeft: "8px" }}>
-                  <Typography variant="subtitle1">Create New Class</Typography>
+                  <Typography variant="subtitle1">Create New Admin</Typography>
                 </Box>
               </Box>
             </Box>
@@ -117,8 +118,8 @@ const useAddClass = ({
                     <Grid item xs={12}>
                       <FormTextField
                         required
-                        name="description"
-                        label="Description"
+                        name="phone"
+                        label="Phone"
                         control={controlCreate}
                         sx={{ marginBottom: "24px" }}
                       />
@@ -181,7 +182,7 @@ const useAddClass = ({
   };
 
   const onAdd = () => {
-    if (user && user.role.indexOf("admin") >= 0) {
+    if (user && user.role.indexOf("superadmin") >= 0) {
       sharedFunction.setAction("Add");
       resetAdd();
       sidebar.setSidebar(prevState => {
@@ -202,13 +203,13 @@ const useAddClass = ({
 
   // Side Effects
   useEffect(() => {
-    if (postClassData) {
+    if (postAdminData) {
       setNewItemAnimation(prevState => {
         return {
           ...prevState,
-          newItem: postClassData.id,
+          newItem: postAdminData.id,
           callbackFunc: () => {
-            snackbar.open("Class created successfully.", false);
+            snackbar.open("Admin created successfully.", false);
             resetAdd();
             sharedFunction.setAction("View");
           },
@@ -220,23 +221,23 @@ const useAddClass = ({
     }
 
     return () => {};
-  }, [postClassData]);
+  }, [postAdminData]);
 
   // Side Effects
   useEffect(() => {
-    if (postClassError) {
+    if (postAdminError) {
       loader.end();
 
-      switch (postClassError.response.data) {
+      switch (postAdminError.response.data) {
         case "ADMIN_ACTIONS_NOT_ALLOWED":
           snackbar.open("Something went wrong. Plaese try again later", true);
           break;
         case "EMPTY_REQUEST":
           snackbar.open("Something went wrong. Plaese try again later", true);
           break;
-        case "DUPLICATED_CLASS":
+        case "DUPLICATED_ADMIN":
           snackbar.open(
-            "Unique class name is required. Please rephrase your topic",
+            "Unique admin name is required. Please rephrase your admin name",
             true,
           );
           break;
@@ -249,13 +250,13 @@ const useAddClass = ({
     }
     loader.end();
     return () => {};
-  }, [postClassError]);
+  }, [postAdminError]);
 
   return {
     onAdd,
   };
 };
 
-useAddClass.propTypes = {};
+useAddAdmin.propTypes = {};
 
-export default useAddClass;
+export default useAddAdmin;

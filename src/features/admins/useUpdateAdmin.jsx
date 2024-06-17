@@ -16,51 +16,57 @@ import * as yup from "yup";
 import formBg from "../../assets/form-bg.png";
 import { FormTextField } from "../../components/FormInput";
 import ArrowBack from "../../components/GoogleIcons/ArrowBack";
-import useClasses from "../../services/classes";
+import useAdmins from "../../services/admins";
 
-const useAddClass = ({
+const useUpdateAdmin = ({
   loader,
   sidebar,
   snackbar,
   noPermissionConfirm,
   user,
-  setNewItemAnimation,
   fetchList,
+  sharedState,
   sharedFunction,
 }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   // API service
-  const { post: postClass } = useClasses();
-  const [{ data: postClassData, error: postClassError }, postClassExecute] =
-    postClass;
+  const { get: getAdmin, put: putAdmin } = useAdmins();
+  const [{ data: getAdminData, error: getAdminError }, getAdminExecute] =
+    getAdmin;
+
+  const [{ data: putAdminData, error: putAdminError }, putAdminExecute] =
+    putAdmin;
 
   // React Hook Form Set Up
-
-  const createClassSchema = yup.object({
-    name: yup.string().required("Please enter name of the class"),
-    description: yup.string().required("Please enter description of the class"),
+  const updateAdminSchema = yup.object({
+    name: yup.string().required("Please enter name of the admin"),
+    phone: yup.string().required("Please enter phone of the admin"),
   });
 
   const {
-    control: controlCreate,
-    handleSubmit: handleSubmitCreate,
-    reset: resetAdd,
+    control: controlUpdate,
+    handleSubmit: handleSubmitUpdate,
+    reset: resetUpdate,
   } = useForm({
     defaultValues: {
+      id: "",
       name: "",
-      description: "",
+      phone: "",
     },
-    resolver: yupResolver(createClassSchema),
+    resolver: yupResolver(updateAdminSchema),
   });
 
-  const handleAdd = async data => {
+  const handleUpdate = async data => {
+    const modifiedData = data;
+    delete modifiedData.id;
+
     loader.start();
-    postClassExecute(data);
+    putAdminExecute(sharedState.id, modifiedData);
   };
 
-  const sideCreate = () => {
+  const sideUpdate = () => {
     return (
       <Box
         role="presentation"
@@ -71,7 +77,9 @@ const useAddClass = ({
         <Box
           component="form"
           noValidate
-          onSubmit={handleSubmitCreate(handleAdd)}
+          onSubmit={handleSubmitUpdate(data => {
+            handleUpdate(data);
+          })}
         >
           <Box
             sx={{
@@ -95,7 +103,7 @@ const useAddClass = ({
                   </IconButton>
                 </Box>
                 <Box sx={{ marginLeft: "8px" }}>
-                  <Typography variant="subtitle1">Create New Class</Typography>
+                  <Typography variant="subtitle1">Update Admin</Typography>
                 </Box>
               </Box>
             </Box>
@@ -108,18 +116,19 @@ const useAddClass = ({
                     <Grid item xs={12}>
                       <FormTextField
                         required
+                        disabled
                         name="name"
                         label="Name"
-                        control={controlCreate}
+                        control={controlUpdate}
                         sx={{ marginBottom: "24px" }}
                       />
                     </Grid>
                     <Grid item xs={12}>
                       <FormTextField
                         required
-                        name="description"
-                        label="Description"
-                        control={controlCreate}
+                        name="phone"
+                        label="Phone"
+                        control={controlUpdate}
                         sx={{ marginBottom: "24px" }}
                       />
                     </Grid>
@@ -132,12 +141,9 @@ const useAddClass = ({
           <Box
             sx={{
               position: "absolute",
-              width: "100%",
-              bottom: { xs: "75px", md: "0px" },
+              bottom: "0px",
+              left: "0px",
               right: "0px",
-              background: "white",
-              zIndex: 1,
-              borderTop: "1px solid rgba(0,0,0,0.1)",
             }}
           >
             {!isSmallScreen && (
@@ -170,7 +176,7 @@ const useAddClass = ({
                     borderRadius: "100px",
                   }}
                 >
-                  Create
+                  Update
                 </Button>
               </Stack>
             </Box>
@@ -180,20 +186,13 @@ const useAddClass = ({
     );
   };
 
-  const onAdd = () => {
-    if (user && user.role.indexOf("admin") >= 0) {
-      sharedFunction.setAction("Add");
-      resetAdd();
-      sidebar.setSidebar(prevState => {
-        return {
-          ...prevState,
-          dependencies: {
-            ...prevState.dependencies,
-          },
-          sidebar: sideCreate,
-        };
-      });
-      sidebar.open();
+  const onUpdate = id => {
+    loader.start();
+
+    if (user && user.role.indexOf("superadmin") >= 0) {
+      sharedFunction.setAction("Update");
+      sharedFunction.setId(id);
+      getAdminExecute(id);
     } else {
       noPermissionConfirm.open();
       loader.end();
@@ -202,43 +201,82 @@ const useAddClass = ({
 
   // Side Effects
   useEffect(() => {
-    if (postClassData) {
-      setNewItemAnimation(prevState => {
+    if (getAdminData) {
+      // open form
+      sidebar.setSidebar(prevState => {
         return {
           ...prevState,
-          newItem: postClassData.id,
-          callbackFunc: () => {
-            snackbar.open("Class created successfully.", false);
-            resetAdd();
-            sharedFunction.setAction("View");
+          dependencies: {
+            ...prevState.dependencies,
           },
+          sidebar: sideUpdate,
         };
       });
-      fetchList({ params: { sort: "-updatedAt" } });
+      resetUpdate({
+        name: getAdminData.name,
+        phone: getAdminData.phone,
+      });
+      sidebar.open();
+      loader.end();
+    }
+  }, [getAdminData]);
 
+  useEffect(() => {
+    if (putAdminData) {
+      sidebar.close();
+      sharedFunction.setAction("updateComplete");
+      fetchList({
+        params:
+          Object.keys(sharedState.searchParams).length > 0
+            ? sharedState.searchParams
+            : { sort: "-updatedAt" },
+        cb: () => {
+          snackbar.open("Admin updated successfully.", false);
+          resetUpdate();
+          sharedFunction.setAction("View");
+          sharedFunction.setId("");
+        },
+      });
       sidebar.close();
     }
 
     return () => {};
-  }, [postClassData]);
+  }, [putAdminData]);
 
   // Side Effects
   useEffect(() => {
-    if (postClassError) {
+    if (getAdminError) {
       loader.end();
+      switch (getAdminError.response.data) {
+        case "INVALID_ID":
+          snackbar.open("Something went wrong. Plaese try again later", true);
+          break;
 
-      switch (postClassError.response.data) {
+        default:
+          break;
+      }
+    }
+    loader.end();
+    return () => {};
+  }, [getAdminError]);
+
+  useEffect(() => {
+    if (putAdminError) {
+      switch (putAdminError.response.data) {
         case "ADMIN_ACTIONS_NOT_ALLOWED":
           snackbar.open("Something went wrong. Plaese try again later", true);
           break;
         case "EMPTY_REQUEST":
           snackbar.open("Something went wrong. Plaese try again later", true);
           break;
-        case "DUPLICATED_CLASS":
+        case "DUPLICATED_ADMIN":
           snackbar.open(
-            "Unique class name is required. Please rephrase your topic",
+            "Unique admin name is required. Please rephrase your admin name",
             true,
           );
+          break;
+        case "INVALID_ID":
+          snackbar.open("Something went wrong. Plaese try again later", true);
           break;
         case "UNAUTHORIZED_ACTION":
           snackbar.open("Please login again to proceed", true);
@@ -249,13 +287,13 @@ const useAddClass = ({
     }
     loader.end();
     return () => {};
-  }, [postClassError]);
+  }, [putAdminError]);
 
   return {
-    onAdd,
+    onUpdate,
   };
 };
 
-useAddClass.propTypes = {};
+useUpdateAdmin.propTypes = {};
 
-export default useAddClass;
+export default useUpdateAdmin;

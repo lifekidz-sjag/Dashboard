@@ -36,6 +36,7 @@ const ActionDropdown = props => {
     selectedItems = 0,
     zIndex = null,
     isLongPressMode = false,
+    renderElement,
   } = props;
 
   const handleClick = event => {
@@ -65,16 +66,6 @@ const ActionDropdown = props => {
       menuItem.action(e); // Pass params to the action function
     }
   };
-  const date =
-    Object.keys(data).length > 0 &&
-    new Date(data.updatedAt).toLocaleString("en-US", {
-      month: "short",
-      day: "2-digit",
-      year: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    });
 
   const renderMenuDropdown = () => {
     if (Object.keys(data).length > 0) {
@@ -103,11 +94,7 @@ const ActionDropdown = props => {
                 borderBottom: "1px solid rgba(43, 43, 43, 0.38)",
               }}
             >
-              <Typography variant="body1">{data.name}</Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: "text.secondary" }}
-              >{`Last updated ${date}`}</Typography>
+              {renderElement()}
             </Box>
             <List>
               {menuItems.map(menuItem => {
@@ -292,6 +279,7 @@ ActionDropdown.propTypes = {
   selectedItems: PropTypes.number,
   zIndex: PropTypes.string,
   isLongPressMode: PropTypes.bool,
+  renderElement: PropTypes.func,
 };
 
 export default ActionDropdown;

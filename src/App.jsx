@@ -5,10 +5,13 @@ import useSJAG from "./hooks/useSJAG";
 import ReportsLayout from "./layouts/ReportsLayout";
 import RootLayout from "./layouts/RootLayout";
 import UserLayout from "./layouts/UserLayout";
+import Admins from "./pages/Admins";
 import Classes from "./pages/Classes";
 import Dashboard from "./pages/Dashboard";
 import Error404 from "./pages/Error404";
 import ReportsLayoutLanding from "./pages/ReportsLayoutLanding";
+import Students from "./pages/Students";
+import Teachers from "./pages/Teachers";
 import UserLogin from "./pages/user/UserLogin";
 import UserLogout from "./pages/user/UserLogout";
 import UserLayoutLanding from "./pages/UserLayoutLanding";
@@ -65,7 +68,7 @@ const router = createBrowserRouter(
             },
             {
               path: "admins",
-              element: <Dashboard />,
+              element: <Admins />,
             },
             {
               path: "classes",
@@ -73,15 +76,11 @@ const router = createBrowserRouter(
             },
             {
               path: "teachers",
-              element: <Dashboard />,
+              element: <Teachers />,
             },
             {
               path: "students",
-              element: <Dashboard />,
-            },
-            {
-              path: "admins",
-              element: <Dashboard />,
+              element: <Students />,
             },
             {
               path: "reports",

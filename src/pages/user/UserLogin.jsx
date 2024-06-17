@@ -1,19 +1,20 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useOutletContext } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { Box, Button, Grid, IconButton, Typography } from "@mui/material";
 import { useRive, useStateMachineInput } from "rive-react";
 import * as yup from "yup";
 
 import { FormTextField } from "../../components/FormInput";
+import ArrowBack from "../../components/GoogleIcons/ArrowBack";
 import ArrowForward from "../../components/GoogleIcons/ArrowForward";
-import ChildCare from "../../components/GoogleIcons/ChildCare";
 import School from "../../components/GoogleIcons/School";
 import ShieldPerson from "../../components/GoogleIcons/ShieldPerson";
 import useAuth from "../../contexts/auth/useAuth";
 
 const UserLogin = () => {
+  const [step, setStep] = useState(0);
   // INITAL PAGE SET UP
   const { loader } = useOutletContext();
 
@@ -116,7 +117,18 @@ const UserLogin = () => {
 
   return (
     <Box>
-      <Box sx={{ padding: "32px 16px 16px 16px" }}>
+      <Box sx={{ padding: "32px 16px 16px 16px", position: "relative" }}>
+        {step === 1 && (
+          <IconButton
+            sx={{ position: "absolute", top: "32px", left: "0px" }}
+            onClick={() => {
+              setStep(0);
+            }}
+          >
+            <ArrowBack color="inherit" />
+          </IconButton>
+        )}
+
         <Typography variant="subtitle1" sx={{ textAlign: "center" }}>
           Login to SJAG Lifekidz Attendance
         </Typography>
@@ -134,7 +146,7 @@ const UserLogin = () => {
           />
         </Box>
       </Box>
-      {watch("role") === "" ? (
+      {step === 0 ? (
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Button
@@ -142,6 +154,7 @@ const UserLogin = () => {
               variant="contained"
               endIcon={<ShieldPerson fontSize="32px" color="white" />}
               onClick={() => {
+                setStep(1);
                 setValue("role", "admin");
               }}
             >
@@ -154,22 +167,11 @@ const UserLogin = () => {
               variant="contained"
               endIcon={<School fontSize="32px" color="white" />}
               onClick={() => {
+                setStep(1);
                 setValue("role", "teacher");
               }}
             >
               Login as teacher
-            </Button>
-          </Grid>
-          <Grid item xs={12}>
-            <Button
-              fullWidth
-              variant="contained"
-              endIcon={<ChildCare fontSize="32px" color="white" />}
-              onClick={() => {
-                setValue("role", "children");
-              }}
-            >
-              Login as student
             </Button>
           </Grid>
         </Grid>

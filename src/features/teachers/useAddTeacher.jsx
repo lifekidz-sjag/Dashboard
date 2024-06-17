@@ -14,11 +14,12 @@ import { useTheme } from "@mui/material/styles";
 import * as yup from "yup";
 
 import formBg from "../../assets/form-bg.png";
-import { FormTextField } from "../../components/FormInput";
+import { FormSelect, FormTextField } from "../../components/FormInput";
 import ArrowBack from "../../components/GoogleIcons/ArrowBack";
 import useClasses from "../../services/classes";
+import useTeachers from "../../services/teachers";
 
-const useAddClass = ({
+const useAddTeacher = ({
   loader,
   sidebar,
   snackbar,
@@ -32,15 +33,22 @@ const useAddClass = ({
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   // API service
-  const { post: postClass } = useClasses();
-  const [{ data: postClassData, error: postClassError }, postClassExecute] =
-    postClass;
+  const { fetch: fetchClasses } = useClasses();
+  const { post: postTeacher } = useTeachers();
+  const [
+    { data: fetchClassesData, error: fetchClassesError },
+    fetchClassesExecute,
+  ] = fetchClasses;
+  const [
+    { data: postTeacherData, error: postTeacherError },
+    postTeacherExecute,
+  ] = postTeacher;
 
   // React Hook Form Set Up
-
-  const createClassSchema = yup.object({
-    name: yup.string().required("Please enter name of the class"),
-    description: yup.string().required("Please enter description of the class"),
+  const createTeacherScema = yup.object({
+    name: yup.string().required("Please enter name of the teacher"),
+    phone: yup.string().required("Please enter phone number of the teacher"),
+    class: yup.string().required("Please select a class"),
   });
 
   const {
@@ -50,17 +58,18 @@ const useAddClass = ({
   } = useForm({
     defaultValues: {
       name: "",
-      description: "",
+      phone: "",
+      class: "",
     },
-    resolver: yupResolver(createClassSchema),
+    resolver: yupResolver(createTeacherScema),
   });
 
   const handleAdd = async data => {
     loader.start();
-    postClassExecute(data);
+    postTeacherExecute(data);
   };
 
-  const sideCreate = () => {
+  const sideCreate = dependencies => {
     return (
       <Box
         role="presentation"
@@ -95,7 +104,9 @@ const useAddClass = ({
                   </IconButton>
                 </Box>
                 <Box sx={{ marginLeft: "8px" }}>
-                  <Typography variant="subtitle1">Create New Class</Typography>
+                  <Typography variant="subtitle1">
+                    Create New Teacher
+                  </Typography>
                 </Box>
               </Box>
             </Box>
@@ -117,9 +128,21 @@ const useAddClass = ({
                     <Grid item xs={12}>
                       <FormTextField
                         required
-                        name="description"
-                        label="Description"
+                        name="phone"
+                        label="Phone"
                         control={controlCreate}
+                        sx={{ marginBottom: "24px" }}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <FormSelect
+                        name="class"
+                        label="Class"
+                        control={controlCreate}
+                        options={dependencies.classes.map(data => ({
+                          label: data.name,
+                          value: data.id,
+                        }))}
                         sx={{ marginBottom: "24px" }}
                       />
                     </Grid>
@@ -184,16 +207,7 @@ const useAddClass = ({
     if (user && user.role.indexOf("admin") >= 0) {
       sharedFunction.setAction("Add");
       resetAdd();
-      sidebar.setSidebar(prevState => {
-        return {
-          ...prevState,
-          dependencies: {
-            ...prevState.dependencies,
-          },
-          sidebar: sideCreate,
-        };
-      });
-      sidebar.open();
+      fetchClassesExecute({ params: { sort: "name" } });
     } else {
       noPermissionConfirm.open();
       loader.end();
@@ -202,13 +216,13 @@ const useAddClass = ({
 
   // Side Effects
   useEffect(() => {
-    if (postClassData) {
+    if (postTeacherData) {
       setNewItemAnimation(prevState => {
         return {
           ...prevState,
-          newItem: postClassData.id,
+          newItem: postTeacherData.id,
           callbackFunc: () => {
-            snackbar.open("Class created successfully.", false);
+            snackbar.open("Teacher created successfully.", false);
             resetAdd();
             sharedFunction.setAction("View");
           },
@@ -220,23 +234,49 @@ const useAddClass = ({
     }
 
     return () => {};
-  }, [postClassData]);
+  }, [postTeacherData]);
+
+  useEffect(() => {
+    if (fetchClassesData && fetchClassesData.data) {
+      sidebar.setSidebar(prevState => {
+        return {
+          ...prevState,
+          dependencies: {
+            ...prevState.dependencies,
+            classes: fetchClassesData.data,
+          },
+          sidebar: sideCreate,
+        };
+      });
+      sidebar.open();
+    }
+
+    return () => {};
+  }, [fetchClassesData]);
+
+  useEffect(() => {
+    if (fetchClassesError) {
+      //
+    }
+
+    return () => {};
+  }, [fetchClassesError]);
 
   // Side Effects
   useEffect(() => {
-    if (postClassError) {
+    if (postTeacherError) {
       loader.end();
 
-      switch (postClassError.response.data) {
+      switch (postTeacherError.response.data) {
         case "ADMIN_ACTIONS_NOT_ALLOWED":
           snackbar.open("Something went wrong. Plaese try again later", true);
           break;
         case "EMPTY_REQUEST":
           snackbar.open("Something went wrong. Plaese try again later", true);
           break;
-        case "DUPLICATED_CLASS":
+        case "DUPLICATED_TEACHER":
           snackbar.open(
-            "Unique class name is required. Please rephrase your topic",
+            "Unique teacher name is required. Please rephrase your teacher name",
             true,
           );
           break;
@@ -249,13 +289,13 @@ const useAddClass = ({
     }
     loader.end();
     return () => {};
-  }, [postClassError]);
+  }, [postTeacherError]);
 
   return {
     onAdd,
   };
 };
 
-useAddClass.propTypes = {};
+useAddTeacher.propTypes = {};
 
-export default useAddClass;
+export default useAddTeacher;

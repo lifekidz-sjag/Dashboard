@@ -190,7 +190,7 @@ const useUpdateClass = ({
   const onUpdate = id => {
     loader.start();
 
-    if (user && user.role === "superadmin") {
+    if (user && user.role.indexOf("admin") >= 0) {
       sharedFunction.setAction("Update");
       sharedFunction.setId(id);
       getClassExecute(id);

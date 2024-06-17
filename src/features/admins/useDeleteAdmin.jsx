@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 
-import useClasses from "../../services/classes";
+import useAdmins from "../../services/admins";
 
-const useDeleteClass = ({
+const useDeleteAdmin = ({
   loader,
   sidebar,
   snackbar,
@@ -14,25 +14,25 @@ const useDeleteClass = ({
   sharedFunction,
 }) => {
   // API service
-  const { del: deleteClass } = useClasses();
+  const { del: deleteAdmin } = useAdmins();
   const [
-    { data: deleteClassData, error: deleteClassError },
-    deleteClassExecute,
-  ] = deleteClass;
+    { data: deleteAdminData, error: deleteAdminError },
+    deleteAdminExecute,
+  ] = deleteAdmin;
 
   const onDelete = ({ id, name }) => {
-    if (user && user.role.indexOf("admin") >= 0) {
+    if (user && user.role.indexOf("superadmin") >= 0) {
       sharedFunction.setAction("Delete");
       sharedFunction.setId(id);
       confirm.open(
-        "Delete Class",
+        "Delete Admin",
         `Are you sure you want delete "${name}?"`,
         {
           text: "Delete",
           onClick: async () => {
             confirm.close();
             loader.start();
-            await deleteClassExecute(id);
+            await deleteAdminExecute(id);
           },
         },
         {
@@ -47,7 +47,7 @@ const useDeleteClass = ({
 
   // Side Effects
   useEffect(() => {
-    if (deleteClassData) {
+    if (deleteAdminData) {
       confirm.close();
       sharedFunction.setAction("deleteComplete");
       fetchList({
@@ -56,7 +56,7 @@ const useDeleteClass = ({
             ? sharedState.searchParams
             : { sort: "-updatedAt" },
         cb: () => {
-          snackbar.open("Class deleted successfully.", false);
+          snackbar.open("Admin deleted successfully.", false);
           sharedFunction.setAction("View");
           sharedFunction.setId("");
         },
@@ -65,13 +65,13 @@ const useDeleteClass = ({
     }
 
     return () => {};
-  }, [deleteClassData]);
+  }, [deleteAdminData]);
 
   // Side Effects
   useEffect(() => {
-    if (deleteClassError) {
+    if (deleteAdminError) {
       loader.end();
-      switch (deleteClassError.response.data) {
+      switch (deleteAdminError.response.data) {
         case "INVALID_ID":
           snackbar.open("Something went wrong. Plaese try again later", true);
           break;
@@ -82,11 +82,11 @@ const useDeleteClass = ({
     }
     loader.end();
     return () => {};
-  }, [deleteClassError]);
+  }, [deleteAdminError]);
 
   useEffect(() => {
-    if (deleteClassError) {
-      switch (deleteClassError.response.data) {
+    if (deleteAdminError) {
+      switch (deleteAdminError.response.data) {
         case "ADMIN_ACTIONS_NOT_ALLOWED":
           snackbar.open("Something went wrong. Plaese try again later", true);
           break;
@@ -102,13 +102,13 @@ const useDeleteClass = ({
       loader.end();
     }
     return () => {};
-  }, [deleteClassError]);
+  }, [deleteAdminError]);
 
   return {
     onDelete,
   };
 };
 
-useDeleteClass.propTypes = {};
+useDeleteAdmin.propTypes = {};
 
-export default useDeleteClass;
+export default useDeleteAdmin;

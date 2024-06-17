@@ -48,6 +48,17 @@ const useNewItemAnimation = ({ snackbar }) => {
       newItemNode.classList.contains("animate-start")
     ) {
       newItemNode.classList.remove("animate-start");
+      setTimeout(() => {
+        newItemNode.classList.remove("list-new-item");
+        newItemNode.classList.remove("expand");
+        newItemNode.classList.remove("show");
+        setNewItemAnimation(prevState => {
+          return {
+            ...prevState,
+            newItem: null,
+          };
+        });
+      }, 1000);
     }
   }, [snackbar.isOpen]);
 

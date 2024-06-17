@@ -14,53 +14,68 @@ import { useTheme } from "@mui/material/styles";
 import * as yup from "yup";
 
 import formBg from "../../assets/form-bg.png";
-import { FormTextField } from "../../components/FormInput";
+import { FormSelect, FormTextField } from "../../components/FormInput";
 import ArrowBack from "../../components/GoogleIcons/ArrowBack";
 import useClasses from "../../services/classes";
+import useTeachers from "../../services/teachers";
 
-const useAddClass = ({
+const useUpdateTeacher = ({
   loader,
   sidebar,
   snackbar,
   noPermissionConfirm,
   user,
-  setNewItemAnimation,
   fetchList,
+  sharedState,
   sharedFunction,
 }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   // API service
-  const { post: postClass } = useClasses();
-  const [{ data: postClassData, error: postClassError }, postClassExecute] =
-    postClass;
+  const { fetch: fetchClasses } = useClasses();
+  const { get: getTeacher, put: putTeacher } = useTeachers();
+  const [
+    { data: fetchClassesData, error: fetchClassesError },
+    fetchClassesExecute,
+  ] = fetchClasses;
+
+  const [{ data: getTeacherData, error: getTeacherError }, getTeacherExecute] =
+    getTeacher;
+
+  const [{ data: putTeacherData, error: putTeacherError }, putTeacherExecute] =
+    putTeacher;
 
   // React Hook Form Set Up
-
-  const createClassSchema = yup.object({
-    name: yup.string().required("Please enter name of the class"),
-    description: yup.string().required("Please enter description of the class"),
+  const updateTeacherSchema = yup.object({
+    name: yup.string().required("Please enter name of the teacher"),
+    phone: yup.string().required("Please enter phone of the teacher"),
+    class: yup.string().required("Please select a class"),
   });
 
   const {
-    control: controlCreate,
-    handleSubmit: handleSubmitCreate,
-    reset: resetAdd,
+    control: controlUpdate,
+    handleSubmit: handleSubmitUpdate,
+    reset: resetUpdate,
   } = useForm({
     defaultValues: {
+      id: "",
       name: "",
-      description: "",
+      phone: "",
+      class: "",
     },
-    resolver: yupResolver(createClassSchema),
+    resolver: yupResolver(updateTeacherSchema),
   });
 
-  const handleAdd = async data => {
+  const handleUpdate = async data => {
+    const modifiedData = data;
+    delete modifiedData.id;
+
     loader.start();
-    postClassExecute(data);
+    putTeacherExecute(sharedState.id, modifiedData);
   };
 
-  const sideCreate = () => {
+  const sideUpdate = dependencies => {
     return (
       <Box
         role="presentation"
@@ -71,7 +86,9 @@ const useAddClass = ({
         <Box
           component="form"
           noValidate
-          onSubmit={handleSubmitCreate(handleAdd)}
+          onSubmit={handleSubmitUpdate(data => {
+            handleUpdate(data);
+          })}
         >
           <Box
             sx={{
@@ -95,7 +112,7 @@ const useAddClass = ({
                   </IconButton>
                 </Box>
                 <Box sx={{ marginLeft: "8px" }}>
-                  <Typography variant="subtitle1">Create New Class</Typography>
+                  <Typography variant="subtitle1">Update Teacher</Typography>
                 </Box>
               </Box>
             </Box>
@@ -108,18 +125,31 @@ const useAddClass = ({
                     <Grid item xs={12}>
                       <FormTextField
                         required
+                        disabled
                         name="name"
                         label="Name"
-                        control={controlCreate}
+                        control={controlUpdate}
                         sx={{ marginBottom: "24px" }}
                       />
                     </Grid>
                     <Grid item xs={12}>
                       <FormTextField
                         required
-                        name="description"
-                        label="Description"
-                        control={controlCreate}
+                        name="phone"
+                        label="Phone"
+                        control={controlUpdate}
+                        sx={{ marginBottom: "24px" }}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <FormSelect
+                        name="class"
+                        label="Class"
+                        control={controlUpdate}
+                        options={dependencies.classes.map(data => ({
+                          label: data.name,
+                          value: data.id,
+                        }))}
                         sx={{ marginBottom: "24px" }}
                       />
                     </Grid>
@@ -132,12 +162,9 @@ const useAddClass = ({
           <Box
             sx={{
               position: "absolute",
-              width: "100%",
-              bottom: { xs: "75px", md: "0px" },
+              bottom: "0px",
+              left: "0px",
               right: "0px",
-              background: "white",
-              zIndex: 1,
-              borderTop: "1px solid rgba(0,0,0,0.1)",
             }}
           >
             {!isSmallScreen && (
@@ -170,7 +197,7 @@ const useAddClass = ({
                     borderRadius: "100px",
                   }}
                 >
-                  Create
+                  Update
                 </Button>
               </Stack>
             </Box>
@@ -180,20 +207,14 @@ const useAddClass = ({
     );
   };
 
-  const onAdd = () => {
+  const onUpdate = id => {
+    loader.start();
+
     if (user && user.role.indexOf("admin") >= 0) {
-      sharedFunction.setAction("Add");
-      resetAdd();
-      sidebar.setSidebar(prevState => {
-        return {
-          ...prevState,
-          dependencies: {
-            ...prevState.dependencies,
-          },
-          sidebar: sideCreate,
-        };
-      });
-      sidebar.open();
+      sharedFunction.setAction("Update");
+      sharedFunction.setId(id);
+      getTeacherExecute(id);
+      fetchClassesExecute();
     } else {
       noPermissionConfirm.open();
       loader.end();
@@ -202,43 +223,92 @@ const useAddClass = ({
 
   // Side Effects
   useEffect(() => {
-    if (postClassData) {
-      setNewItemAnimation(prevState => {
+    if (getTeacherData && fetchClassesData && fetchClassesData.data) {
+      // open form
+      sidebar.setSidebar(prevState => {
         return {
           ...prevState,
-          newItem: postClassData.id,
-          callbackFunc: () => {
-            snackbar.open("Class created successfully.", false);
-            resetAdd();
-            sharedFunction.setAction("View");
+          dependencies: {
+            ...prevState.dependencies,
+            classes: fetchClassesData.data,
           },
+          sidebar: sideUpdate,
         };
       });
-      fetchList({ params: { sort: "-updatedAt" } });
+      resetUpdate({
+        name: getTeacherData.name,
+        phone: getTeacherData.phone,
+        class: getTeacherData.class,
+      });
+      sidebar.open();
+      loader.end();
+    }
+  }, [getTeacherData, fetchClassesData]);
 
+  useEffect(() => {
+    if (putTeacherData) {
+      sidebar.close();
+      sharedFunction.setAction("updateComplete");
+      fetchList({
+        params:
+          Object.keys(sharedState.searchParams).length > 0
+            ? sharedState.searchParams
+            : { sort: "-updatedAt" },
+        cb: () => {
+          snackbar.open("Teacher updated successfully.", false);
+          resetUpdate();
+          sharedFunction.setAction("View");
+          sharedFunction.setId("");
+        },
+      });
       sidebar.close();
     }
 
     return () => {};
-  }, [postClassData]);
+  }, [putTeacherData]);
+
+  useEffect(() => {
+    if (fetchClassesError) {
+      //
+    }
+
+    return () => {};
+  }, [fetchClassesError]);
 
   // Side Effects
   useEffect(() => {
-    if (postClassError) {
+    if (getTeacherError) {
       loader.end();
+      switch (getTeacherError.response.data) {
+        case "INVALID_ID":
+          snackbar.open("Something went wrong. Plaese try again later", true);
+          break;
 
-      switch (postClassError.response.data) {
+        default:
+          break;
+      }
+    }
+    loader.end();
+    return () => {};
+  }, [getTeacherError]);
+
+  useEffect(() => {
+    if (putTeacherError) {
+      switch (putTeacherError.response.data) {
         case "ADMIN_ACTIONS_NOT_ALLOWED":
           snackbar.open("Something went wrong. Plaese try again later", true);
           break;
         case "EMPTY_REQUEST":
           snackbar.open("Something went wrong. Plaese try again later", true);
           break;
-        case "DUPLICATED_CLASS":
+        case "DUPLICATED_TEACHER":
           snackbar.open(
-            "Unique class name is required. Please rephrase your topic",
+            "Unique teacher name is required. Please rephrase your teacher name",
             true,
           );
+          break;
+        case "INVALID_ID":
+          snackbar.open("Something went wrong. Plaese try again later", true);
           break;
         case "UNAUTHORIZED_ACTION":
           snackbar.open("Please login again to proceed", true);
@@ -249,13 +319,13 @@ const useAddClass = ({
     }
     loader.end();
     return () => {};
-  }, [postClassError]);
+  }, [putTeacherError]);
 
   return {
-    onAdd,
+    onUpdate,
   };
 };
 
-useAddClass.propTypes = {};
+useUpdateTeacher.propTypes = {};
 
-export default useAddClass;
+export default useUpdateTeacher;

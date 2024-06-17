@@ -9,6 +9,7 @@ import ValidateError from "../GoogleIcons/ValidateError";
 import ValidateSuccess from "../GoogleIcons/ValidateSuccess";
 
 const FormTextField = ({
+  key,
   name,
   control,
   label,
@@ -66,6 +67,7 @@ const FormTextField = ({
           fieldState: { error },
         }) => (
           <TextField
+            key={key}
             variant="standard"
             required={required || false}
             fullWidth
@@ -200,6 +202,7 @@ const FormTextField = ({
   );
 };
 FormTextField.propTypes = {
+  key: PropTypes.string,
   name: PropTypes.string.isRequired,
   control: PropTypes.shape().isRequired,
   label: PropTypes.string.isRequired,
@@ -208,6 +211,7 @@ FormTextField.propTypes = {
   sx: PropTypes.shape(),
   disabled: PropTypes.bool,
   readOnly: PropTypes.bool,
+  customOnChange: PropTypes.func,
   customOnChangeParam: PropTypes.func,
   rule: PropTypes.string,
 };

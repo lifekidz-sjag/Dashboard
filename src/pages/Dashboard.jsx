@@ -126,7 +126,7 @@ const Dashboard = () => {
         </Grid>
         <Grid container item xs={12} lg={6}>
           <Grid item xs={6} />
-          {user.role === "superadmin" && (
+          {user.role.indexOf("admin") >= 0 && (
             <Box
               sx={{
                 backgroundColor: "#FFF",

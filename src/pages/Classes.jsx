@@ -6,7 +6,7 @@ import useClassesFeatures from "../features/classes/useClassesFeatures";
 
 const Classes = () => {
   const contextProps = useOutletContext();
-  const { loader, setActionBar } = contextProps;
+  const { loader, setActionBar, user } = contextProps;
 
   const { features, state } = useClassesFeatures({
     contextProps,
@@ -58,6 +58,7 @@ const Classes = () => {
 
   return (
     <ListClasses
+      user={user}
       newItemAnimation={newItemAnimation}
       className={className}
       nodeRefFunc={nodeRefFunc}

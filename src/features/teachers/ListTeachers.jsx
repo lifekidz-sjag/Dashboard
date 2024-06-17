@@ -18,8 +18,10 @@ import ArrowUpward from "../../components/GoogleIcons/ArrowUpward";
 import Delete from "../../components/GoogleIcons/Delete";
 import EditNote from "../../components/GoogleIcons/EditNote";
 
-const nameWidth = "0 0 210px";
-const descriptionWidth = "1";
+const nameWidth = "2";
+const phoneWidth = "1";
+const classWidth = "2";
+
 const lastModifiedWidth = "0 0 210px";
 const moreActionWidth = "0 0 40px";
 
@@ -46,12 +48,13 @@ const CustomizedDivider = styled(() => (
   <Divider orientation="vertical" variant="middle" flexItem />
 ))(() => ({}));
 
-const ListClasses = ({
+const ListTeachers = ({
   user,
   newItemAnimation,
   className,
   nodeRefFunc,
   list,
+  classes,
   paginationComponent,
   onSort,
   sort,
@@ -119,7 +122,13 @@ const ListClasses = ({
               textOverflow: "ellipsis",
             }}
           >
-            Description: <b>{data.description}</b>
+            Phone: <b>{data.phone}</b>, Class:{" "}
+            <b>
+              {classes &&
+                classes.data.filter(c => {
+                  return c.id === data.class;
+                })[0].name}
+            </b>
           </Typography>
           <Typography
             variant="body2"
@@ -278,7 +287,7 @@ const ListClasses = ({
                   },
                 }}
               >
-                {/* Class Name */}
+                {/* Teacher Name */}
                 <CustomizedListItemText
                   disableTypography
                   sx={{ flex: nameWidth }}
@@ -304,12 +313,13 @@ const ListClasses = ({
                     </Box>
                   </Box>
                 </CustomizedListItemText>
-                {/* Class Description */}
+
+                {/* Teacher Phone */}
                 <CustomizedListItemText
                   disableTypography
                   sx={{
-                    flex: descriptionWidth,
-                    display: { xs: "none", lg: "block" },
+                    flex: phoneWidth,
+                    display: { xs: "none", md: "block" },
                   }}
                 >
                   <Box
@@ -323,14 +333,44 @@ const ListClasses = ({
                       WebkitBoxOrient: "vertical",
                     }}
                   >
-                    <Typography variant="body1">{item.description}</Typography>
+                    <Typography variant="body1">{item.phone}</Typography>
                   </Box>
                 </CustomizedListItemText>
 
+                {/* Teacher Phone */}
+                <CustomizedListItemText
+                  disableTypography
+                  sx={{
+                    flex: classWidth,
+                    display: { xs: "none", md: "block" },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      cursor: "pointer",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      display: "-webkit-box",
+                      wordBreak: "break-word",
+                      WebkitLineClamp: "1",
+                      WebkitBoxOrient: "vertical",
+                    }}
+                  >
+                    <Typography variant="body1">
+                      {classes &&
+                        classes.data &&
+                        classes.data.filter(c => {
+                          return c.id === item.class;
+                        })[0].name}
+                    </Typography>
+                  </Box>
+                </CustomizedListItemText>
+
+                {/* Last Modified */}
                 <CustomizedListItemText
                   sx={{
                     flex: lastModifiedWidth,
-                    display: { xs: "none", md: "block" },
+                    display: { xs: "none", lg: "block" },
                   }}
                 >
                   <Typography variant="body1" sx={{ fontSize: "14px" }}>
@@ -351,7 +391,10 @@ const ListClasses = ({
                 {/* Lock & More action */}
                 <CustomizedListItemText
                   disableTypography
-                  sx={{ flex: moreActionWidth }}
+                  sx={{
+                    flex: moreActionWidth,
+                    display: { xs: "none", md: "block" },
+                  }}
                 >
                   <Box>
                     <ActionDropdown
@@ -484,7 +527,7 @@ const ListClasses = ({
                       minHeight: "50px",
                     }}
                   >
-                    {/* Class name */}
+                    {/* Teacher Name */}
                     <CustomizedListItemText
                       disableTypography
                       sx={{
@@ -532,13 +575,11 @@ const ListClasses = ({
                       </Box>
                     </CustomizedListItemText>
                     <CustomizedDivider />
-                    {/* Class Description */}
+                    {/* Teacher Phone */}
                     <CustomizedListItemText
                       disableTypography
                       sx={{
-                        flex: descriptionWidth,
-                        display: { xs: "none", lg: "block" },
-
+                        flex: phoneWidth,
                         cursor: "pointer",
                         ".downward": {
                           transform: "rotate(180deg)",
@@ -551,14 +592,35 @@ const ListClasses = ({
                         },
                       }}
                     >
-                      <Typography variant="body1">Description</Typography>
+                      <Typography variant="body1">Phone</Typography>
+                    </CustomizedListItemText>
+                    <CustomizedDivider />
+
+                    {/* Teacher Class */}
+                    <CustomizedListItemText
+                      disableTypography
+                      sx={{
+                        flex: classWidth,
+                        cursor: "pointer",
+                        ".downward": {
+                          transform: "rotate(180deg)",
+                        },
+                        ":hover": {
+                          ".sort-icon": {
+                            display: "block",
+                            transition: "transform 0.3s ease-in-out",
+                          },
+                        },
+                      }}
+                    >
+                      <Typography variant="body1">Class</Typography>
                     </CustomizedListItemText>
                     <CustomizedDivider />
 
                     <CustomizedListItemText
                       sx={{
                         flex: lastModifiedWidth,
-                        display: { xs: "none", md: "block" },
+                        display: { xs: "none", lg: "block" },
                         cursor: "pointer",
                         ".downward": {
                           transform: "rotate(180deg)",
@@ -603,6 +665,7 @@ const ListClasses = ({
                         )}
                       </Box>
                     </CustomizedListItemText>
+
                     <CustomizedDivider />
 
                     {/* Lock & More action */}
@@ -641,12 +704,15 @@ const ListClasses = ({
   );
 };
 
-ListClasses.propTypes = {
+ListTeachers.propTypes = {
   user: PropTypes.shape().isRequired,
   newItemAnimation: PropTypes.shape().isRequired,
   className: PropTypes.func.isRequired,
   nodeRefFunc: PropTypes.func.isRequired,
   list: PropTypes.shape({
+    data: PropTypes.arrayOf(PropTypes.shape()),
+  }).isRequired,
+  classes: PropTypes.shape({
     data: PropTypes.arrayOf(PropTypes.shape()),
   }).isRequired,
   paginationComponent: PropTypes.element.isRequired,
@@ -658,4 +724,4 @@ ListClasses.propTypes = {
   searchStatus: PropTypes.string.isRequired,
 };
 
-export default ListClasses;
+export default ListTeachers;
