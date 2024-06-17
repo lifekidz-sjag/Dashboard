@@ -17,12 +17,13 @@ import Add from "../components/GoogleIcons/Add";
 import { useAuth } from "../contexts/auth";
 
 const Dashboard = () => {
-  const { loader, setActionBar } = useOutletContext();
+  const { loader, setActionBar, actionBarDefault } = useOutletContext();
   const { user } = useAuth();
   useEffect(() => {
     loader.start();
 
     setActionBar({
+      ...actionBarDefault,
       title: {
         enabled: true,
         display: true,

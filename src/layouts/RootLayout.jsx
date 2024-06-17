@@ -49,7 +49,7 @@ const RootLayout = () => {
   };
 
   const props = useOutletContext();
-  const { loader, actionBarDefault, actionBar, setActionBar } = props;
+  const { loader, actionBar, setActionBar } = props;
   const ab = actionBar;
   const sab = setActionBar;
 
@@ -62,12 +62,7 @@ const RootLayout = () => {
   }, [isAuthenticated, user]);
 
   useEffect(() => {
-    sab(actionBarDefault);
-  }, [location.pathname]);
-
-  useEffect(() => {
     loader.start();
-    sab(actionBarDefault);
   }, []);
 
   useEffect(() => {
