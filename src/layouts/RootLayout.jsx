@@ -27,6 +27,7 @@ import MainNavigation from "../components/MainNavigation";
 import { useAuth } from "../contexts/auth";
 
 const RootLayout = () => {
+  console.log("RUNNING ROOT LAYOUT");
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
   const location = useLocation();
