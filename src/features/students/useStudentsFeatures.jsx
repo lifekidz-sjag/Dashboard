@@ -7,6 +7,7 @@ import useClockInStudent from "./useClockInStudent";
 import useClockOutStudent from "./useClockOutStudent";
 import useDeleteStudent from "./useDeleteStudent";
 import useFetchStudents from "./useFetchStudents";
+import useQRCodeStudent from "./useQRCodeStudent";
 import useSearchStudents from "./useSearchStudents";
 import useSortStudents from "./useSortStudents";
 import useUpdateStudent from "./useUpdateStudent";
@@ -116,6 +117,12 @@ const useStudentsFeatures = ({ contextProps, popupClockIn, popupClockOut }) => {
     sharedFunction,
   });
 
+  const qrCodeStudent = useQRCodeStudent({
+    loader,
+    snackbar,
+    confirm,
+  });
+
   // dependencies
   useEffect(() => {
     setActionBar({
@@ -140,6 +147,7 @@ const useStudentsFeatures = ({ contextProps, popupClockIn, popupClockOut }) => {
       newItemAnimate,
       clockInStudent,
       clockOutStudent,
+      qrCodeStudent,
     },
     state: {
       searchStatus,

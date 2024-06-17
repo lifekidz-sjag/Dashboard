@@ -28,6 +28,7 @@ const Students = () => {
     newItemAnimate,
     clockInStudent,
     clockOutStudent,
+    qrCodeStudent,
   } = features;
   const { newItemAnimation, className, nodeRefFunc } = newItemAnimate;
 
@@ -90,6 +91,7 @@ const Students = () => {
         onUpdate={updateStudent.onUpdate}
         onDelete={deleteStudent.onDelete}
         searchStatus={state.searchStatus}
+        onView={qrCodeStudent.onView}
       />
       <Popup {...popupClockIn}>{popupClockIn.popupContent}</Popup>
       <Popup {...popupClockOut}>{popupClockOut.popupContent}</Popup>

@@ -17,6 +17,7 @@ import ActionDropdown from "../../components/ActionDropdown";
 import ArrowUpward from "../../components/GoogleIcons/ArrowUpward";
 import Delete from "../../components/GoogleIcons/Delete";
 import EditNote from "../../components/GoogleIcons/EditNote";
+import QRCodeScanner from "../../components/GoogleIcons/QRCodeScanner";
 
 const nameWidth = "2";
 const classWidth = "2";
@@ -61,6 +62,7 @@ const ListStudents = ({
   onUpdate,
   onDelete,
   searchStatus,
+  onView,
 }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
@@ -78,6 +80,18 @@ const ListStudents = ({
         ),
         action: () => {
           onUpdate(id);
+        },
+      },
+      {
+        text: "View QR Code",
+        icon: (
+          <QRCodeScanner
+            className="xtopia-menu-icon"
+            sx={{ width: "24px", height: "24px" }}
+          />
+        ),
+        action: () => {
+          onView(name);
         },
       },
     ];
@@ -121,7 +135,7 @@ const ListStudents = ({
               textOverflow: "ellipsis",
             }}
           >
-            Phone: <b>{data.phone}</b>, Class:{" "}
+            Age: <b>{data.age}</b>, Class:{" "}
             <b>
               {classes &&
                 classes.data &&
@@ -678,6 +692,7 @@ ListStudents.propTypes = {
   onUpdate: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   searchStatus: PropTypes.string.isRequired,
+  onView: PropTypes.func.isRequired,
 };
 
 export default ListStudents;
