@@ -227,6 +227,9 @@ body{
 	opacity: 100;
 	background-color: transparent;
 }
+/* #reader__scan_region video{
+	width: 80vw !important;
+}
 
 #reader__dashboard_section{
 	display: flex;
@@ -255,7 +258,7 @@ body{
 }
 #html5-qrcode-button-camera-permission:hover, #html5-qrcode-button-camera-start:hover, #html5-qrcode-button-camera-stop:hover {
 	background-color:#2c397f;
-}
+} */
 
 
 

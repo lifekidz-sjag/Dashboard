@@ -27,9 +27,10 @@ const useClockInStudent = ({
       },
       {
         onClick: () => {
-          popupClockIn.close();
-
           document.getElementById("html5-qrcode-button-camera-stop").click();
+          setTimeout(() => {
+            popupClockIn.close();
+          }, 1000);
         },
       },
       "headerBorder",
@@ -42,9 +43,10 @@ const useClockInStudent = ({
         `You have clocked in ${studentInfo.studentName} successfully.`,
         false,
       );
-      popupClockIn.close();
-
       document.getElementById("html5-qrcode-button-camera-stop").click();
+      setTimeout(() => {
+        popupClockIn.close();
+      }, 1000);
       setStudentInfo({});
     }
 
@@ -55,9 +57,10 @@ const useClockInStudent = ({
   useEffect(() => {
     if (clockInError) {
       loader.end();
-      popupClockIn.close();
-
       document.getElementById("html5-qrcode-button-camera-stop").click();
+      setTimeout(() => {
+        popupClockIn.close();
+      }, 1000);
       setStudentInfo({});
 
       switch (clockInError.response.data) {

@@ -28,9 +28,10 @@ const useClockOutStudent = ({
       },
       {
         onClick: () => {
-          popupClockOut.close();
-
           document.getElementById("html5-qrcode-button-camera-stop").click();
+          setTimeout(() => {
+            popupClockOut.close();
+          }, 1000);
         },
       },
       "headerBorder",
@@ -43,9 +44,10 @@ const useClockOutStudent = ({
         `You have clocked out ${studentInfo.studentName} successfully.`,
         false,
       );
-      popupClockOut.close();
-
       document.getElementById("html5-qrcode-button-camera-stop").click();
+      setTimeout(() => {
+        popupClockOut.close();
+      }, 1000);
       setStudentInfo({});
     }
 
@@ -56,9 +58,10 @@ const useClockOutStudent = ({
   useEffect(() => {
     if (clockOutError) {
       loader.end();
-      popupClockOut.close();
-
       document.getElementById("html5-qrcode-button-camera-stop").click();
+      setTimeout(() => {
+        popupClockOut.close();
+      }, 1000);
       setStudentInfo({});
 
       switch (clockOutError.response.data) {
