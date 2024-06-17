@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Box } from "@mui/material";
+import CryptoJS from "crypto-js";
 import { Html5QrcodeScanner, Html5QrcodeScanType } from "html5-qrcode";
 
 import useAttendances from "../../services/attendances";
@@ -102,9 +103,16 @@ const useClockOutStudent = ({
         scanner.render(decodedText => {
           if (isScanning) {
             scanner.clear();
-            const decodedStudentInfo = JSON.parse(decodedText);
+            const bytes = CryptoJS.AES.decrypt(
+              JSON.parse(decodedText).encrypted,
+              "wAqNU0K3BKX8",
+            );
+            const decodedStudentInfo = JSON.parse(
+              bytes.toString(CryptoJS.enc.Utf8),
+            );
             const studentName = decodedStudentInfo.name;
             const classId = decodedStudentInfo.class;
+
             setStudentInfo({
               classId,
               studentName,

@@ -19,6 +19,7 @@
     "@rive-app/react-canvas": "^4.10.0",
     "axios": "^1.7.2",
     "axios-hooks": "^5.0.2",
+    "crypto-js": "^4.2.0",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.10",
     "html5-qrcode": "^2.3.8",

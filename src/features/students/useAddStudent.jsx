@@ -12,6 +12,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import CryptoJS from "crypto-js";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import QRCode from "qrcode.react";
@@ -100,15 +101,18 @@ const useAddStudent = ({
   });
 
   const handleAdd = async data => {
-    const modifiedData = data;
+    const modifiedData = {
+      name: data.name,
+      class: data.class,
+    };
     loader.start();
-    dayjs.extend(utc);
 
-    modifiedData.birthday = `${dayjs(new Date(data.birthday))
-      .utc()
-      .format("YYYY-MM-DD")}`;
+    const encryptedData = CryptoJS.AES.encrypt(
+      JSON.stringify(modifiedData),
+      "wAqNU0K3BKX8",
+    ).toString();
 
-    setQRCodeData(JSON.stringify(modifiedData));
+    setQRCodeData(JSON.stringify({ encrypted: encryptedData }));
   };
 
   const genderOptions = [
@@ -429,7 +433,7 @@ const useAddStudent = ({
 
         data.qRcode = qrCodeDataUri.replace(/^data:image\/[a-z]+;base64,/, "");
         postStudentExecute(data);
-      }, 2000);
+      }, 1000);
     }
 
     return () => {};
