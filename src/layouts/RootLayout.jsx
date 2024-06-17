@@ -61,7 +61,9 @@ const RootLayout = () => {
     }
   }, [isAuthenticated, user]);
 
-  useEffect(() => {}, [location.pathname]);
+  useEffect(() => {
+    sab(actionBarDefault);
+  }, [location.pathname]);
 
   useEffect(() => {
     loader.start();
