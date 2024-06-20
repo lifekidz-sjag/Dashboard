@@ -14,16 +14,15 @@ import { useTheme } from "@mui/material/styles";
 import * as yup from "yup";
 
 import formBg from "../../assets/form-bg.png";
-import { FormTextField } from "../../components/FormInput";
+import { FormSwitch, FormTextField } from "../../components/FormInput";
 import ArrowBack from "../../components/GoogleIcons/ArrowBack";
-import useAdmins from "../../services/admins";
+import useClassesEvaluaton from "../../services/classesEvaluation";
 
-const useUpdateAdmin = ({
+const useUpdateClassEvaluation = ({
+  classId,
   loader,
   sidebar,
   snackbar,
-  noPermissionConfirm,
-  user,
   fetchList,
   sharedState,
   sharedFunction,
@@ -32,17 +31,25 @@ const useUpdateAdmin = ({
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   // API service
-  const { get: getAdmin, put: putAdmin } = useAdmins();
-  const [{ data: getAdminData, error: getAdminError }, getAdminExecute] =
-    getAdmin;
+  const { get: getClassEvaluation, put: putClassEvaluation } =
+    useClassesEvaluaton(classId);
+  const [
+    { data: getClassEvaluationData, error: getClassEvaluationError },
+    getClassEvaluationExecute,
+  ] = getClassEvaluation;
 
-  const [{ data: putAdminData, error: putAdminError }, putAdminExecute] =
-    putAdmin;
+  const [
+    { data: putClassEvaluationData, error: putClassEvaluationError },
+    putClassEvaluationExecute,
+  ] = putClassEvaluation;
 
   // React Hook Form Set Up
-  const updateAdminSchema = yup.object({
-    name: yup.string().required("Please enter name of the admin"),
-    phone: yup.string().required("Please enter phone of the admin"),
+  const updateClassSchema = yup.object({
+    criteriaName: yup.string().required("Please enter name of the criteria"),
+    criteriaDescription: yup
+      .string()
+      .required("Please enter description of the criteria"),
+    status: yup.boolean().required("Please select one"),
   });
 
   const {
@@ -52,18 +59,21 @@ const useUpdateAdmin = ({
   } = useForm({
     defaultValues: {
       id: "",
-      name: "",
-      phone: "",
+      criteriaName: "",
+      criteriaDescription: "",
+      status: true,
     },
-    resolver: yupResolver(updateAdminSchema),
+    resolver: yupResolver(updateClassSchema),
   });
 
   const handleUpdate = async data => {
     const modifiedData = data;
+    modifiedData.status =
+      modifiedData.status.toString() === "false" ? "inactive" : "active";
     delete modifiedData.id;
 
     loader.start();
-    putAdminExecute(sharedState.id, modifiedData);
+    putClassEvaluationExecute(sharedState.id, modifiedData);
   };
 
   const sideUpdate = () => {
@@ -103,8 +113,11 @@ const useUpdateAdmin = ({
                   </IconButton>
                 </Box>
                 <Box sx={{ marginLeft: "8px" }}>
-                  <Typography variant="subtitle1">Update Admin</Typography>
+                  <Typography variant="subtitle1">Update Class</Typography>
                 </Box>
+              </Box>
+              <Box>
+                <FormSwitch name="status" control={controlUpdate} />
               </Box>
             </Box>
 
@@ -116,9 +129,8 @@ const useUpdateAdmin = ({
                     <Grid item xs={12}>
                       <FormTextField
                         required
-                        disabled
-                        name="name"
-                        label="Name"
+                        name="criteriaName"
+                        label="Name of Evaluation"
                         control={controlUpdate}
                         sx={{ marginBottom: "24px" }}
                       />
@@ -126,8 +138,8 @@ const useUpdateAdmin = ({
                     <Grid item xs={12}>
                       <FormTextField
                         required
-                        name="phone"
-                        label="Phone"
+                        name="criteriaDescription"
+                        label="Description of Evaluation"
                         control={controlUpdate}
                         sx={{ marginBottom: "24px" }}
                       />
@@ -162,6 +174,7 @@ const useUpdateAdmin = ({
             >
               <Stack spacing={5} direction="row">
                 <Button
+                  className="XyanButton"
                   variant="text"
                   size="large"
                   style={{
@@ -172,6 +185,7 @@ const useUpdateAdmin = ({
                   Cancel
                 </Button>
                 <Button
+                  className="XyanButton"
                   variant="contained"
                   size="large"
                   type="submit"
@@ -192,19 +206,14 @@ const useUpdateAdmin = ({
   const onUpdate = id => {
     loader.start();
 
-    if (user && user.role.indexOf("superadmin") >= 0) {
-      sharedFunction.setAction("Update");
-      sharedFunction.setId(id);
-      getAdminExecute(id);
-    } else {
-      noPermissionConfirm.open();
-      loader.end();
-    }
+    sharedFunction.setAction("Update");
+    sharedFunction.setId(id);
+    getClassEvaluationExecute(id);
   };
 
   // Side Effects
   useEffect(() => {
-    if (getAdminData) {
+    if (getClassEvaluationData) {
       // open form
       sidebar.setSidebar(prevState => {
         return {
@@ -216,25 +225,26 @@ const useUpdateAdmin = ({
         };
       });
       resetUpdate({
-        name: getAdminData.name,
-        phone: getAdminData.phone,
+        criteriaName: getClassEvaluationData.criteriaName,
+        criteriaDescription: getClassEvaluationData.criteriaDescription,
+        status: getClassEvaluationData.status === "active",
       });
       sidebar.open();
       loader.end();
     }
-  }, [getAdminData]);
+  }, [getClassEvaluationData]);
 
   useEffect(() => {
-    if (putAdminData) {
+    if (putClassEvaluationData) {
       sidebar.close();
       sharedFunction.setAction("updateComplete");
       fetchList({
         params:
           Object.keys(sharedState.searchParams).length > 0
             ? sharedState.searchParams
-            : { sort: "-updatedAt" },
+            : { sort: "-status" },
         cb: () => {
-          snackbar.open("Admin updated successfully.", false);
+          snackbar.open("Class Evaluation updated successfully.", false);
           resetUpdate();
           sharedFunction.setAction("View");
           sharedFunction.setId("");
@@ -244,42 +254,44 @@ const useUpdateAdmin = ({
     }
 
     return () => {};
-  }, [putAdminData]);
+  }, [putClassEvaluationData]);
 
   // Side Effects
   useEffect(() => {
-    if (getAdminError) {
+    if (getClassEvaluationError) {
       loader.end();
-      switch (getAdminError.response.data) {
+      switch (getClassEvaluationError.response.data) {
         case "INVALID_ID":
           snackbar.open("Something went wrong. Plaese try again later", true);
           break;
-
         default:
           break;
       }
     }
     loader.end();
     return () => {};
-  }, [getAdminError]);
+  }, [getClassEvaluationError]);
 
   useEffect(() => {
-    if (putAdminError) {
-      switch (putAdminError.response.data) {
-        case "ADMIN_ACTIONS_NOT_ALLOWED":
-          snackbar.open("Something went wrong. Plaese try again later", true);
-          break;
+    if (putClassEvaluationError) {
+      switch (putClassEvaluationError.response.data) {
         case "EMPTY_REQUEST":
           snackbar.open("Something went wrong. Plaese try again later", true);
           break;
-        case "DUPLICATED_ADMIN":
+        case "INVALID_ID":
+          snackbar.open("Something went wrong. Plaese try again later", true);
+          break;
+        case "EXCEED_MAXIMUM_EVALUATION":
           snackbar.open(
-            "Unique admin name is required. Please rephrase your admin name",
+            "Only a total of 3 active evaluation is allowed for each class",
             true,
           );
           break;
-        case "INVALID_ID":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+        case "DUPLICATED_CLASS_EVALUATION":
+          snackbar.open(
+            "Unique class evaluation is required. Please rephrase your topic",
+            true,
+          );
           break;
         case "UNAUTHORIZED_ACTION":
           snackbar.open("Please login again to proceed", true);
@@ -290,13 +302,13 @@ const useUpdateAdmin = ({
     }
     loader.end();
     return () => {};
-  }, [putAdminError]);
+  }, [putClassEvaluationError]);
 
   return {
     onUpdate,
   };
 };
 
-useUpdateAdmin.propTypes = {};
+useUpdateClassEvaluation.propTypes = {};
 
-export default useUpdateAdmin;
+export default useUpdateClassEvaluation;

@@ -70,22 +70,6 @@ const useDeleteClass = ({
   // Side Effects
   useEffect(() => {
     if (deleteClassError) {
-      loader.end();
-      switch (deleteClassError.response.data) {
-        case "INVALID_ID":
-          snackbar.open("Something went wrong. Plaese try again later", true);
-          break;
-
-        default:
-          break;
-      }
-    }
-    loader.end();
-    return () => {};
-  }, [deleteClassError]);
-
-  useEffect(() => {
-    if (deleteClassError) {
       switch (deleteClassError.response.data) {
         case "ADMIN_ACTIONS_NOT_ALLOWED":
           snackbar.open("Something went wrong. Plaese try again later", true);

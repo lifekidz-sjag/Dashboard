@@ -1,17 +1,18 @@
 import { useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 
 import ListClasses from "../features/classes/ListClasses";
 import useClassesFeatures from "../features/classes/useClassesFeatures";
 
 const Classes = () => {
+  const { id } = useParams();
   const contextProps = useOutletContext();
   const { loader, setActionBar, user } = contextProps;
 
   const { features, state } = useClassesFeatures({
     contextProps,
   });
-
+  const navigate = useNavigate();
   const {
     fetchClasses,
     sortClasses,
@@ -25,6 +26,9 @@ const Classes = () => {
 
   // Page load
   useEffect(() => {
+    if (id) {
+      navigate(`/classes/${id}/evaluation`);
+    }
     loader.start();
     setActionBar({
       title: {

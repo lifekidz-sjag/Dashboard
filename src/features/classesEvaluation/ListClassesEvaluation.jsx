@@ -1,8 +1,7 @@
-import { useNavigate } from "react-router-dom";
 import {
   Box,
+  Chip,
   Divider,
-  IconButton,
   List,
   ListItem,
   ListItemButton,
@@ -15,14 +14,13 @@ import PropTypes from "prop-types";
 
 import BlankImage from "../../assets/sjag_blank.gif";
 import ActionDropdown from "../../components/ActionDropdown";
-import ArrowUpward from "../../components/GoogleIcons/ArrowUpward";
-import CreditScore from "../../components/GoogleIcons/CreditScore";
 import Delete from "../../components/GoogleIcons/Delete";
 import EditNote from "../../components/GoogleIcons/EditNote";
 
 const nameWidth = "0 0 210px";
 const descriptionWidth = "1";
 const lastModifiedWidth = "0 0 210px";
+const statusWidth = "0 0 80px";
 const moreActionWidth = "0 0 40px";
 
 const CustomizedListItemButton = styled(ListItemButton, {
@@ -48,39 +46,21 @@ const CustomizedDivider = styled(() => (
   <Divider orientation="vertical" variant="middle" flexItem />
 ))(() => ({}));
 
-const ListClasses = ({
-  user,
+const ListClassesEvaluation = ({
   newItemAnimation,
   className,
   nodeRefFunc,
   list,
   paginationComponent,
-  onSort,
-  sort,
-  lastClicked,
   onUpdate,
   onDelete,
-  searchStatus,
 }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
-  const navigate = useNavigate();
 
   // Action Dropdown set up
   const dropdownItems = (id, name) => {
     const menuItems = [
-      {
-        text: "View Evaluation",
-        icon: (
-          <CreditScore
-            className="xtopia-menu-icon"
-            sx={{ width: "24px", height: "24px" }}
-          />
-        ),
-        action: () => {
-          navigate(`/classes/${id}/evaluation`);
-        },
-      },
       {
         text: "Manage",
         icon: (
@@ -94,22 +74,65 @@ const ListClasses = ({
         },
       },
     ];
-    if (user.role === "superadmin" && id !== user.id) {
-      menuItems.push({
-        text: "Remove",
-        icon: (
-          <Delete
-            className="xtopia-menu-icon"
-            sx={{ width: "24px", height: "24px" }}
-          />
-        ),
-        action: () => {
-          onDelete({ id, name });
-        },
-      });
-    }
+    menuItems.push({
+      text: "Remove",
+      icon: (
+        <Delete
+          className="xtopia-menu-icon"
+          sx={{ width: "24px", height: "24px" }}
+        />
+      ),
+      action: () => {
+        onDelete({ id, name });
+      },
+    });
 
     return menuItems;
+  };
+  const renderStatusChip = status => {
+    let statusText = "";
+    let backgroundColor = "";
+    let color = "";
+    switch (status) {
+      case "active":
+        statusText = "Active";
+        backgroundColor = theme.palette.success.main;
+        color = theme.palette.secondary.contrastText;
+        break;
+      case "inactive":
+        statusText = "Inactive";
+        backgroundColor = theme.palette.grey["300"];
+        color = theme.palette.text.primary;
+        break;
+      default:
+        statusText = "NONE";
+        break;
+    }
+    return isSmallScreen ? (
+      <Box
+        sx={{
+          width: "16px",
+          height: "16px",
+          borderRadius: "50%",
+          background: backgroundColor,
+        }}
+      />
+    ) : (
+      <Chip
+        label={statusText}
+        sx={{
+          backgroundColor,
+          color,
+          width: "auto",
+          height: "24px",
+          "& .MuiChip-label": {
+            overflow: "unset !important",
+            paddingX: "0px !important",
+          },
+          paddingX: "8px !important",
+        }}
+      />
+    );
   };
 
   const renderMobileDropdownInfo = data => {
@@ -126,7 +149,7 @@ const ListClasses = ({
         });
       return (
         <>
-          <Typography variant="body1">{data.name}</Typography>
+          <Typography variant="body1">{data.criteriaName}</Typography>
           <Typography
             variant="body1"
             sx={{
@@ -134,12 +157,12 @@ const ListClasses = ({
               textOverflow: "ellipsis",
             }}
           >
-            Description: <b>{data.description}</b>
+            Description: <b>{data.criteriaDescription}</b>
           </Typography>
           <Typography
             variant="body2"
             sx={{ color: "text.secondary" }}
-          >{`Last updated ${date}`}</Typography>
+          >{`Last Modified ${date}`}</Typography>
         </>
       );
     }
@@ -200,12 +223,21 @@ const ListClasses = ({
                       WebkitBoxOrient: "vertical",
                     }}
                   >
-                    <Typography variant="body1">{item.name}</Typography>
+                    <Typography variant="body1">{item.criteriaName}</Typography>
                   </Box>
                 </Box>
               </CustomizedListItemText>
             </CustomizedListItemButton>
-
+            <CustomizedListItemText
+              disableTypography
+              sx={{
+                display: "flex",
+                flex: statusWidth,
+                justifyContent: "center",
+              }}
+            >
+              {renderStatusChip(item.status)}
+            </CustomizedListItemText>
             {/* Lock & More action */}
             <CustomizedListItemButton
               dense
@@ -223,7 +255,7 @@ const ListClasses = ({
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <Box>
                     <ActionDropdown
-                      menuItems={dropdownItems(item.id, item.name)}
+                      menuItems={dropdownItems(item.id, item.criteriaName)}
                       iconOrientation="horizontal"
                       data={item}
                       renderElement={() => {
@@ -315,7 +347,9 @@ const ListClasses = ({
                         WebkitBoxOrient: "vertical",
                       }}
                     >
-                      <Typography variant="body1">{item.name}</Typography>
+                      <Typography variant="body1">
+                        {item.criteriaName}
+                      </Typography>
                     </Box>
                   </Box>
                 </CustomizedListItemText>
@@ -338,7 +372,9 @@ const ListClasses = ({
                       WebkitBoxOrient: "vertical",
                     }}
                   >
-                    <Typography variant="body1">{item.description}</Typography>
+                    <Typography variant="body1">
+                      {item.criteriaDescription}
+                    </Typography>
                   </Box>
                 </CustomizedListItemText>
 
@@ -362,7 +398,17 @@ const ListClasses = ({
                     })()}
                   </Typography>
                 </CustomizedListItemText>
-
+                {/* Status */}
+                <CustomizedListItemText
+                  disableTypography
+                  sx={{
+                    display: "flex",
+                    flex: statusWidth,
+                    justifyContent: "center",
+                  }}
+                >
+                  {renderStatusChip(item.status)}
+                </CustomizedListItemText>
                 {/* Lock & More action */}
                 <CustomizedListItemText
                   disableTypography
@@ -370,7 +416,7 @@ const ListClasses = ({
                 >
                   <Box>
                     <ActionDropdown
-                      menuItems={dropdownItems(item.id, item.name)}
+                      menuItems={dropdownItems(item.id, item.criteriaName)}
                       iconOrientation="horizontal"
                     />
                   </Box>
@@ -443,32 +489,7 @@ const ListClasses = ({
                           },
                         }}
                       >
-                        <Box
-                          role="button"
-                          onClick={() => {
-                            if (searchStatus === "none") {
-                              onSort("name");
-                            }
-                          }}
-                          sx={{ display: "flex", alignItems: "center" }}
-                        >
-                          <Typography variant="body1">Name</Typography>
-                          {searchStatus === "none" && (
-                            <IconButton
-                              onClick={() => {
-                                onSort("name");
-                              }}
-                              sx={{ marginLeft: "8px" }}
-                            >
-                              <ArrowUpward
-                                color="inherit"
-                                className={`sort-icon ${
-                                  sort.name === 1 ? "upward" : "downward"
-                                }`}
-                              />
-                            </IconButton>
-                          )}
-                        </Box>
+                        <Typography variant="body1">Name</Typography>
                       </CustomizedListItemText>
                     </CustomizedListItemButton>
                   </ListItem>
@@ -516,35 +537,7 @@ const ListClasses = ({
                         },
                       }}
                     >
-                      <Box
-                        role="button"
-                        onClick={() => {
-                          if (searchStatus === "none") {
-                            onSort("name");
-                          }
-                        }}
-                        sx={{ display: "flex", alignItems: "center" }}
-                      >
-                        <Typography variant="body1">Name</Typography>
-                        {searchStatus === "none" && (
-                          <IconButton
-                            onClick={() => {
-                              onSort("name");
-                            }}
-                            sx={{ marginLeft: "8px" }}
-                          >
-                            <ArrowUpward
-                              color="inherit"
-                              className={`sort-icon ${
-                                sort.name === 1 ? "upward" : "downward"
-                              }`}
-                              sx={{
-                                display: lastClicked.name ? "block" : "none",
-                              }}
-                            />
-                          </IconButton>
-                        )}
-                      </Box>
+                      <Typography variant="body1">Name</Typography>
                     </CustomizedListItemText>
                     <CustomizedDivider />
                     {/* Class Description */}
@@ -586,40 +579,29 @@ const ListClasses = ({
                         },
                       }}
                     >
-                      <Box
-                        role="button"
-                        onClick={() => {
-                          if (searchStatus === "none") {
-                            onSort("updatedAt");
-                          }
-                        }}
-                        sx={{ display: "flex", alignItems: "center" }}
-                      >
-                        <Typography variant="body1">Last Modified</Typography>
-                        {searchStatus === "none" && (
-                          <IconButton
-                            onClick={() => {
-                              onSort("updatedAt");
-                            }}
-                            sx={{ marginLeft: "8px" }}
-                          >
-                            <ArrowUpward
-                              color="inherit"
-                              className={`sort-icon ${
-                                sort.updatedAt === 1 ? "upward" : "downward"
-                              }`}
-                              sx={{
-                                display: lastClicked.updatedAt
-                                  ? "block"
-                                  : "none",
-                              }}
-                            />
-                          </IconButton>
-                        )}
-                      </Box>
+                      <Typography variant="body1">Last Modified</Typography>
                     </CustomizedListItemText>
                     <CustomizedDivider />
-
+                    <CustomizedListItemText
+                      sx={{
+                        flex: statusWidth,
+                        justifyContent: "center",
+                        display: { xs: "none", md: "flex" },
+                        cursor: "pointer",
+                        ".downward": {
+                          transform: "rotate(180deg)",
+                        },
+                        ":hover": {
+                          ".sort-icon": {
+                            display: "block",
+                            transition: "transform 0.3s ease-in-out",
+                          },
+                        },
+                      }}
+                    >
+                      <Typography variant="body1">Status</Typography>
+                    </CustomizedListItemText>
+                    <CustomizedDivider />
                     {/* Lock & More action */}
                     <CustomizedListItemText
                       disableTypography
@@ -656,8 +638,7 @@ const ListClasses = ({
   );
 };
 
-ListClasses.propTypes = {
-  user: PropTypes.shape().isRequired,
+ListClassesEvaluation.propTypes = {
   newItemAnimation: PropTypes.shape().isRequired,
   className: PropTypes.func.isRequired,
   nodeRefFunc: PropTypes.func.isRequired,
@@ -665,12 +646,8 @@ ListClasses.propTypes = {
     data: PropTypes.arrayOf(PropTypes.shape()),
   }).isRequired,
   paginationComponent: PropTypes.element.isRequired,
-  onSort: PropTypes.func.isRequired,
-  sort: PropTypes.shape().isRequired,
-  lastClicked: PropTypes.shape().isRequired,
   onUpdate: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
-  searchStatus: PropTypes.string.isRequired,
 };
 
-export default ListClasses;
+export default ListClassesEvaluation;

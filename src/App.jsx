@@ -7,6 +7,7 @@ import RootLayout from "./layouts/RootLayout";
 import UserLayout from "./layouts/UserLayout";
 import Admins from "./pages/Admins";
 import Classes from "./pages/Classes";
+import ClassEvaluation from "./pages/ClassEvaluation";
 import Dashboard from "./pages/Dashboard";
 import Error404 from "./pages/Error404";
 import ReportsLayoutLanding from "./pages/ReportsLayoutLanding";
@@ -73,6 +74,10 @@ const router = createBrowserRouter(
             {
               path: "classes",
               element: <Classes />,
+            },
+            {
+              path: "classes/:id/evaluation",
+              element: <ClassEvaluation />,
             },
             {
               path: "teachers",

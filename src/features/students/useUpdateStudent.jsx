@@ -293,9 +293,12 @@ const useUpdateStudent = ({
           <Box
             sx={{
               position: "absolute",
-              bottom: "0px",
-              left: "0px",
+              width: "100%",
+              bottom: { xs: "75px", md: "0px" },
               right: "0px",
+              background: "white",
+              zIndex: 1,
+              borderTop: "1px solid rgba(0,0,0,0.1)",
             }}
           >
             {!isSmallScreen && (
