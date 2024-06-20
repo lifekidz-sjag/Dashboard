@@ -13,7 +13,6 @@ import Close from "./GoogleIcons/Close";
 
 const Popup = props => {
   const {
-    popupButton,
     children = null,
     title,
     popup,
@@ -136,7 +135,6 @@ const Popup = props => {
             }}
             variant="contained"
             style={{ borderRadius: "20px" }}
-            disabled={popupButton}
           >
             {popup.text}
           </Button>
@@ -148,7 +146,6 @@ const Popup = props => {
 };
 
 Popup.propTypes = {
-  popupButton: PropTypes.bool.isRequired,
   title: PropTypes.string.isRequired,
   popup: PropTypes.shape().isRequired,
   cancel: PropTypes.shape().isRequired,

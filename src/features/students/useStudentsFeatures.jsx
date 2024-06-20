@@ -111,6 +111,7 @@ const useStudentsFeatures = ({ contextProps, popupClockIn, popupClockOut }) => {
 
   const clockOutStudent = useClockOutStudent({
     popupClockOut,
+    sidebar,
     loader,
     popup,
     snackbar,

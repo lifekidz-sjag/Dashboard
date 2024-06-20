@@ -10,6 +10,7 @@ const Students = () => {
   const contextProps = useOutletContext();
   const popupClockIn = usePopup();
   const popupClockOut = usePopup();
+
   const { loader, setActionBar, user } = contextProps;
 
   const { features, state } = useStudentsFeatures({
