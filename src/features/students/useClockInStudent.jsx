@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { isMobile } from "react-device-detect";
 import { Box } from "@mui/material";
 import CryptoJS from "crypto-js";
 import { Html5QrcodeScanner, Html5QrcodeScanType } from "html5-qrcode";
@@ -88,6 +89,11 @@ const useClockInStudent = ({
 
   useEffect(() => {
     if (popupClockIn.isOpen) {
+      const mobileArr = [Html5QrcodeScanType.SCAN_TYPE_CAMERA];
+      const desktopArr = [
+        Html5QrcodeScanType.SCAN_TYPE_CAMERA,
+        Html5QrcodeScanType.SCAN_TYPE_FILE,
+      ];
       setTimeout(() => {
         const scanner = new Html5QrcodeScanner("reader", {
           qrbox: {
@@ -95,7 +101,7 @@ const useClockInStudent = ({
             height: 250,
           },
           fps: 5,
-          supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
+          supportedScanTypes: isMobile ? mobileArr : desktopArr,
         });
 
         let isScanning = true;

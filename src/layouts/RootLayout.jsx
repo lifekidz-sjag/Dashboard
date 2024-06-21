@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Outlet,
-  useLocation,
-  useNavigate,
-  useOutletContext,
-} from "react-router-dom";
+import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
 import {
   Box,
   Fab,
@@ -30,7 +25,6 @@ const RootLayout = () => {
   console.log("RUNNING ROOT LAYOUT");
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
-  const location = useLocation();
   const navigate = useNavigate();
 
   // Authetication stuffs
@@ -369,7 +363,6 @@ const RootLayout = () => {
 RootLayout.propTypes = {
   loader: PropTypes.shape(),
   actionBar: PropTypes.shape(),
-  actionBarDefault: PropTypes.shape(),
   setActionBar: PropTypes.func,
 };
 export default RootLayout;

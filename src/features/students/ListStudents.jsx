@@ -1,5 +1,6 @@
 import {
   Box,
+  Chip,
   Divider,
   IconButton,
   List,
@@ -210,6 +211,23 @@ const ListStudents = ({
                   >
                     <Typography variant="body1">{item.name}</Typography>
                   </Box>
+                  {item.type === "new" && (
+                    <Chip
+                      label="New"
+                      sx={{
+                        marginLeft: "8px",
+                        backgroundColor: theme.palette.success.main,
+                        color: theme.palette.secondary.contrastText,
+                        width: "auto",
+                        height: "24px",
+                        "& .MuiChip-label": {
+                          overflow: "unset !important",
+                          paddingX: "0px !important",
+                        },
+                        paddingX: "8px !important",
+                      }}
+                    />
+                  )}
                 </Box>
               </CustomizedListItemText>
             </CustomizedListItemButton>
@@ -325,6 +343,23 @@ const ListStudents = ({
                     >
                       <Typography variant="body1">{item.name}</Typography>
                     </Box>
+                    {item.type === "new" && (
+                      <Chip
+                        label="New"
+                        sx={{
+                          marginLeft: "8px",
+                          backgroundColor: theme.palette.success.main,
+                          color: theme.palette.secondary.contrastText,
+                          width: "auto",
+                          height: "24px",
+                          "& .MuiChip-label": {
+                            overflow: "unset !important",
+                            paddingX: "0px !important",
+                          },
+                          paddingX: "8px !important",
+                        }}
+                      />
+                    )}
                   </Box>
                 </CustomizedListItemText>
 

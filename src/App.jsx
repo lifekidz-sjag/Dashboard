@@ -10,6 +10,7 @@ import Classes from "./pages/Classes";
 import ClassEvaluation from "./pages/ClassEvaluation";
 import Dashboard from "./pages/Dashboard";
 import Error404 from "./pages/Error404";
+import ReportsClasses from "./pages/ReportsClasses";
 import ReportsLayoutLanding from "./pages/ReportsLayoutLanding";
 import Students from "./pages/Students";
 import Teachers from "./pages/Teachers";
@@ -103,7 +104,7 @@ const router = createBrowserRouter(
                 {
                   index: true,
                   path: "classes",
-                  element: <Dashboard />,
+                  element: <ReportsClasses />,
                 },
               ],
             },

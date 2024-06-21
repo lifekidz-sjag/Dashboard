@@ -62,7 +62,8 @@ const useAddStudent = ({
       .nullable()
       .required("Please enter age of the student"),
     class: yup.string().required("Please select a class"),
-    gender: yup.string().required("Please select gender or the student"),
+    type: yup.string().required("Please select one"),
+    gender: yup.string().required("Please select gender of the student"),
     birthday: yup.string().required("Please enter birthday of student"),
     famName: yup.string().required("Please enter main family member name"),
     famContact: yup
@@ -86,6 +87,7 @@ const useAddStudent = ({
       name: "",
       age: "",
       class: "",
+      type: "",
       gender: "",
       birthday: new Date(new Date().setHours(new Date().getHours() + 8))
         .toISOString()
@@ -118,6 +120,11 @@ const useAddStudent = ({
   const genderOptions = [
     { id: "male", name: "Male" },
     { id: "female", name: "Female" },
+  ];
+
+  const typeOptions = [
+    { id: "regular", name: "Regular" },
+    { id: "new", name: "New" },
   ];
 
   const sideCreate = dependencies => {
@@ -207,6 +214,18 @@ const useAddStudent = ({
                       />
                     </Grid>
                     <Grid item xs={12} md={6}>
+                      <FormSelect
+                        name="type"
+                        label="Regular or New"
+                        control={controlCreate}
+                        options={typeOptions.map(data => ({
+                          label: data.name,
+                          value: data.id,
+                        }))}
+                        sx={{ marginBottom: "24px" }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
                       <FormTextField
                         required
                         name="age"
@@ -239,7 +258,7 @@ const useAddStudent = ({
                         sx={{ marginBottom: "24px" }}
                       />
                     </Grid>
-                    <Grid item xs={12} sx={{ marginTop: "24px" }}>
+                    <Grid item xs={12} md={6} sx={{ marginTop: "24px" }}>
                       <FormDateTimePicker
                         label="Birthday"
                         name="birthday"

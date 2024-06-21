@@ -28,7 +28,7 @@ const useUpdateClassEvaluation = ({
   sharedFunction,
 }) => {
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   // API service
   const { get: getClassEvaluation, put: putClassEvaluation } =

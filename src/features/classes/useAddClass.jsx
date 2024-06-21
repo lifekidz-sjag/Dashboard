@@ -29,7 +29,7 @@ const useAddClass = ({
   sharedFunction,
 }) => {
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   // API service
   const { post: postClass } = useClasses();

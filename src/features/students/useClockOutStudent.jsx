@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { isMobile } from "react-device-detect";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
@@ -321,6 +322,7 @@ const useClockOutStudent = ({
   useEffect(() => {
     if (postStudentEvaluationData) {
       loader.end();
+      sidebar.close();
 
       snackbar.open(
         `You have clocked out ${studentInfo.studentName} successfully.`,
@@ -361,6 +363,12 @@ const useClockOutStudent = ({
 
   useEffect(() => {
     if (popupClockOut.isOpen) {
+      const mobileArr = [Html5QrcodeScanType.SCAN_TYPE_CAMERA];
+      const desktopArr = [
+        Html5QrcodeScanType.SCAN_TYPE_CAMERA,
+        Html5QrcodeScanType.SCAN_TYPE_FILE,
+      ];
+
       setTimeout(() => {
         const scanner = new Html5QrcodeScanner("reader", {
           qrbox: {
@@ -368,7 +376,7 @@ const useClockOutStudent = ({
             height: 250,
           },
           fps: 5,
-          supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
+          supportedScanTypes: isMobile ? mobileArr : desktopArr,
         });
 
         let isScanning = true;
@@ -411,15 +419,20 @@ const useClockOutStudent = ({
         // Handle data
         popupClockOut.close();
         const array = [];
-        response.data.data.forEach(v => {
-          array.push({
-            id: v.id,
-            rating: 0,
-          });
-        });
 
-        resetRating({ rating: array });
-        setClassEvaluation(response.data.data);
+        if (response.data.data.length) {
+          response.data.data.forEach(v => {
+            array.push({
+              id: v.id,
+              rating: 0,
+            });
+          });
+
+          resetRating({ rating: array });
+          setClassEvaluation(response.data.data);
+        } else {
+          clockOutExecute(studentInfo);
+        }
       });
     }
   }, [cId]);

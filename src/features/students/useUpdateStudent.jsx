@@ -36,7 +36,7 @@ const useUpdateStudent = ({
   sharedFunction,
 }) => {
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   // API service
   const { fetch: fetchClasses } = useClasses();
@@ -57,7 +57,8 @@ const useUpdateStudent = ({
     name: yup.string().required("Please enter name of the student"),
     age: yup.number().required("Please enter age of the student"),
     class: yup.string().required("Please select a class"),
-    gender: yup.string().required("Please select gender or the student"),
+    gender: yup.string().required("Please select gender of the student"),
+    type: yup.string().required("Please select one"),
     birthday: yup.string().required("Please enter birthday of student"),
     famName: yup.string().required("Please enter main family member name"),
     famContact: yup
@@ -81,6 +82,7 @@ const useUpdateStudent = ({
       age: "",
       class: "",
       gender: "",
+      type: "",
       birthday: new Date(new Date().setHours(new Date().getHours() + 8))
         .toISOString()
         .replace(/\.\d{3}Z$/, ""),
@@ -111,7 +113,10 @@ const useUpdateStudent = ({
     { id: "male", name: "Male" },
     { id: "female", name: "Female" },
   ];
-
+  const typeOptions = [
+    { id: "regular", name: "Regular" },
+    { id: "new", name: "New" },
+  ];
   const sideUpdate = dependencies => {
     return (
       <Box
@@ -188,6 +193,18 @@ const useUpdateStudent = ({
                       />
                     </Grid>
                     <Grid item xs={12} md={6}>
+                      <FormSelect
+                        name="type"
+                        label="Regular or New?"
+                        control={controlUpdate}
+                        options={typeOptions.map(data => ({
+                          label: data.name,
+                          value: data.id,
+                        }))}
+                        sx={{ marginBottom: "24px" }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
                       <FormTextField
                         required
                         name="age"
@@ -220,7 +237,7 @@ const useUpdateStudent = ({
                         sx={{ marginBottom: "24px" }}
                       />
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={12} md={6}>
                       <FormDateTimePicker
                         label="Birthday"
                         name="birthday"
@@ -373,6 +390,7 @@ const useUpdateStudent = ({
         name: getStudentData.name,
         age: getStudentData.age,
         gender: getStudentData.gender,
+        type: getStudentData.type,
         class: getStudentData.class,
         birthday: getStudentData.birthday,
         famName: getStudentData.famName,
