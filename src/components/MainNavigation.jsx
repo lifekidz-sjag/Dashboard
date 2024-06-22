@@ -22,6 +22,7 @@ import ChildCare from "./GoogleIcons/ChildCare";
 import Dashboard from "./GoogleIcons/Dashboard";
 import Groups from "./GoogleIcons/Groups";
 import MoreHoriz from "./GoogleIcons/MoreHoriz";
+import Notifications from "./GoogleIcons/NotificationsIcon";
 import Report from "./GoogleIcons/Report";
 import School from "./GoogleIcons/School";
 import ShieldPerson from "./GoogleIcons/ShieldPerson";
@@ -275,11 +276,6 @@ const navigationItems = user => {
           name: "Students",
           path: `/reports/students`,
         },
-        // {
-        //   id: "85565589-5501-4aaa-8754-10ca0c9b4964",
-        //   name: "Tokens Usage",
-        //   path: `/reports/${projectId}/reports/ai-assistant/tokens-usage`,
-        // },
       ],
     },
     {
@@ -309,6 +305,15 @@ const navigationItems = user => {
         path: `/admins`,
         icon: currentPage => {
           return <ShieldPerson currentpage={currentPage.toString()} />;
+        },
+        mobile: "second",
+      },
+      {
+        id: "31a62c4b-13ff-4f86-af3f-b316fb8c9b8f",
+        name: "Announcements",
+        path: `/notifications`,
+        icon: currentPage => {
+          return <Notifications currentpage={currentPage.toString()} />;
         },
         mobile: "second",
       },

@@ -66,7 +66,7 @@ function a11yProps(index) {
 }
 
 const ReportsClasses = () => {
-  const { loader, setActionBar } = useOutletContext();
+  const { loader, setActionBar, actionBarDefault } = useOutletContext();
   const [list, setList] = useState([]);
   const [classOptions, setClassOptions] = useState([]);
 
@@ -398,7 +398,10 @@ const ReportsClasses = () => {
         type: "pie",
         radius: "50%",
         data: processed.map(el => {
-          return { value: el.studentCount, name: `${el.age} years old` };
+          return {
+            value: el.studentCount,
+            name: `${el.age} years old (${el.studentCount})`,
+          };
         }),
         emphasis: {
           itemStyle: {
@@ -413,7 +416,7 @@ const ReportsClasses = () => {
         orient: "vertical",
         left: 10,
         data: processed.map(el => {
-          return `${el.age} years old`;
+          return `${el.age} years old (${el.studentCount})`;
         }),
       };
 
@@ -584,7 +587,6 @@ const ReportsClasses = () => {
   };
 
   const classFilter = () => {
-    console.log(getValues("classFilter"));
     setValue("classFilter", getValues("classFilter"), {
       shouldValidate: true,
     });
@@ -598,6 +600,7 @@ const ReportsClasses = () => {
 
     fetchClassesExecute({ params: { sort: "name" } });
     setActionBar({
+      actionBarDefault,
       title: {
         enabled: true,
         display: true,
@@ -630,7 +633,6 @@ const ReportsClasses = () => {
   }, [fetchClassesData]);
   useEffect(() => {
     if (classOptions.length > 0) {
-      console.log(classOptions);
       fetchReportsClassesExecute({
         params: getFilterParam({ classId: classOptions[0].value }),
       });

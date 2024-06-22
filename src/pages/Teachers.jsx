@@ -1,12 +1,14 @@
 import { useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 
 import ListTeachers from "../features/teachers/ListTeachers";
 import useTeachersFeatures from "../features/teachers/useTeachersFeatures";
 
 const Teachers = () => {
+  const [searchParams] = useSearchParams();
+
   const contextProps = useOutletContext();
-  const { loader, setActionBar, user } = contextProps;
+  const { loader, setActionBar, user, actionBarDefault } = contextProps;
 
   const { features, state } = useTeachersFeatures({
     contextProps,
@@ -26,7 +28,12 @@ const Teachers = () => {
   // Page load
   useEffect(() => {
     loader.start();
+
+    if (searchParams.get("add") === "true") {
+      addTeacher.onAdd();
+    }
     setActionBar({
+      ...actionBarDefault,
       title: {
         enabled: true,
         display: true,

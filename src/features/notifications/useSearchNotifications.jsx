@@ -5,7 +5,7 @@ import * as yup from "yup";
 
 import { FormTextField } from "../../components/FormInput";
 
-const useSearchClassesEvaluation = ({ loader, fetchList, sharedFunction }) => {
+const useSearchNotifications = ({ loader, fetchList, sharedFunction }) => {
   // Native states
 
   const searchInfoSchema = yup.object({
@@ -34,7 +34,7 @@ const useSearchClassesEvaluation = ({ loader, fetchList, sharedFunction }) => {
     };
 
     if (data.keyword) {
-      params["filter[criteriaName]"] = `like:${data.keyword}`;
+      params["filter[title]"] = `like:${data.keyword}`;
     }
 
     sharedFunction.setSearchParams(params);
@@ -48,7 +48,7 @@ const useSearchClassesEvaluation = ({ loader, fetchList, sharedFunction }) => {
     loader.start();
     fetchList({
       params: {
-        sort: "status",
+        sort: "-updatedAt",
       },
     });
     resetSearch();
@@ -94,6 +94,6 @@ const useSearchClassesEvaluation = ({ loader, fetchList, sharedFunction }) => {
   };
 };
 
-useSearchClassesEvaluation.propTypes = {};
+useSearchNotifications.propTypes = {};
 
-export default useSearchClassesEvaluation;
+export default useSearchNotifications;

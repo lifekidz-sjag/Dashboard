@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 
 import Popup from "../components/Popup";
 import ListStudents from "../features/students/ListStudents";
@@ -7,11 +7,13 @@ import useStudentsFeatures from "../features/students/useStudentsFeatures";
 import usePopup from "../hooks/usePopup";
 
 const Students = () => {
+  const [searchParams] = useSearchParams();
+
   const contextProps = useOutletContext();
   const popupClockIn = usePopup();
   const popupClockOut = usePopup();
 
-  const { loader, setActionBar, user } = contextProps;
+  const { loader, setActionBar, user, actionBarDefault } = contextProps;
 
   const { features, state } = useStudentsFeatures({
     contextProps,
@@ -36,7 +38,11 @@ const Students = () => {
   // Page load
   useEffect(() => {
     loader.start();
+    if (searchParams.get("add") === "true") {
+      addStudent.onAdd();
+    }
     setActionBar({
+      ...actionBarDefault,
       title: {
         enabled: true,
         display: true,

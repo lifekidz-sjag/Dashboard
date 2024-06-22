@@ -41,7 +41,7 @@ const useFetchClassesEvaluation = ({
 
       fetchClassesEvaluationExecute({
         params: {
-          sort: "-status",
+          sort: "status",
           "page[size]": 10,
         },
       });

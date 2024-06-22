@@ -25,12 +25,6 @@ const AvatarDropdown = () => {
 
   const menuItems = [
     {
-      id: "ce7f9d92-8c48-49e4-b3af-6305c427e893",
-      name: "Profile",
-      path: `/account/profile`,
-      icon: <AccountsIcon />,
-    },
-    {
       id: "ce7f9d92-8c48-49e4-b3af-6305c427e898",
       name: "Logout",
       action: () => {

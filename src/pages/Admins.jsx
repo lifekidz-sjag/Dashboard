@@ -6,7 +6,7 @@ import useAdminsFeatures from "../features/admins/useAdminsFeatures";
 
 const Admins = () => {
   const contextProps = useOutletContext();
-  const { loader, setActionBar, user } = contextProps;
+  const { loader, setActionBar, user, actionBarDefault } = contextProps;
 
   const { features, state } = useAdminsFeatures({
     contextProps,
@@ -27,6 +27,7 @@ const Admins = () => {
   useEffect(() => {
     loader.start();
     setActionBar({
+      ...actionBarDefault,
       title: {
         enabled: true,
         display: true,

@@ -1,7 +1,7 @@
 import useApiService from "../hooks/useApiService";
 
 const useReportsClasses = () => {
-  const apiEndpoint = `Reports/Attendances`;
+  const apiEndpoint = `ReportsClass/Attendances`;
   return useApiService(apiEndpoint);
 };
 

@@ -14,56 +14,71 @@ import { useTheme } from "@mui/material/styles";
 import * as yup from "yup";
 
 import formBg from "../../assets/form-bg.png";
-import { FormTextField } from "../../components/FormInput";
+import {
+  FormSwitch,
+  FormTextAreaField,
+  FormTextField,
+} from "../../components/FormInput";
 import ArrowBack from "../../components/GoogleIcons/ArrowBack";
-import useClassesEvaluaton from "../../services/classesEvaluation";
+import useNotifications from "../../services/notifications";
 
-const useAddClassEvaluation = ({
-  classId,
+const useUpdateNotification = ({
   loader,
   sidebar,
   snackbar,
-  setNewItemAnimation,
   fetchList,
+  sharedState,
   sharedFunction,
 }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   // API service
-  const { post: postClassEvaluation } = useClassesEvaluaton(classId);
+  const { get: getNotifications, put: putNotification } = useNotifications();
   const [
-    { data: postClassEvaluationData, error: postClassEvaluationError },
-    postClassEvaluationExecute,
-  ] = postClassEvaluation;
+    { data: getNotificationsData, error: getNotificationsError },
+    getNotificationsExecute,
+  ] = getNotifications;
+
+  const [
+    { data: putNotificationData, error: putNotificationError },
+    putNotificationExecute,
+  ] = putNotification;
 
   // React Hook Form Set Up
-
-  const createClassSchema = yup.object({
-    criteriaName: yup.string().required("Please enter name of the criteria"),
-    criteriaDescription: yup
+  const updateNotificationSchema = yup.object({
+    title: yup.string().required("Please enter title of the notification"),
+    description: yup
       .string()
-      .required("Please enter description of the criteria"),
+      .required("Please enter description of the notiifcation"),
+    status: yup.boolean().required("Please select one"),
   });
 
   const {
-    control: controlCreate,
-    handleSubmit: handleSubmitCreate,
-    reset: resetAdd,
+    control: controlUpdate,
+    handleSubmit: handleSubmitUpdate,
+    reset: resetUpdate,
   } = useForm({
     defaultValues: {
-      name: "",
+      id: "",
+      title: "",
       description: "",
+      status: true,
     },
-    resolver: yupResolver(createClassSchema),
+    resolver: yupResolver(updateNotificationSchema),
   });
 
-  const handleAdd = async data => {
+  const handleUpdate = async data => {
+    const modifiedData = data;
+    modifiedData.status =
+      modifiedData.status.toString() === "false" ? "inactive" : "active";
+    delete modifiedData.id;
+
     loader.start();
-    postClassEvaluationExecute(data);
+    putNotificationExecute(sharedState.id, modifiedData);
   };
 
-  const sideCreate = () => {
+  const sideUpdate = () => {
     return (
       <Box
         role="presentation"
@@ -74,7 +89,9 @@ const useAddClassEvaluation = ({
         <Box
           component="form"
           noValidate
-          onSubmit={handleSubmitCreate(handleAdd)}
+          onSubmit={handleSubmitUpdate(data => {
+            handleUpdate(data);
+          })}
         >
           <Box
             sx={{
@@ -98,8 +115,13 @@ const useAddClassEvaluation = ({
                   </IconButton>
                 </Box>
                 <Box sx={{ marginLeft: "8px" }}>
-                  <Typography variant="subtitle1">Create New Class</Typography>
+                  <Typography variant="subtitle1">
+                    Update Notification
+                  </Typography>
                 </Box>
+              </Box>
+              <Box>
+                <FormSwitch name="status" control={controlUpdate} />
               </Box>
             </Box>
 
@@ -111,18 +133,19 @@ const useAddClassEvaluation = ({
                     <Grid item xs={12}>
                       <FormTextField
                         required
-                        name="criteriaName"
-                        label="Name of Evaluation"
-                        control={controlCreate}
+                        name="title"
+                        label="Title of Notification"
+                        control={controlUpdate}
                         sx={{ marginBottom: "24px" }}
                       />
                     </Grid>
                     <Grid item xs={12}>
-                      <FormTextField
+                      <FormTextAreaField
                         required
-                        name="criteriaDescription"
-                        label="Description of Evaluation"
-                        control={controlCreate}
+                        rows={3}
+                        name="description"
+                        label="Description of Notification"
+                        control={controlUpdate}
                         sx={{ marginBottom: "24px" }}
                       />
                     </Grid>
@@ -173,7 +196,7 @@ const useAddClassEvaluation = ({
                     borderRadius: "100px",
                   }}
                 >
-                  Create
+                  Update
                 </Button>
               </Stack>
             </Box>
@@ -183,61 +206,85 @@ const useAddClassEvaluation = ({
     );
   };
 
-  const onAdd = () => {
-    sharedFunction.setAction("Add");
-    resetAdd();
-    sidebar.setSidebar(prevState => {
-      return {
-        ...prevState,
-        dependencies: {
-          ...prevState.dependencies,
-        },
-        sidebar: sideCreate,
-      };
-    });
-    sidebar.open();
+  const onUpdate = id => {
+    loader.start();
+
+    sharedFunction.setAction("Update");
+    sharedFunction.setId(id);
+    getNotificationsExecute(id);
   };
 
   // Side Effects
   useEffect(() => {
-    if (postClassEvaluationData) {
-      setNewItemAnimation(prevState => {
+    if (getNotificationsData) {
+      // open form
+      sidebar.setSidebar(prevState => {
         return {
           ...prevState,
-          newItem: postClassEvaluationData.id,
-          callbackFunc: () => {
-            snackbar.open("Class Evaluation created successfully.", false);
-            resetAdd();
-            sharedFunction.setAction("View");
+          dependencies: {
+            ...prevState.dependencies,
           },
+          sidebar: sideUpdate,
         };
       });
-      fetchList({ params: { sort: "status" } });
+      resetUpdate({
+        title: getNotificationsData.title,
+        description: getNotificationsData.description,
+        status: getNotificationsData.status === "active",
+      });
+      sidebar.open();
+      loader.end();
+    }
+  }, [getNotificationsData]);
 
+  useEffect(() => {
+    if (putNotificationData) {
+      sidebar.close();
+      sharedFunction.setAction("updateComplete");
+      fetchList({
+        params:
+          Object.keys(sharedState.searchParams).length > 0
+            ? sharedState.searchParams
+            : { sort: "status" },
+        cb: () => {
+          snackbar.open("Notification updated successfully.", false);
+          resetUpdate();
+          sharedFunction.setAction("View");
+          sharedFunction.setId("");
+        },
+      });
       sidebar.close();
     }
 
     return () => {};
-  }, [postClassEvaluationData]);
+  }, [putNotificationData]);
 
   // Side Effects
   useEffect(() => {
-    if (postClassEvaluationError) {
+    if (getNotificationsError) {
       loader.end();
+      switch (getNotificationsError.response.data) {
+        case "INVALID_ID":
+          snackbar.open("Something went wrong. Plaese try again later", true);
+          break;
+        default:
+          break;
+      }
+    }
+    loader.end();
+    return () => {};
+  }, [getNotificationsError]);
 
-      switch (postClassEvaluationError.response.data) {
+  useEffect(() => {
+    if (putNotificationError) {
+      switch (putNotificationError.response.data) {
         case "EMPTY_REQUEST":
           snackbar.open("Something went wrong. Plaese try again later", true);
           break;
         case "INVALID_ID":
-          snackbar.open("Class ID incorrect", true);
+          snackbar.open("Something went wrong. Plaese try again later", true);
           break;
-        case "DUPLICATED_CLASS_EVALUATION":
-          snackbar.open(
-            "Unique class evaluation is required. Please rephrase your topic",
-            true,
-          );
-          break;
+
         case "UNAUTHORIZED_ACTION":
           snackbar.open("Please login again to proceed", true);
           break;
@@ -247,13 +294,13 @@ const useAddClassEvaluation = ({
     }
     loader.end();
     return () => {};
-  }, [postClassEvaluationError]);
+  }, [putNotificationError]);
 
   return {
-    onAdd,
+    onUpdate,
   };
 };
 
-useAddClassEvaluation.propTypes = {};
+useUpdateNotification.propTypes = {};
 
-export default useAddClassEvaluation;
+export default useUpdateNotification;

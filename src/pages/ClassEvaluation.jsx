@@ -7,7 +7,7 @@ import useClassesEvaluationFeatures from "../features/classesEvaluation/useClass
 const ClassEvaluation = () => {
   const { id } = useParams();
   const contextProps = useOutletContext();
-  const { loader, setActionBar, user } = contextProps;
+  const { loader, setActionBar, user, actionBarDefault } = contextProps;
 
   const { features, state } = useClassesEvaluationFeatures({
     classId: id,
@@ -28,6 +28,7 @@ const ClassEvaluation = () => {
   useEffect(() => {
     loader.start();
     setActionBar({
+      ...actionBarDefault,
       title: {
         enabled: true,
         display: true,
@@ -52,7 +53,7 @@ const ClassEvaluation = () => {
     });
 
     // Load list
-    fetchClassesEvaluation.onFetch({ params: { sort: "-status" } });
+    fetchClassesEvaluation.onFetch({ params: { sort: "status" } });
 
     return () => {};
   }, []);

@@ -81,7 +81,10 @@ const useClockOutStudent = ({
       },
       {
         onClick: () => {
-          document.getElementById("html5-qrcode-button-camera-stop").click();
+          if (document.getElementById("html5-qrcode-button-camera-stop")) {
+            document.getElementById("html5-qrcode-button-camera-stop").click();
+          }
+
           setTimeout(() => {
             popupClockOut.close();
           }, 1000);

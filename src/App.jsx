@@ -7,11 +7,14 @@ import RootLayout from "./layouts/RootLayout";
 import UserLayout from "./layouts/UserLayout";
 import Admins from "./pages/Admins";
 import Classes from "./pages/Classes";
+import ClassAttendances from "./pages/ClassesAttendances";
 import ClassEvaluation from "./pages/ClassEvaluation";
 import Dashboard from "./pages/Dashboard";
 import Error404 from "./pages/Error404";
+import Notifications from "./pages/Notifications";
 import ReportsClasses from "./pages/ReportsClasses";
 import ReportsLayoutLanding from "./pages/ReportsLayoutLanding";
+import ReportsStudents from "./pages/ReportsStudents";
 import Students from "./pages/Students";
 import Teachers from "./pages/Teachers";
 import UserLogin from "./pages/user/UserLogin";
@@ -73,8 +76,16 @@ const router = createBrowserRouter(
               element: <Admins />,
             },
             {
+              path: "notifications",
+              element: <Notifications />,
+            },
+            {
               path: "classes",
               element: <Classes />,
+            },
+            {
+              path: "classes/attendances",
+              element: <ClassAttendances />,
             },
             {
               path: "classes/:id/evaluation",
@@ -99,7 +110,7 @@ const router = createBrowserRouter(
                 {
                   index: true,
                   path: "students",
-                  element: <Dashboard />,
+                  element: <ReportsStudents />,
                 },
                 {
                   index: true,

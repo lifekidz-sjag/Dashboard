@@ -242,7 +242,7 @@ const useUpdateClassEvaluation = ({
         params:
           Object.keys(sharedState.searchParams).length > 0
             ? sharedState.searchParams
-            : { sort: "-status" },
+            : { sort: "status" },
         cb: () => {
           snackbar.open("Class Evaluation updated successfully.", false);
           resetUpdate();

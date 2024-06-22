@@ -1,13 +1,20 @@
 import { useEffect } from "react";
-import { useNavigate, useOutletContext, useParams } from "react-router-dom";
+import {
+  useNavigate,
+  useOutletContext,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 
 import ListClasses from "../features/classes/ListClasses";
 import useClassesFeatures from "../features/classes/useClassesFeatures";
 
 const Classes = () => {
+  const [searchParams] = useSearchParams();
+
   const { id } = useParams();
   const contextProps = useOutletContext();
-  const { loader, setActionBar, user } = contextProps;
+  const { loader, setActionBar, user, actionBarDefault } = contextProps;
 
   const { features, state } = useClassesFeatures({
     contextProps,
@@ -30,7 +37,12 @@ const Classes = () => {
       navigate(`/classes/${id}/evaluation`);
     }
     loader.start();
+
+    if (searchParams.get("add") === "true") {
+      addClass.onAdd();
+    }
     setActionBar({
+      ...actionBarDefault,
       title: {
         enabled: true,
         display: true,
