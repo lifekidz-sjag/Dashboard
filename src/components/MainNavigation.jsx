@@ -285,7 +285,7 @@ const navigationItems = user => {
       icon: currentPage => {
         return <School currentpage={currentPage.toString()} />;
       },
-      mobile: "second",
+      mobile: "first",
     },
   );
   if (user.role.indexOf("admin") >= 0) {
@@ -493,7 +493,14 @@ const MainNavigation = ({
                   icon={item.icon(currentPage === item.id)}
                 />
               ))}
-
+            <BottomNavigationAction
+              label=""
+              disabled
+              sx={{
+                opacity: !isDelayedMobileMenuExpanded ? "0" : "100",
+                cursor: !isDelayedMobileMenuExpanded ? "none" : "pointer",
+              }}
+            />
             <BottomNavigationAction
               label="Show less"
               onClick={() => {
