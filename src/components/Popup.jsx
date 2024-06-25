@@ -103,7 +103,7 @@ const Popup = props => {
           sx={{
             padding: "0px 0px 16px !important",
             display: "flex",
-            justifyContent: "center",
+            justifyContent: type,
             alignItems: "start",
           }}
           style={contentWithFullSpacing}

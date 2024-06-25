@@ -15,6 +15,8 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
+import Error from "../assets/404.gif";
+
 const Error404 = () => {
   const error = useRouteError();
   const theme = useTheme();
@@ -74,8 +76,8 @@ const Error404 = () => {
       >
         <Box
           component="img"
-          // src={Image404}
-          sx={{ width: "160px", height: "160px" }}
+          src={Error}
+          sx={{ width: "300px", height: "300px" }}
         />
         <Typography variant="h4" sx={{ marginTop: "8px" }}>
           Uh oh! It looks like we took a wrong turn.

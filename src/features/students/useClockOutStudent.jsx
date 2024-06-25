@@ -90,7 +90,7 @@ const useClockOutStudent = ({
           }, 1000);
         },
       },
-      "headerBorder",
+      "center",
       step === 0 ? <Box id="reader" /> : <Box />,
     );
   };

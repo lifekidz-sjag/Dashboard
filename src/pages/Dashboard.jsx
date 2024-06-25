@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
+import Slider from "react-slick";
 import {
   Box,
   Card,
   CardActionArea,
   CardContent,
+  CardMedia,
   Grid,
   IconButton,
-  List,
   Typography,
   useMediaQuery,
 } from "@mui/material";
@@ -16,8 +17,15 @@ import axios from "axios";
 import dayjs, { utc } from "dayjs";
 import moment from "moment";
 
+import AnnouncementV1 from "../assets/announcement-v1.gif";
+import AnnouncementV2 from "../assets/announcement-v2.gif";
+import AnnouncementV3 from "../assets/announcement-v3.gif";
 import Bible from "../assets/bible.png";
-import Birthday from "../assets/birthday.gif";
+import BirthdayV1 from "../assets/birthday-v1.gif";
+import BirthdayV2 from "../assets/birthday-v2.gif";
+import BirthdayV3 from "../assets/birthday-v3.gif";
+import BirthdayV4 from "../assets/birthday-v4.gif";
+import BirthdayV5 from "../assets/birthday-v5.gif";
 import ClockIn from "../assets/clock-in.png";
 import ClockOut from "../assets/clock-out.png";
 import DashboardVideo from "../assets/dashboard-unscreen.gif";
@@ -32,6 +40,38 @@ import usePopup from "../hooks/usePopup";
 import useNotifications from "../services/notifications";
 
 const Dashboard = () => {
+  const birthdayImageList = [
+    BirthdayV1,
+    BirthdayV2,
+    BirthdayV3,
+    BirthdayV4,
+    BirthdayV5,
+  ];
+  const announcementImageList = [
+    AnnouncementV1,
+    AnnouncementV2,
+    AnnouncementV3,
+  ];
+  const slickSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    waitForAnimate: false,
+    autoplay: true,
+    autoplaySpeed: 4000,
+  };
+  const slickSettings2 = {
+    dots: true,
+    // infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    waitForAnimate: false,
+    autoplay: true,
+    autoplaySpeed: 4000,
+  };
   const contextProps = useOutletContext();
   const { loader, setActionBar, actionBarDefault } = contextProps;
   const { user } = useAuth();
@@ -60,7 +100,6 @@ const Dashboard = () => {
       params: {
         "filter[status]": "active",
         sort: "-updatedAt",
-        "page[size]": 1,
       },
     });
 
@@ -201,7 +240,7 @@ const Dashboard = () => {
                   backgroundColor: "#FFF",
                   flex: "1 1 auto",
                   minHeight: "100%",
-                  padding: "24px 24px 64px",
+                  padding: "24px 24px 0px",
                   margin: "24px 0px",
                   borderRadius: "8px",
                   position: "relative",
@@ -209,60 +248,67 @@ const Dashboard = () => {
               >
                 <Box>
                   <Typography
+                    gutterBottom
                     variant="h5"
                     color="textPrimary"
                     fontWeight={500}
-                    sx={{ marginBottom: "16px" }}
+                    sx={{ marginBottom: " 24px" }}
                   >
                     Upcoming Birthdays
                   </Typography>
                 </Box>
-
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={6} sx={{ textAlign: "center" }}>
-                    <Box
-                      component="img"
-                      src={Birthday}
-                      sx={{ width: "200px", marginTop: "24px" }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <List
-                      sx={{
-                        width: "100%",
-                        borderRadius: { xs: "24px 24px 0px 0px", md: "8px" },
-                        backgroundColor: "background.paper",
-                      }}
-                    >
-                      {info &&
-                        info.birthday &&
-                        info.birthday.map((e, index) => {
-                          return (
+                <Box sx={{ textAlign: "center" }}>
+                  <Slider {...slickSettings}>
+                    {info &&
+                      info.birthday &&
+                      info.birthday.map((e, index) => {
+                        return (
+                          <Card
+                            key={e.studentName}
+                            sx={{
+                              width: {
+                                xs: "80% !important",
+                                md: "50% !important",
+                              },
+                              borderRadius: "16px",
+                            }}
+                          >
                             <Box
-                              key={e.studentName}
-                              sx={{ marginBottom: "24px" }}
+                              sx={{ display: "flex", justifyContent: "center" }}
                             >
+                              <CardMedia
+                                component="img"
+                                sx={{ width: 200 }}
+                                image={birthdayImageList[index]}
+                                alt="birthday"
+                              />
+                            </Box>
+                            <CardContent>
                               <Typography
                                 variant="h5"
+                                gutterBottom
                                 color="textPrimary"
                                 fontWeight={500}
+                                component="div"
                               >
-                                {index + 1}. {e.studentName}
+                                {e.studentName}
                               </Typography>
                               <Typography
                                 variant="body1"
                                 color="textPrimary"
                                 fontWeight={500}
                               >
-                                {moment(e.birthdayDate).format("MMMM D, YYYY")},{" "}
-                                {e.dayCountdown} days
+                                {moment(e.birthdayDate).format("MMMM D, YYYY")}
                               </Typography>
-                            </Box>
-                          );
-                        })}
-                    </List>
-                  </Grid>
-                </Grid>
+                              <Typography variant="body1" color="textPrimary">
+                                {e.dayCountdown} days from now
+                              </Typography>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                  </Slider>
+                </Box>
               </Box>
             </Grid>
             <Grid container item xs={12} lg={6}>
@@ -287,10 +333,16 @@ const Dashboard = () => {
                   >
                     Admin Actions
                   </Typography>
-                  <Grid container rowSpacing={1} columnSpacing={4}>
-                    <Grid item xs={6} sm={4}>
+                  <Grid container rowSpacing={4} columnSpacing={4}>
+                    <Grid item xs={6} sm={6}>
                       <Box sx={{ marginBottom: "16px" }}>
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
                           <Typography
                             variant="body1"
                             color="textPrimary"
@@ -315,13 +367,13 @@ const Dashboard = () => {
                           sx={{
                             display: "flex",
                             alignItems: "flex-end",
-                            justifyContent: "flex-start",
+                            justifyContent: "center",
                           }}
                         >
                           <Box
                             component="img"
                             src={Teacher}
-                            sx={{ width: "auto", height: "64px" }}
+                            sx={{ width: "auto", height: "120px" }}
                           />
                           <Typography
                             variant={isSmallScreen ? "h5" : "h4"}
@@ -332,9 +384,15 @@ const Dashboard = () => {
                         </Box>
                       </Box>
                     </Grid>
-                    <Grid item xs={6} sm={4}>
+                    <Grid item xs={6} sm={6}>
                       <Box sx={{ marginBottom: "16px" }}>
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
                           <Typography
                             variant="body1"
                             color="textPrimary"
@@ -359,13 +417,13 @@ const Dashboard = () => {
                           sx={{
                             display: "flex",
                             alignItems: "flex-end",
-                            justifyContent: "flex-start",
+                            justifyContent: "center",
                           }}
                         >
                           <Box
                             component="img"
                             src={Bible}
-                            sx={{ width: "auto", height: "64px" }}
+                            sx={{ width: "auto", height: "120px" }}
                           />
                           <Typography
                             variant={isSmallScreen ? "h5" : "h4"}
@@ -376,9 +434,15 @@ const Dashboard = () => {
                         </Box>
                       </Box>
                     </Grid>
-                    <Grid item xs={6} sm={4}>
+                    <Grid item xs={6} sm={6}>
                       <Box sx={{ marginBottom: "16px" }}>
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
                           <Typography
                             variant="body1"
                             color="textPrimary"
@@ -403,13 +467,13 @@ const Dashboard = () => {
                           sx={{
                             display: "flex",
                             alignItems: "flex-end",
-                            justifyContent: "flex-start",
+                            justifyContent: "center",
                           }}
                         >
                           <Box
                             component="img"
                             src={Student}
-                            sx={{ width: "auto", height: "64px" }}
+                            sx={{ width: "auto", height: "120px" }}
                           />
                           <Typography
                             variant={isSmallScreen ? "h5" : "h4"}
@@ -420,9 +484,15 @@ const Dashboard = () => {
                         </Box>
                       </Box>
                     </Grid>
-                    <Grid item xs={6} sm={4}>
+                    <Grid item xs={6} sm={6}>
                       <Box>
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
                           <Typography
                             variant="body1"
                             color="textPrimary"
@@ -447,13 +517,13 @@ const Dashboard = () => {
                           sx={{
                             display: "flex",
                             alignItems: "flex-end",
-                            justifyContent: "flex-start",
+                            justifyContent: "center",
                           }}
                         >
                           <Box
                             component="img"
                             src={Marketing}
-                            sx={{ width: "auto", height: "64px" }}
+                            sx={{ width: "auto", height: "120px" }}
                           />
                         </Box>
                       </Box>
@@ -467,7 +537,7 @@ const Dashboard = () => {
                 sx={{
                   backgroundColor: "#FFF",
                   flex: "1 1 auto",
-                  minHeight: "80%",
+                  minHeight: "100%",
                   padding: "24px",
                   margin: "24px 0px",
                   borderRadius: "8px",
@@ -480,34 +550,61 @@ const Dashboard = () => {
                     fontWeight={500}
                     sx={{ marginBottom: "24px" }}
                   >
-                    Notifications by Admin
+                    Announcements
                   </Typography>
                 </div>
-                <Card variant="project-card">
-                  <CardContent sx={{ padding: "16px" }}>
-                    <Typography
-                      variant="h5"
-                      color="textPrimary"
-                      fontWeight={500}
-                      sx={{ marginBottom: "24px" }}
-                    >
-                      {notification && notification[0].title}
-                    </Typography>
+                <Box sx={{ textAlign: "center" }}>
+                  <Slider {...slickSettings2}>
                     {notification &&
-                      notification[0].description.split("\n\n").map(e => {
+                      notification.map((item, index) => {
                         return (
-                          <Typography
-                            key={e}
-                            variant="body1"
-                            color="textPrimary"
-                            fontWeight={500}
+                          <Card
+                            key={item.id}
+                            sx={{
+                              width: {
+                                xs: "80% !important",
+                                md: "50% !important",
+                              },
+                              borderRadius: "16px",
+                            }}
                           >
-                            {e}
-                          </Typography>
+                            <Box
+                              sx={{ display: "flex", justifyContent: "center" }}
+                            >
+                              <CardMedia
+                                component="img"
+                                sx={{ width: 200 }}
+                                image={announcementImageList[index]}
+                                alt="birthday"
+                              />
+                            </Box>
+                            <CardContent>
+                              <Typography
+                                variant="h5"
+                                color="textPrimary"
+                                fontWeight={500}
+                                sx={{ marginBottom: "24px" }}
+                              >
+                                {item.title}
+                              </Typography>
+                              {item.description.split("\n\n").map(e => {
+                                return (
+                                  <Typography
+                                    key={e}
+                                    variant="body1"
+                                    color="textPrimary"
+                                    fontWeight={500}
+                                  >
+                                    {e}
+                                  </Typography>
+                                );
+                              })}
+                            </CardContent>
+                          </Card>
                         );
                       })}
-                  </CardContent>
-                </Card>
+                  </Slider>
+                </Box>
               </Box>
             </Grid>
           </Grid>

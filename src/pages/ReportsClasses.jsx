@@ -284,6 +284,10 @@ const ReportsClasses = () => {
       },
       yAxis: {
         type: "value",
+        max: value => {
+          return value.max + 2;
+        },
+        minInterval: 1,
         // name: "Amount (RM)",
         nameGap: 50,
         nameLocation: "middle",
@@ -397,12 +401,14 @@ const ReportsClasses = () => {
       opts.series.push({
         type: "pie",
         radius: "50%",
-        data: processed.map(el => {
-          return {
-            value: el.studentCount,
-            name: `${el.age} years old (${el.studentCount})`,
-          };
-        }),
+        data:
+          processed &&
+          processed.map(el => {
+            return {
+              value: el.studentCount,
+              name: `${el.age} years old (${el.studentCount})`,
+            };
+          }),
         emphasis: {
           itemStyle: {
             shadowBlur: 10,
@@ -414,10 +420,13 @@ const ReportsClasses = () => {
 
       opts.legend = {
         orient: "vertical",
-        left: 10,
-        data: processed.map(el => {
-          return `${el.age} years old (${el.studentCount})`;
-        }),
+        left: 0,
+        bottom: 0,
+        data:
+          processed &&
+          processed.map(el => {
+            return `${el.age} years old (${el.studentCount})`;
+          }),
       };
 
       return opts;
@@ -600,7 +609,7 @@ const ReportsClasses = () => {
 
     fetchClassesExecute({ params: { sort: "name" } });
     setActionBar({
-      actionBarDefault,
+      ...actionBarDefault,
       title: {
         enabled: true,
         display: true,
@@ -650,7 +659,7 @@ const ReportsClasses = () => {
   useEffect(() => {}, [fetchReportsClassesError]);
   useEffect(() => {}, [fetchClassesError]);
 
-  return list.data && list.summary && classOptions ? (
+  return (
     <>
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
         <Box sx={{ width: "180px" }}>
@@ -667,227 +676,230 @@ const ReportsClasses = () => {
           />
         </Box>
       </Box>
-
-      <Box
-        sx={{
-          boxSizing: "border-box",
-          padding: "24px 36px",
-          background: "rgba(255, 255, 255,1)",
-          borderRadius: "8px",
-          paddingBottom: { xs: "24px", md: "24px" },
-        }}
-      >
-        <Box
-          sx={{
-            display: { xs: "block", md: "flex" },
-            justifyContent: "space-between",
-          }}
-        >
-          <Tabs
-            value={tabValue}
-            variant="scrollable"
-            scrollButtons="auto"
-            allowScrollButtonsMobile
-            TabIndicatorProps={{
-              style: { display: "none" },
-            }}
-            onChange={(event, newValue) => {
-              setTabValue(newValue);
-            }}
-            sx={{ minHeight: "36px", height: "36px" }}
-          >
-            <Tab
-              label="Day"
-              {...a11yProps(0)}
-              sx={{
-                minHeight: "36px",
-                height: "36px",
-                border: "1px solid rgba(63, 81, 181, 0.5)",
-                borderRadius: "100px 0px 0px 100px",
-                "&.Mui-selected": {
-                  color: theme.palette.primary.main,
-                  backgroundColor: theme.palette.primary.light,
-                },
-              }}
-            />
-            <Tab
-              label="Week"
-              {...a11yProps(1)}
-              sx={{
-                minHeight: "36px",
-                height: "36px",
-                border: "1px solid rgba(63, 81, 181, 0.5)",
-                borderLeft: "0px",
-                borderRight: "0px",
-                "&.Mui-selected": {
-                  color: theme.palette.primary.main,
-                  backgroundColor: theme.palette.primary.light,
-                },
-              }}
-            />
-            <Tab
-              label="Month"
-              {...a11yProps(2)}
-              sx={{
-                minHeight: "36px",
-                height: "36px",
-                border: "1px solid rgba(63, 81, 181, 0.5)",
-                borderRadius: "0px 100px 100px 0px",
-                "&.Mui-selected": {
-                  color: theme.palette.primary.main,
-                  backgroundColor: theme.palette.primary.light,
-                },
-              }}
-            />
-          </Tabs>
-
+      {list.data && list.summary && classOptions ? (
+        <>
           <Box
             sx={{
-              display: "flex",
-              marginTop: { xs: "32px", md: "0px" },
+              boxSizing: "border-box",
+              padding: "24px 36px",
+              background: "rgba(255, 255, 255,1)",
+              borderRadius: "8px",
+              paddingBottom: { xs: "24px", md: "24px" },
             }}
           >
-            {/* Sort Date */}
-            <Box sx={{ width: "180px" }}>
-              <FormSelect
-                name="dataFilter"
-                variant="outlined"
-                control={control}
-                label="Filter by"
-                options={filterByOptions}
-                customOnChange={() => {
-                  defaultDateFilter();
-                  onChange(getValues());
+            <Box
+              sx={{
+                display: { xs: "block", md: "flex" },
+                justifyContent: "space-between",
+              }}
+            >
+              <Tabs
+                value={tabValue}
+                variant="scrollable"
+                scrollButtons="auto"
+                allowScrollButtonsMobile
+                TabIndicatorProps={{
+                  style: { display: "none" },
                 }}
-              />
-            </Box>
-
-            {/* Date Picker */}
-            <Box sx={{ marginLeft: "16px", width: "300px" }}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <FormDateRangePicker
-                  name="dataDate"
-                  control={control}
-                  formState={formState}
-                  getValues={getValues}
-                  customOnChange={(d1, d2) => {
-                    classFilter();
-                    onChange({
-                      dataDate: [d1, d2],
-                      classFilter: getValues("classFilter"),
-                    });
+                onChange={(event, newValue) => {
+                  setTabValue(newValue);
+                }}
+                sx={{ minHeight: "36px", height: "36px" }}
+              >
+                <Tab
+                  label="Day"
+                  {...a11yProps(0)}
+                  sx={{
+                    minHeight: "36px",
+                    height: "36px",
+                    border: "1px solid rgba(63, 81, 181, 0.5)",
+                    borderRadius: "100px 0px 0px 100px",
+                    "&.Mui-selected": {
+                      color: theme.palette.primary.main,
+                      backgroundColor: theme.palette.primary.light,
+                    },
                   }}
-                  firstDatePicked={firstDatePicked}
-                  secondDatePicked={secondDatePicked}
-                  setFirstDatePicked={setFirstDatePicked}
-                  setSecondDatePicked={setSecondDatePicked}
-                  dateFilterOnChange={dateFilterOnChange}
                 />
-              </LocalizationProvider>
+                <Tab
+                  label="Week"
+                  {...a11yProps(1)}
+                  sx={{
+                    minHeight: "36px",
+                    height: "36px",
+                    border: "1px solid rgba(63, 81, 181, 0.5)",
+                    borderLeft: "0px",
+                    borderRight: "0px",
+                    "&.Mui-selected": {
+                      color: theme.palette.primary.main,
+                      backgroundColor: theme.palette.primary.light,
+                    },
+                  }}
+                />
+                <Tab
+                  label="Month"
+                  {...a11yProps(2)}
+                  sx={{
+                    minHeight: "36px",
+                    height: "36px",
+                    border: "1px solid rgba(63, 81, 181, 0.5)",
+                    borderRadius: "0px 100px 100px 0px",
+                    "&.Mui-selected": {
+                      color: theme.palette.primary.main,
+                      backgroundColor: theme.palette.primary.light,
+                    },
+                  }}
+                />
+              </Tabs>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  marginTop: { xs: "32px", md: "0px" },
+                }}
+              >
+                {/* Sort Date */}
+                <Box sx={{ width: "180px" }}>
+                  <FormSelect
+                    name="dataFilter"
+                    variant="outlined"
+                    control={control}
+                    label="Filter by"
+                    options={filterByOptions}
+                    customOnChange={() => {
+                      defaultDateFilter();
+                      onChange(getValues());
+                    }}
+                  />
+                </Box>
+
+                {/* Date Picker */}
+                <Box sx={{ marginLeft: "16px", width: "300px" }}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <FormDateRangePicker
+                      name="dataDate"
+                      control={control}
+                      formState={formState}
+                      getValues={getValues}
+                      customOnChange={(d1, d2) => {
+                        classFilter();
+                        onChange({
+                          dataDate: [d1, d2],
+                          classFilter: getValues("classFilter"),
+                        });
+                      }}
+                      firstDatePicked={firstDatePicked}
+                      secondDatePicked={secondDatePicked}
+                      setFirstDatePicked={setFirstDatePicked}
+                      setSecondDatePicked={setSecondDatePicked}
+                      dateFilterOnChange={dateFilterOnChange}
+                    />
+                  </LocalizationProvider>
+                </Box>
+              </Box>
+            </Box>
+            <TabPanel value={tabValue} index={tabValue}>
+              {(() => {
+                let key;
+
+                switch (tabValue) {
+                  case 0:
+                    key = "day";
+                    break;
+                  case 1:
+                    key = "week";
+                    break;
+                  case 2:
+                    key = "month";
+                    break;
+                  default:
+                }
+
+                return (
+                  <Box sx={{ marginTop: "16px" }}>
+                    <ReactEChartsCore
+                      echarts={echarts}
+                      option={chart.setup(list.data, key)}
+                      notMerge
+                      lazyUpdate
+                      theme="theme_name"
+                      // onChartReady={this.onChartReadyCallback}
+                      // onEvents={EventsDict}
+                      // opts={}
+                      style={{
+                        height: isSmallScreen ? "280px" : "400px",
+                        width: "100%",
+                      }}
+                    />
+                  </Box>
+                );
+              })()}
+            </TabPanel>
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  // flexWrap: "wrap",
+                  justifyContent: "space-between",
+                  marginTop: "16px",
+                  width: { xs: "100%", md: "50%" },
+                }}
+              >
+                {renderFigures(
+                  list.summary.averageAttendance,
+                  "K",
+                  list.summary.diffAverageAttendance,
+                  "Average Attendance",
+                  `vs Previous ${list.summary.dayCount} Day${
+                    list.summary.dayCount > 1 ? "s" : ""
+                  }`,
+                  "flex",
+                )}
+                <Divider
+                  orientation="vertical"
+                  variant="middle"
+                  flexItem
+                  sx={{ display: { xs: "none", md: "block" } }}
+                />
+
+                {renderFigures(
+                  list.summary.newStudentCount,
+                  "K",
+                  list.summary.diffNewStudentCount,
+                  "New Student",
+                  `vs Previous ${list.summary.dayCount} Day${
+                    list.summary.dayCount > 1 ? "s" : ""
+                  }`,
+                  "flex",
+                )}
+              </Box>
             </Box>
           </Box>
-        </Box>
-        <TabPanel value={tabValue} index={tabValue}>
-          {(() => {
-            let key;
-
-            switch (tabValue) {
-              case 0:
-                key = "day";
-                break;
-              case 1:
-                key = "week";
-                break;
-              case 2:
-                key = "month";
-                break;
-              default:
-            }
-
-            return (
-              <Box sx={{ marginTop: "16px" }}>
-                <ReactEChartsCore
-                  echarts={echarts}
-                  option={chart.setup(list.data, key)}
-                  notMerge
-                  lazyUpdate
-                  theme="theme_name"
-                  // onChartReady={this.onChartReadyCallback}
-                  // onEvents={EventsDict}
-                  // opts={}
-                  style={{
-                    height: isSmallScreen ? "400px" : "400px",
-                    width: "100%",
-                  }}
-                />
-              </Box>
-            );
-          })()}
-        </TabPanel>
-        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <Box
             sx={{
-              display: "flex",
-              // flexWrap: "wrap",
-              justifyContent: "space-between",
-              marginTop: "16px",
-              width: { xs: "100%", md: "50%" },
+              boxSizing: "border-box",
+              marginTop: "24px",
+              padding: "24px 36px",
+              background: "rgba(255, 255, 255,1)",
+              borderRadius: "8px",
+              paddingBottom: { xs: "24px", md: "24px" },
             }}
           >
-            {renderFigures(
-              list.summary.averageAttendance,
-              "K",
-              list.summary.diffAverageAttendance,
-              "Average Attendance",
-              `vs Previous ${list.summary.dayCount} Day${
-                list.summary.dayCount > 1 ? "s" : ""
-              }`,
-              "flex",
-            )}
-            <Divider
-              orientation="vertical"
-              variant="middle"
-              flexItem
-              sx={{ display: { xs: "none", md: "block" } }}
+            <ReactEChartsCore
+              echarts={echarts}
+              option={pieChart.setup(list.summary.ageDistribution)}
+              notMerge
+              lazyUpdate
+              theme="theme_name"
+              style={{
+                height: isSmallScreen ? "280px" : "400px",
+                width: "100%",
+              }}
             />
-
-            {renderFigures(
-              list.summary.newStudentCount,
-              "K",
-              list.summary.diffNewStudentCount,
-              "New Student",
-              `vs Previous ${list.summary.dayCount} Day${
-                list.summary.dayCount > 1 ? "s" : ""
-              }`,
-              "flex",
-            )}
           </Box>
-        </Box>
-      </Box>
-      <Box
-        sx={{
-          boxSizing: "border-box",
-          marginTop: "24px",
-          padding: "24px 36px",
-          background: "rgba(255, 255, 255,1)",
-          borderRadius: "8px",
-          paddingBottom: { xs: "24px", md: "24px" },
-        }}
-      >
-        <ReactEChartsCore
-          echarts={echarts}
-          option={pieChart.setup(list.summary.ageDistribution)}
-          notMerge
-          lazyUpdate
-          theme="theme_name"
-          style={{
-            height: isSmallScreen ? "400px" : "400px",
-            width: "100%",
-          }}
-        />
-      </Box>
+        </>
+      ) : null}
     </>
-  ) : null;
+  );
 };
 
 export default ReportsClasses;

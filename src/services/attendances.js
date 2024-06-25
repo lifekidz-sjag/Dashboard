@@ -41,6 +41,53 @@ const useAttendances = () => {
       data: body,
     });
   };
+
+  const getGroupedAttendanceEndpoint = "Attendances/Grouped";
+
+  const [
+    {
+      data: getGroupedAttendanceData,
+      loading: getGroupedAttendanceLoading,
+      error: getGroupedAttendanceError,
+    },
+    getGroupedAttendanceExecuteBase,
+  ] = useAxios(
+    {
+      url: getGroupedAttendanceEndpoint,
+      method: "GET",
+    },
+    { manual: true },
+  );
+  const getGroupedAttendanceExecute = params => {
+    getGroupedAttendanceExecuteBase({
+      url: getGroupedAttendanceEndpoint,
+      params: params.params,
+    });
+  };
+
+  const getDetailedAttendanceEndpoint = "Attendances/Detailed";
+
+  const [
+    {
+      data: getDetailedAttendanceData,
+      loading: getDetailedAttendanceLoading,
+      error: getDetailedAttendanceError,
+    },
+    getDetailedAttendanceExecuteBase,
+  ] = useAxios(
+    {
+      url: getDetailedAttendanceEndpoint,
+      method: "GET",
+    },
+    { manual: true },
+  );
+  const getDetailedAttendanceExecute = params => {
+    getDetailedAttendanceExecuteBase({
+      url: getDetailedAttendanceEndpoint,
+      params: params.params,
+    });
+  };
+
   return {
     ...apiService,
     clockIn: [
@@ -58,6 +105,22 @@ const useAttendances = () => {
         error: clockOutError,
       },
       clockOutExecute,
+    ],
+    getGroupedAttendance: [
+      {
+        data: getGroupedAttendanceData,
+        loading: getGroupedAttendanceLoading,
+        error: getGroupedAttendanceError,
+      },
+      getGroupedAttendanceExecute,
+    ],
+    getDetailedAttendance: [
+      {
+        data: getDetailedAttendanceData,
+        loading: getDetailedAttendanceLoading,
+        error: getDetailedAttendanceError,
+      },
+      getDetailedAttendanceExecute,
     ],
   };
 };

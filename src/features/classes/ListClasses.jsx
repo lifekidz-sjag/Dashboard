@@ -19,6 +19,7 @@ import ArrowUpward from "../../components/GoogleIcons/ArrowUpward";
 import CreditScore from "../../components/GoogleIcons/CreditScore";
 import Delete from "../../components/GoogleIcons/Delete";
 import EditNote from "../../components/GoogleIcons/EditNote";
+import HowToReg from "../../components/GoogleIcons/HowToReg";
 
 const nameWidth = "0 0 210px";
 const descriptionWidth = "1";
@@ -69,20 +70,20 @@ const ListClasses = ({
   // Action Dropdown set up
   const dropdownItems = (id, name) => {
     const menuItems = [
-      // {
-      //   text: "View Attendances",
-      //   icon: (
-      //     <CreditScore
-      //       className="xtopia-menu-icon"
-      //       sx={{ width: "24px", height: "24px" }}
-      //     />
-      //   ),
-      //   action: () => {
-      //     navigate(`/classes/attendances?classId=${id}`);
-      //   },
-      // },
       {
-        text: "View Evaluation",
+        text: "View Attendances",
+        icon: (
+          <HowToReg
+            className="xtopia-menu-icon"
+            sx={{ width: "24px", height: "24px" }}
+          />
+        ),
+        action: () => {
+          navigate(`/classes/${id}/attendances`);
+        },
+      },
+      {
+        text: "Manage Evaluation",
         icon: (
           <CreditScore
             className="xtopia-menu-icon"

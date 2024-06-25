@@ -38,7 +38,7 @@ const useClockInStudent = ({
           }, 1000);
         },
       },
-      "headerBorder",
+      "center",
       <Box id="reader" />,
     );
   };
