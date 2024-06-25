@@ -126,6 +126,227 @@ const Dashboard = () => {
   }, [fetchNotificationsData]);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
+  const renderBirthday = () => {
+    if (info.birthday) {
+      if (info.birthday.length > 1) {
+        return (
+          <Box sx={{ textAlign: "center" }}>
+            <Slider {...slickSettings}>
+              {info &&
+                info.birthday &&
+                info.birthday.map((e, index) => {
+                  return (
+                    <Card
+                      key={e.studentName}
+                      sx={{
+                        width: {
+                          xs: "80% !important",
+                          md: "50% !important",
+                        },
+                        borderRadius: "16px",
+                      }}
+                    >
+                      <Box sx={{ display: "flex", justifyContent: "center" }}>
+                        <CardMedia
+                          component="img"
+                          sx={{ width: 200 }}
+                          image={birthdayImageList[index]}
+                          alt="birthday"
+                        />
+                      </Box>
+                      <CardContent>
+                        <Typography
+                          variant="h5"
+                          gutterBottom
+                          color="textPrimary"
+                          fontWeight={500}
+                          component="div"
+                        >
+                          {e.studentName}
+                        </Typography>
+                        <Typography
+                          variant="body1"
+                          color="textPrimary"
+                          fontWeight={500}
+                        >
+                          {moment(e.birthdayDate).format("MMMM D, YYYY")}
+                        </Typography>
+                        <Typography variant="body1" color="textPrimary">
+                          {e.dayCountdown} days from now
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+            </Slider>
+          </Box>
+        );
+      }
+      return (
+        <Box
+          sx={{
+            textAlign: "center",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <Card
+            key={info.birthday[0].studentName}
+            sx={{
+              width: {
+                xs: "80% !important",
+                md: "50% !important",
+              },
+              borderRadius: "16px",
+            }}
+          >
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <CardMedia
+                component="img"
+                sx={{ width: 200 }}
+                image={birthdayImageList[0]}
+                alt="birthday"
+              />
+            </Box>
+            <CardContent>
+              <Typography
+                variant="h5"
+                gutterBottom
+                color="textPrimary"
+                fontWeight={500}
+                component="div"
+              >
+                {info.birthday[0].studentName}
+              </Typography>
+              <Typography variant="body1" color="textPrimary" fontWeight={500}>
+                {moment(info.birthday[0].birthdayDate).format("MMMM D, YYYY")}
+              </Typography>
+              <Typography variant="body1" color="textPrimary">
+                {info.birthday[0].dayCountdown} days from now
+              </Typography>
+            </CardContent>
+          </Card>
+        </Box>
+      );
+    }
+
+    return null;
+  };
+  const renderNotification = () => {
+    if (notification) {
+      if (notification.length > 1) {
+        return (
+          <Box
+            sx={{
+              textAlign: "center",
+            }}
+          >
+            <Slider {...slickSettings2}>
+              {notification &&
+                notification.map((item, index) => {
+                  return (
+                    <Card
+                      key={item.id}
+                      sx={{
+                        width: {
+                          xs: "80% !important",
+                          md: "50% !important",
+                        },
+                        borderRadius: "16px",
+                      }}
+                    >
+                      <Box sx={{ display: "flex", justifyContent: "center" }}>
+                        <CardMedia
+                          component="img"
+                          sx={{ width: 200 }}
+                          image={announcementImageList[index]}
+                          alt="birthday"
+                        />
+                      </Box>
+                      <CardContent>
+                        <Typography
+                          variant="h5"
+                          color="textPrimary"
+                          fontWeight={500}
+                          sx={{ marginBottom: "24px" }}
+                        >
+                          {item.title}
+                        </Typography>
+                        {item.description.split("\n\n").map(e => {
+                          return (
+                            <Typography
+                              key={e}
+                              variant="body1"
+                              color="textPrimary"
+                              fontWeight={500}
+                            >
+                              {e}
+                            </Typography>
+                          );
+                        })}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+            </Slider>
+          </Box>
+        );
+      }
+      return (
+        <Box
+          sx={{
+            textAlign: "center",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <Card
+            key={notification[0].id}
+            sx={{
+              width: {
+                xs: "80% !important",
+                md: "50% !important",
+              },
+              borderRadius: "16px",
+            }}
+          >
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <CardMedia
+                component="img"
+                sx={{ width: 200 }}
+                image={announcementImageList[0]}
+                alt="birthday"
+              />
+            </Box>
+            <CardContent>
+              <Typography
+                variant="h5"
+                color="textPrimary"
+                fontWeight={500}
+                sx={{ marginBottom: "24px" }}
+              >
+                {notification[0].title}
+              </Typography>
+              {notification[0].description.split("\n\n").map(e => {
+                return (
+                  <Typography
+                    key={e}
+                    variant="body1"
+                    color="textPrimary"
+                    fontWeight={500}
+                  >
+                    {e}
+                  </Typography>
+                );
+              })}
+            </CardContent>
+          </Card>
+        </Box>
+      );
+    }
+
+    return null;
+  };
   return (
     info && (
       <>
@@ -257,58 +478,7 @@ const Dashboard = () => {
                     Upcoming Birthdays
                   </Typography>
                 </Box>
-                <Box sx={{ textAlign: "center" }}>
-                  <Slider {...slickSettings}>
-                    {info &&
-                      info.birthday &&
-                      info.birthday.map((e, index) => {
-                        return (
-                          <Card
-                            key={e.studentName}
-                            sx={{
-                              width: {
-                                xs: "80% !important",
-                                md: "50% !important",
-                              },
-                              borderRadius: "16px",
-                            }}
-                          >
-                            <Box
-                              sx={{ display: "flex", justifyContent: "center" }}
-                            >
-                              <CardMedia
-                                component="img"
-                                sx={{ width: 200 }}
-                                image={birthdayImageList[index]}
-                                alt="birthday"
-                              />
-                            </Box>
-                            <CardContent>
-                              <Typography
-                                variant="h5"
-                                gutterBottom
-                                color="textPrimary"
-                                fontWeight={500}
-                                component="div"
-                              >
-                                {e.studentName}
-                              </Typography>
-                              <Typography
-                                variant="body1"
-                                color="textPrimary"
-                                fontWeight={500}
-                              >
-                                {moment(e.birthdayDate).format("MMMM D, YYYY")}
-                              </Typography>
-                              <Typography variant="body1" color="textPrimary">
-                                {e.dayCountdown} days from now
-                              </Typography>
-                            </CardContent>
-                          </Card>
-                        );
-                      })}
-                  </Slider>
-                </Box>
+                {renderBirthday()}
               </Box>
             </Grid>
             <Grid container item xs={12} lg={6}>
@@ -553,58 +723,8 @@ const Dashboard = () => {
                     Announcements
                   </Typography>
                 </div>
-                <Box sx={{ textAlign: "center" }}>
-                  <Slider {...slickSettings2}>
-                    {notification &&
-                      notification.map((item, index) => {
-                        return (
-                          <Card
-                            key={item.id}
-                            sx={{
-                              width: {
-                                xs: "80% !important",
-                                md: "50% !important",
-                              },
-                              borderRadius: "16px",
-                            }}
-                          >
-                            <Box
-                              sx={{ display: "flex", justifyContent: "center" }}
-                            >
-                              <CardMedia
-                                component="img"
-                                sx={{ width: 200 }}
-                                image={announcementImageList[index]}
-                                alt="birthday"
-                              />
-                            </Box>
-                            <CardContent>
-                              <Typography
-                                variant="h5"
-                                color="textPrimary"
-                                fontWeight={500}
-                                sx={{ marginBottom: "24px" }}
-                              >
-                                {item.title}
-                              </Typography>
-                              {item.description.split("\n\n").map(e => {
-                                return (
-                                  <Typography
-                                    key={e}
-                                    variant="body1"
-                                    color="textPrimary"
-                                    fontWeight={500}
-                                  >
-                                    {e}
-                                  </Typography>
-                                );
-                              })}
-                            </CardContent>
-                          </Card>
-                        );
-                      })}
-                  </Slider>
-                </Box>
+
+                {renderNotification()}
               </Box>
             </Grid>
           </Grid>
