@@ -4,7 +4,7 @@ import { Box, Grid, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 import BackgroundImage from "../assets/background.jpg";
-import CardBackgroundImage from "../assets/login.mp4";
+import CardBackgroundImage from "../assets/login.gif";
 import { useAuth } from "../contexts/auth";
 
 const UserLayout = () => {
@@ -43,10 +43,9 @@ const UserLayout = () => {
       <Box
         sx={{
           width: "100%",
-          minHeight: { xs: "0", md: "458px" },
+          minHeight: { xs: "0", md: "400px" },
           background: "white",
-
-          maxWidth: { xs: "320px", md: "728px" },
+          maxWidth: { xs: "320px", md: "850px" },
           borderRadius: "8px",
           overflow: "hidden",
           display: "flex",
@@ -58,31 +57,16 @@ const UserLayout = () => {
           {isMediumScreen && (
             <Grid item xs={7}>
               <Box
+                component="img"
                 sx={{
                   height: "100%",
-                  backgroundSize: "cover",
+                  width: "100%",
+                  backgroundSize: "contain",
                   display: "flex",
                   alignItems: "end",
-                  position: "relative",
                 }}
-              >
-                <video
-                  className="videoTag"
-                  autoPlay
-                  loop
-                  muted
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                >
-                  <source src={CardBackgroundImage} type="video/mp4" />
-                </video>
-              </Box>
+                src={CardBackgroundImage}
+              />
             </Grid>
           )}
 

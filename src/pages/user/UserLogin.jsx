@@ -117,21 +117,29 @@ const UserLogin = () => {
 
   return (
     <Box>
-      <Box sx={{ padding: "32px 16px 16px 16px", position: "relative" }}>
-        {step === 1 && (
-          <IconButton
-            sx={{ position: "absolute", top: "32px", left: "0px" }}
-            onClick={() => {
-              setStep(0);
-            }}
-          >
-            <ArrowBack color="inherit" />
-          </IconButton>
-        )}
+      <Box>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {step === 1 && (
+            <IconButton
+              sx={{}}
+              onClick={() => {
+                setStep(0);
+              }}
+            >
+              <ArrowBack color="inherit" />
+            </IconButton>
+          )}
 
-        <Typography variant="subtitle1" sx={{ textAlign: "center" }}>
-          Login to SJAG Lifekidz Attendance
-        </Typography>
+          <Typography variant="subtitle1" sx={{ textAlign: "center" }}>
+            Login to SJAG Lifekidz Attendance
+          </Typography>
+        </Box>
 
         <Box
           sx={{
