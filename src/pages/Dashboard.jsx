@@ -176,7 +176,9 @@ const Dashboard = () => {
                           {moment(e.birthdayDate).format("MMMM D, YYYY")}
                         </Typography>
                         <Typography variant="body1" color="textPrimary">
-                          {e.dayCountdown} days from now
+                          {e.dayCountdown === 0
+                            ? "TODAY!"
+                            : `${e.dayCountdown} day(s) from now`}
                         </Typography>
                       </CardContent>
                     </Card>
@@ -226,7 +228,9 @@ const Dashboard = () => {
                 {moment(info.birthday[0].birthdayDate).format("MMMM D, YYYY")}
               </Typography>
               <Typography variant="body1" color="textPrimary">
-                {info.birthday[0].dayCountdown} days from now
+                {info.birthday[0].dayCountdown === 0
+                  ? "TODAY!"
+                  : `${info.birthday[0].dayCountdown} day(s) from now`}
               </Typography>
             </CardContent>
           </Card>
@@ -434,7 +438,7 @@ const Dashboard = () => {
             <Box
               sx={{
                 backgroundColor: "#CCDFFB",
-                padding: "24px",
+                padding: "40px",
                 borderRadius: "8px",
                 width: { xs: "100%", sm: "50%" },
                 // flex: 1,

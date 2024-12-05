@@ -143,7 +143,7 @@ const useUpdateNotification = ({
                         required
                         rows={3}
                         name="description"
-                        label="Description of Notification"
+                        label="Description of Notification (Keep it short)"
                         control={controlUpdate}
                         sx={{ marginBottom: "24px" }}
                       />

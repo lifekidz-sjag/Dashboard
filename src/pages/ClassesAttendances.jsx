@@ -645,7 +645,7 @@ const ClassAttendances = () => {
                   disableTypography
                   sx={{
                     flex: attendanceCountWidth,
-                    display: { xs: "none", lg: "flex" },
+                    display: { xs: "none", md: "flex" },
                     justifyContent: "center",
                   }}
                 >
@@ -859,7 +859,7 @@ const ClassAttendances = () => {
                       disableTypography
                       sx={{
                         flex: attendanceCountWidth,
-                        display: { xs: "none", lg: "flex" },
+                        display: { xs: "none", md: "flex" },
                         justifyContent: "center",
                       }}
                     >

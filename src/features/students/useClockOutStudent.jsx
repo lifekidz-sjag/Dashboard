@@ -75,13 +75,15 @@ const useClockOutStudent = ({
       },
       {
         onClick: () => {
-          if (document.getElementById("html5-qrcode-button-camera-stop")) {
+          if (
+            document.getElementById("html5-qrcode-button-camera-stop") &&
+            document.getElementById("html5-qrcode-button-camera-stop").style
+              .display !== "none"
+          ) {
             document.getElementById("html5-qrcode-button-camera-stop").click();
-          }
-
-          setTimeout(() => {
+          } else {
             popupClockOut.close();
-          }, 1000);
+          }
         },
       },
       "center",
@@ -147,7 +149,7 @@ const useClockOutStudent = ({
             >
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <Box sx={{ marginLeft: "8px" }}>
-                  <Typography variant="subtitle1">Create Student</Typography>
+                  <Typography variant="subtitle1">Evaluation</Typography>
                 </Box>
               </Box>
             </Box>
@@ -371,6 +373,8 @@ const useClockOutStudent = ({
           }
         });
       }, 1000);
+    } else {
+      setStudentInfo({});
     }
   }, [popupClockOut.isOpen]);
 

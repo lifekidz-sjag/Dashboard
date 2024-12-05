@@ -375,10 +375,10 @@ const ReportsStudents = () => {
                     {renderFigures(
                       `${
                         studentData.attendanceSummary.averageAttendance * 100
-                      }%, ${studentData.attendanceSummary.attendanceCount}`,
+                      }%`,
                       studentData.attendanceSummary.diffAverageAttendance,
                       "Attendance Rate",
-                      `out of ${studentData.attendanceSummary.dayCount} Weeks`,
+                      `${studentData.attendanceSummary.attendanceCount} out of ${studentData.attendanceSummary.dayCount} Weeks`,
                       "flex",
                     )}
                   </Box>

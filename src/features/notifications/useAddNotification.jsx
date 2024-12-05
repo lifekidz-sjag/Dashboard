@@ -121,7 +121,7 @@ const useAddNotification = ({
                       <FormTextAreaField
                         required
                         name="description"
-                        label="Description of Notification"
+                        label="Description of Notification (Keep it short)"
                         control={controlCreate}
                         rows={3}
                         sx={{ marginBottom: "24px" }}

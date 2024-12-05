@@ -88,6 +88,7 @@ const Popup = props => {
                   aria-label="close"
                   onClick={e => {
                     if (cancel.onClick) {
+                      console.log(123);
                       cancel.onClick(e);
                     }
                   }}

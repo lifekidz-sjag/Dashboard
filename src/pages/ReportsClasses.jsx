@@ -1017,28 +1017,32 @@ const ReportsClasses = () => {
             </Typography>
             <Box>
               {classOptions.length > 0 &&
-                list.summary.age12Distribution.map(e => {
-                  return (
-                    <Box
-                      key={e.name}
-                      sx={{
-                        display: "flex",
-                        flex: "50%",
-                        marginBottom: "16px",
-                      }}
-                    >
-                      <Typography>{e.name}</Typography>
-                      <Typography
-                        sx={{ marginLeft: "24px", fontWeight: "600" }}
+                list.summary.age12Distribution
+                  .filter(item => {
+                    return item.class && item.name;
+                  })
+                  .map(e => {
+                    return (
+                      <Box
+                        key={e.name}
+                        sx={{
+                          display: "flex",
+                          flex: "50%",
+                          marginBottom: "16px",
+                        }}
                       >
-                        {
-                          classOptions.filter(el => el.value === e.class)[0]
-                            .label
-                        }
-                      </Typography>
-                    </Box>
-                  );
-                })}
+                        <Typography>{e.name}</Typography>
+                        <Typography
+                          sx={{ marginLeft: "24px", fontWeight: "600" }}
+                        >
+                          {
+                            classOptions.filter(el => el.value === e.class)[0]
+                              .label
+                          }
+                        </Typography>
+                      </Box>
+                    );
+                  })}
             </Box>
           </Box>
         </>

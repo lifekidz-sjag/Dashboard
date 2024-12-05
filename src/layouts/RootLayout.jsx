@@ -186,6 +186,7 @@ const RootLayout = () => {
         return (
           <Box
             sx={{
+              marginY: "24px",
               textAlign: "center",
             }}
           >
@@ -198,7 +199,7 @@ const RootLayout = () => {
                       sx={{
                         width: {
                           xs: "80% !important",
-                          md: "50% !important",
+                          md: "80% !important",
                         },
                         borderRadius: "16px",
                       }}
@@ -542,7 +543,7 @@ const RootLayout = () => {
         {/* Popup */}
         <Dialog
           fullWidth
-          maxWidth="xs"
+          maxWidth="sm"
           open={confirm.isOpen}
           onClose={() => {}}
           disableEscapeKeyDown
@@ -550,7 +551,7 @@ const RootLayout = () => {
           sx={{ zIndex: 1502 }}
         >
           <DialogTitle>Notifications</DialogTitle>
-          <DialogContent>
+          <DialogContent sx={{ overflow: "hidden" }}>
             <Box sx={{ width: "100%" }}>
               {renderNotification(notifications)}
             </Box>

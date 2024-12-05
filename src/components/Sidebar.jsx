@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { Box, Drawer, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import PropTypes from "prop-types";
@@ -7,6 +9,14 @@ const Sidebar = ({ sidebar = null, isOpen, close, dependencies = {} }) => {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
   const anchor = isSmallScreen ? "bottom" : "right";
 
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (isOpen && searchParams.size === 0) {
+      close();
+    }
+  }, [location.pathname]);
   return (
     <Box>
       <Drawer
