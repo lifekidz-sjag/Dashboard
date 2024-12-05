@@ -18,12 +18,11 @@ import { styled, useTheme } from "@mui/material/styles";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import quarterOfYear from "dayjs/plugin/quarterOfYear";
 import utc from "dayjs/plugin/utc";
 import * as yup from "yup";
 
 import BlankImage from "../assets/sjag_blank.gif";
-import ClockIn from "../assets/time.png";
-import ClockOut from "../assets/time-out.png";
 import { FormDateRangePicker, FormSelect } from "../components/FormInput";
 import Visibility from "../components/GoogleIcons/Visibility";
 import useAttendances from "../services/attendances";
@@ -62,7 +61,9 @@ const ClassAttendances = () => {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   dayjs.extend(utc);
-  const { loader, popup, setActionBar, actionBarDefault } = useOutletContext();
+  dayjs.extend(quarterOfYear);
+  const { user, loader, popup, setActionBar, actionBarDefault } =
+    useOutletContext();
   const [list, setList] = useState([]);
   const [className, setClassName] = useState("");
   const [studentCount, setStudentCount] = useState(0);
@@ -93,21 +94,21 @@ const ClassAttendances = () => {
   // Select Set Up
   const filterByOptions = [
     { label: "Today", value: "today" },
-    { label: "Yesterday", value: "yesterday" },
     { label: "This Week", value: "thisWeek" },
     { label: "Last Week", value: "lastWeek" },
-    { label: "Last 7 days", value: "last7Days" },
-    { label: "Last 30 days", value: "last30Days" },
-    { label: "Last 90 days", value: "last90Days" },
+    { label: "This Month", value: "thisMonth" },
+    { label: "Last Month", value: "lastMonth" },
+    { label: "This Quarter", value: "thisQuarter" },
+    { label: "Last Quarter", value: "lastQuarter" },
     { label: "Custom", value: "custom" },
   ];
   // React Hook Form Set Up
   const { control, formState, getValues, setValue, watch, reset } = useForm({
     defaultValues: {
-      dataFilter: "last30Days",
+      dataFilter: "thisMonth",
       dataDate: [
-        dayjs(new Date()).startOf("day").subtract(30, "day"),
-        dayjs(new Date()).startOf("day").subtract(1, "day"),
+        dayjs(new Date()).startOf("month"),
+        dayjs(new Date()).startOf("day"),
       ],
     },
     resolver: yupResolver(dataFilterSchema),
@@ -118,8 +119,8 @@ const ClassAttendances = () => {
   // API Callback
   const getFilterParam = ({ data, classId }) => {
     const dataDate = (data && data.dataDate) || [
-      dayjs(new Date()).startOf("day").subtract(30, "day"),
-      dayjs(new Date()).startOf("day").subtract(1, "day"),
+      dayjs(new Date()).startOf("month"),
+      dayjs(new Date()).startOf("day"),
     ];
     dayjs.extend(utc);
 
@@ -165,18 +166,7 @@ const ClassAttendances = () => {
         );
 
         break;
-      case "yesterday":
-        setValue(
-          "dataDate",
-          [
-            dayjs(new Date()).startOf("day").subtract(1, "day"),
-            dayjs(new Date()).startOf("day").subtract(1, "day"),
-          ],
-          {
-            shouldValidate: true,
-          },
-        );
-        break;
+
       case "thisWeek":
         setValue(
           "dataDate",
@@ -201,36 +191,55 @@ const ClassAttendances = () => {
           },
         );
         break;
-      case "last7Days":
+      case "thisMonth":
         setValue(
           "dataDate",
           [
-            dayjs(new Date()).startOf("day").subtract(7, "day"),
-            dayjs(new Date()).startOf("day").subtract(1, "day"),
+            dayjs(new Date()).startOf("month"),
+            dayjs(new Date()).startOf("day"),
           ],
           {
             shouldValidate: true,
           },
         );
         break;
-      case "last30Days":
+      case "lastMonth":
         setValue(
           "dataDate",
           [
-            dayjs(new Date()).startOf("day").subtract(30, "day"),
-            dayjs(new Date()).startOf("day").subtract(1, "day"),
+            dayjs(new Date()).startOf("month").subtract(1, "month"),
+            dayjs(new Date())
+              .startOf("day")
+              .subtract(1, "month")
+              .endOf("month"),
           ],
           {
             shouldValidate: true,
           },
         );
         break;
-      case "last90Days":
+      case "thisQuarter":
         setValue(
           "dataDate",
           [
-            dayjs(new Date()).startOf("day").subtract(90, "day"),
-            dayjs(new Date()).startOf("day").subtract(1, "day"),
+            dayjs(new Date()).startOf("quarter"),
+            dayjs(new Date()).startOf("day"),
+          ],
+          {
+            shouldValidate: true,
+          },
+        );
+
+        break;
+      case "lastQuarter":
+        setValue(
+          "dataDate",
+          [
+            dayjs(new Date()).startOf("quarter").subtract(1, "quarter"),
+            dayjs(new Date())
+              .startOf("quarter")
+              .subtract(1, "quarter")
+              .endOf("quarter"),
           ],
           {
             shouldValidate: true,
@@ -257,6 +266,11 @@ const ClassAttendances = () => {
       case "Clocked Out":
         statusText = "Clocked Out";
         backgroundColor = theme.palette.success.main;
+        color = theme.palette.secondary.contrastText;
+        break;
+      case "Default Clocked Out":
+        statusText = "System Clocked Out";
+        backgroundColor = theme.palette.info.main;
         color = theme.palette.secondary.contrastText;
         break;
       case "Clocked In":
@@ -301,20 +315,31 @@ const ClassAttendances = () => {
   };
 
   useEffect(() => {
-    loader.start();
+    if (user && user.role.indexOf("admin") < 0) {
+      setActionBar({
+        ...actionBarDefault,
+        title: {
+          enabled: true,
+          display: true,
+          name: "Attendance List",
+        },
+      });
+    } else {
+      loader.start();
 
-    getGroupedAttendanceExecute({
-      params: getFilterParam({ classId: id }),
-    });
-    getClassExecute(id);
+      getGroupedAttendanceExecute({
+        params: getFilterParam({ classId: id }),
+      });
+      getClassExecute(id);
 
-    reset({
-      dataFilter: "last30Days",
-      dataDate: [
-        dayjs(new Date()).startOf("day").subtract(30, "day"),
-        dayjs(new Date()).startOf("day").subtract(1, "day"),
-      ],
-    });
+      reset({
+        dataFilter: "thisMonth",
+        dataDate: [
+          dayjs(new Date()).startOf("month"),
+          dayjs(new Date()).startOf("day"),
+        ],
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -351,6 +376,20 @@ const ClassAttendances = () => {
       setClassName(getClassData.name);
     }
   }, [getClassData]);
+  const defaultClockedOutTime = dayjs(new Date())
+    .utc()
+    .set("hour", 12)
+    .set("minute", 0)
+    .set("second", 0)
+    .set("millisecond", 0)
+    .format("YYYY-MM-DDTHH:mm:ss[Z]");
+
+  const renderCondition = clockOutTime => {
+    if (clockOutTime === defaultClockedOutTime) {
+      return "Default Clocked Out";
+    }
+    return "Clocked Out";
+  };
   useEffect(() => {
     if (getDetailedAttendanceData) {
       popup.open(
@@ -367,9 +406,7 @@ const ClassAttendances = () => {
             return (
               <ListItem key={el.clockIn}>
                 <CustomizedListItemText disableTypography>
-                  <Box
-                    sx={{ display: "flex", justifyContent: "space-between" }}
-                  >
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
                     <Typography
                       sx={{ display: "inline", marginRight: "16px" }}
                       component="span"
@@ -378,31 +415,29 @@ const ClassAttendances = () => {
                     >
                       {index + 1}. {el.studentName}
                     </Typography>
-                    {renderStatusChip(el.status)}
                   </Box>
-                  <Box sx={{ textAlign: "left", marginTop: "8px" }}>
+                  <Box
+                    sx={{
+                      textAlign: "left",
+                      marginTop: "8px",
+                      marginLeft: "16px",
+                    }}
+                  >
                     {el.clockIn === "0001-01-01T00:00:00" ? null : (
                       <Box
                         sx={{
                           display: "flex",
-                          alignItems: "flex-end",
+                          alignItems: "center",
                         }}
                       >
-                        <Box
-                          component="img"
-                          src={ClockIn}
-                          sx={{
-                            width: "16px",
-                            height: "16px",
-                          }}
-                        />
+                        {renderStatusChip("Clocked In")}
                         <Typography
                           sx={{ marginLeft: "8px" }}
                           component="span"
                           variant="body2"
                           color="text.primary"
                         >
-                          {dayjs(el.clockIn).format("DD-MM-YYYY HH:mm:ss")}
+                          {dayjs(el.clockIn).utc().format("DD-MM-YYYY hh:mm A")}
                         </Typography>
                       </Box>
                     )}
@@ -410,25 +445,26 @@ const ClassAttendances = () => {
                       <Box
                         sx={{
                           display: "flex",
-                          alignItems: "flex-end",
+                          alignItems: "center",
                           marginTop: "8px",
                         }}
                       >
-                        <Box
-                          component="img"
-                          src={ClockOut}
-                          sx={{ width: "16px", height: "16px" }}
-                        />
+                        {renderStatusChip(renderCondition(el.clockOut))}
                         <Typography
                           sx={{ marginLeft: "8px" }}
                           component="span"
                           variant="body2"
                           color="text.primary"
                         >
-                          {dayjs(el.clockOut).format("DD-MM-YYYY HH:mm:ss")}
+                          {dayjs(el.clockOut)
+                            .utc()
+                            .format("DD-MM-YYYY hh:mm A")}
                         </Typography>
                       </Box>
                     )}
+                    {el.clockIn === "0001-01-01T00:00:00" &&
+                      el.clockOut === "0001-01-01T00:00:00" &&
+                      renderStatusChip(el.status)}
                   </Box>
                 </CustomizedListItemText>
               </ListItem>
@@ -514,7 +550,7 @@ const ClassAttendances = () => {
                     }}
                   >
                     <Typography variant="body1">
-                      {item.value} / {studentCount}
+                      {item.value} / {item.studentCount}
                     </Typography>
                   </Box>
                 </Box>
@@ -625,7 +661,7 @@ const ClassAttendances = () => {
                     }}
                   >
                     <Typography variant="body1">
-                      {item.value} / {studentCount}
+                      {item.value} / {item.studentCount}
                     </Typography>
                   </Box>
                 </CustomizedListItemText>

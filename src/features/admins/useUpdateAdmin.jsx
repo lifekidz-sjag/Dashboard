@@ -14,7 +14,11 @@ import { useTheme } from "@mui/material/styles";
 import * as yup from "yup";
 
 import formBg from "../../assets/form-bg.png";
-import { FormTextField } from "../../components/FormInput";
+import {
+  FormSelect,
+  FormSwitch,
+  FormTextField,
+} from "../../components/FormInput";
 import ArrowBack from "../../components/GoogleIcons/ArrowBack";
 import useAdmins from "../../services/admins";
 
@@ -43,6 +47,8 @@ const useUpdateAdmin = ({
   const updateAdminSchema = yup.object({
     name: yup.string().required("Please enter name of the admin"),
     phone: yup.string().required("Please enter phone of the admin"),
+    role: yup.string().required("Please select role"),
+    resetPassword: yup.boolean().required("Please select one"),
   });
 
   const {
@@ -54,6 +60,8 @@ const useUpdateAdmin = ({
       id: "",
       name: "",
       phone: "",
+      role: "admin",
+      resetPassword: false,
     },
     resolver: yupResolver(updateAdminSchema),
   });
@@ -61,6 +69,7 @@ const useUpdateAdmin = ({
   const handleUpdate = async data => {
     const modifiedData = data;
     delete modifiedData.id;
+    modifiedData.resetPassword = data.resetPassword.toString();
 
     loader.start();
     putAdminExecute(sharedState.id, modifiedData);
@@ -130,6 +139,38 @@ const useUpdateAdmin = ({
                         label="Phone"
                         control={controlUpdate}
                         sx={{ marginBottom: "24px" }}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <FormSelect
+                        name="role"
+                        label="Role"
+                        control={controlUpdate}
+                        options={[
+                          {
+                            label: "superadmin",
+                            value: "superadmin",
+                          },
+                          {
+                            label: "admin",
+                            value: "admin",
+                          },
+                        ]}
+                        sx={{ marginBottom: "24px" }}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <Typography variant="caption">
+                        Reset Password? (Reset to current phone number set)
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <FormSwitch
+                        name="resetPassword"
+                        label=""
+                        control={controlUpdate}
                       />
                     </Grid>
                   </Grid>
@@ -218,6 +259,8 @@ const useUpdateAdmin = ({
       resetUpdate({
         name: getAdminData.name,
         phone: getAdminData.phone,
+        role: getAdminData.role,
+        resetPassword: false,
       });
       sidebar.open();
       loader.end();
@@ -252,7 +295,7 @@ const useUpdateAdmin = ({
       loader.end();
       switch (getAdminError.response.data) {
         case "INVALID_ID":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
 
         default:
@@ -267,10 +310,10 @@ const useUpdateAdmin = ({
     if (putAdminError) {
       switch (putAdminError.response.data) {
         case "ADMIN_ACTIONS_NOT_ALLOWED":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         case "EMPTY_REQUEST":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         case "DUPLICATED_ADMIN":
           snackbar.open(
@@ -279,7 +322,7 @@ const useUpdateAdmin = ({
           );
           break;
         case "INVALID_ID":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         case "UNAUTHORIZED_ACTION":
           snackbar.open("Please login again to proceed", true);

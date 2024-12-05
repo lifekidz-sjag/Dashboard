@@ -6,11 +6,11 @@ const FormTextAreaField = ({
   name,
   control,
   label,
-  required,
-  sx,
-  disabled,
-  readOnly,
-  rows,
+  required = false,
+  sx = {},
+  disabled = false,
+  readOnly = false,
+  rows = 0,
 }) => {
   return (
     <Controller
@@ -56,14 +56,6 @@ FormTextAreaField.propTypes = {
   disabled: PropTypes.bool,
   readOnly: PropTypes.bool,
   rows: PropTypes.number,
-};
-
-FormTextAreaField.defaultProps = {
-  sx: {},
-  required: false,
-  disabled: false,
-  readOnly: false,
-  rows: 0,
 };
 
 export default FormTextAreaField;

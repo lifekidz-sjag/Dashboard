@@ -19,6 +19,7 @@ import formBg from "../../assets/form-bg.png";
 import {
   FormDateTimePicker,
   FormSelect,
+  FormTextAreaField,
   FormTextField,
 } from "../../components/FormInput";
 import ArrowBack from "../../components/GoogleIcons/ArrowBack";
@@ -29,8 +30,6 @@ const useUpdateStudent = ({
   loader,
   sidebar,
   snackbar,
-  noPermissionConfirm,
-  user,
   fetchList,
   sharedState,
   sharedFunction,
@@ -55,11 +54,12 @@ const useUpdateStudent = ({
   // React Hook Form Set Up
   const updateStudentSchema = yup.object({
     name: yup.string().required("Please enter name of the student"),
-    age: yup.number().required("Please enter age of the student"),
+    age: yup.number(),
     class: yup.string().required("Please select a class"),
     gender: yup.string().required("Please select gender of the student"),
     type: yup.string().required("Please select one"),
     birthday: yup.string().required("Please enter birthday of student"),
+    allergies: yup.string(),
     famName: yup.string().required("Please enter main family member name"),
     famContact: yup
       .string()
@@ -76,6 +76,8 @@ const useUpdateStudent = ({
     control: controlUpdate,
     handleSubmit: handleSubmitUpdate,
     reset: resetUpdate,
+    watch,
+    setValue,
   } = useForm({
     defaultValues: {
       name: "",
@@ -86,6 +88,7 @@ const useUpdateStudent = ({
       birthday: new Date(new Date().setHours(new Date().getHours() + 8))
         .toISOString()
         .replace(/\.\d{3}Z$/, ""),
+      allergies: "",
       famName: "",
       famContact: "",
       famRelationship: "",
@@ -99,6 +102,7 @@ const useUpdateStudent = ({
   const handleUpdate = async data => {
     const modifiedData = data;
     delete modifiedData.id;
+    delete modifiedData.age;
     dayjs.extend(utc);
 
     modifiedData.birthday = `${dayjs(new Date(data.birthday))
@@ -144,23 +148,15 @@ const useUpdateStudent = ({
             }}
           >
             {/* Top Bar */}
-            <Box
-              sx={{
-                position: "sticky",
-                top: 0,
-                background: "#fff",
-                zIndex: 2,
-              }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Box>
-                  <IconButton onClick={sidebar.close}>
-                    <ArrowBack color="inherit" />
-                  </IconButton>
-                </Box>
-                <Box sx={{ marginLeft: "8px" }}>
-                  <Typography variant="subtitle1">Update Student</Typography>
-                </Box>
+
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Box>
+                <IconButton onClick={sidebar.close}>
+                  <ArrowBack color="inherit" />
+                </IconButton>
+              </Box>
+              <Box sx={{ marginLeft: "8px" }}>
+                <Typography variant="subtitle1">Update Student</Typography>
               </Box>
             </Box>
 
@@ -205,15 +201,6 @@ const useUpdateStudent = ({
                       />
                     </Grid>
                     <Grid item xs={12} md={6}>
-                      <FormTextField
-                        required
-                        name="age"
-                        label="Age"
-                        control={controlUpdate}
-                        sx={{ marginBottom: "24px" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
                       <FormSelect
                         name="gender"
                         label="Gender"
@@ -237,11 +224,28 @@ const useUpdateStudent = ({
                         sx={{ marginBottom: "24px" }}
                       />
                     </Grid>
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={6} sx={{ marginTop: "24px" }}>
+                      <FormTextField
+                        disabled
+                        name="age"
+                        label="Age"
+                        control={controlUpdate}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={6} sx={{ marginTop: "24px" }}>
                       <FormDateTimePicker
                         label="Birthday"
                         name="birthday"
                         control={controlUpdate}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <FormTextAreaField
+                        name="allergies"
+                        label="Allergies"
+                        control={controlUpdate}
+                        rows={3}
+                        sx={{ marginBottom: "24px" }}
                       />
                     </Grid>
                     <FormLabel sx={{ marginLeft: "16px", marginRight: "8px" }}>
@@ -361,17 +365,24 @@ const useUpdateStudent = ({
   const onUpdate = id => {
     loader.start();
 
-    if (user && user.role.indexOf("admin") >= 0) {
-      sharedFunction.setAction("Update");
-      sharedFunction.setId(id);
-      getStudentExecute(id);
-      fetchClassesExecute();
-    } else {
-      noPermissionConfirm.open();
-      loader.end();
-    }
+    sharedFunction.setAction("Update");
+    sharedFunction.setId(id);
+    getStudentExecute(id);
+    fetchClassesExecute();
   };
-
+  const calculateAge = dateString => {
+    const birthDate = new Date(dateString);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age -= 1;
+    }
+    return age;
+  };
   // Side Effects
   useEffect(() => {
     if (getStudentData && fetchClassesData && fetchClassesData.data) {
@@ -393,6 +404,7 @@ const useUpdateStudent = ({
         type: getStudentData.type,
         class: getStudentData.class,
         birthday: getStudentData.birthday,
+        allergies: getStudentData.allergies,
         famName: getStudentData.famName,
         famContact: getStudentData.famContact,
         famRelationship: getStudentData.famRelationship,
@@ -441,7 +453,7 @@ const useUpdateStudent = ({
       loader.end();
       switch (getStudentError.response.data) {
         case "INVALID_ID":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
 
         default:
@@ -456,10 +468,10 @@ const useUpdateStudent = ({
     if (putStudentError) {
       switch (putStudentError.response.data) {
         case "ADMIN_ACTIONS_NOT_ALLOWED":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         case "EMPTY_REQUEST":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         case "DUPLICATED_STUDENT":
           snackbar.open(
@@ -468,7 +480,7 @@ const useUpdateStudent = ({
           );
           break;
         case "INVALID_ID":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         case "UNAUTHORIZED_ACTION":
           snackbar.open("Please login again to proceed", true);
@@ -481,6 +493,11 @@ const useUpdateStudent = ({
     return () => {};
   }, [putStudentError]);
 
+  useEffect(() => {
+    if (watch("birthday")) {
+      setValue("age", calculateAge(watch("birthday")));
+    }
+  }, [watch("birthday")]);
   return {
     onUpdate,
   };

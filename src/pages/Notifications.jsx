@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useOutletContext, useSearchParams } from "react-router-dom";
 
+import NoPermission from "../components/NoPermission";
 import ListNotifications from "../features/notifications/ListNotifications";
 import useNotificationsFeatures from "../features/notifications/useNotificationsFeatures";
 
@@ -26,42 +27,53 @@ const Notifications = () => {
 
   // Page load
   useEffect(() => {
-    loader.start();
-    if (searchParams.get("add") === "true") {
-      addNotification.onAdd();
-    }
-    setActionBar({
-      ...actionBarDefault,
-      title: {
-        enabled: true,
-        display: true,
-        name: "Announcements",
-      },
-      fab: {
-        enabled: true,
-        display: true,
-        action: () => {
-          addNotification.onAdd();
+    if (user && user.role.indexOf("admin") < 0) {
+      setActionBar({
+        ...actionBarDefault,
+        title: {
+          enabled: true,
+          display: true,
+          name: "Announcements",
         },
-      },
-      search: {
-        enabled: true,
-        display: true,
-        isOpen: false,
-        renderContent: searchNotifications.searchBarContent,
-        searchFunc: searchNotifications.searchFunc,
-        submitFunc: searchNotifications.submitFunc,
-        backFunc: searchNotifications.backFunc,
-      },
-    });
+      });
+    } else {
+      loader.start();
+      if (searchParams.get("add") === "true") {
+        addNotification.onAdd();
+      }
+      setActionBar({
+        ...actionBarDefault,
+        title: {
+          enabled: true,
+          display: true,
+          name: "Announcements",
+        },
+        fab: {
+          enabled: true,
+          display: true,
+          action: () => {
+            addNotification.onAdd();
+          },
+        },
+        search: {
+          enabled: true,
+          display: true,
+          isOpen: false,
+          renderContent: searchNotifications.searchBarContent,
+          searchFunc: searchNotifications.searchFunc,
+          submitFunc: searchNotifications.submitFunc,
+          backFunc: searchNotifications.backFunc,
+        },
+      });
 
-    // Load list
-    fetchNotifications.onFetch({ params: { sort: "-updatedAt" } });
+      // Load list
+      fetchNotifications.onFetch({ params: { sort: "-updatedAt" } });
+    }
 
     return () => {};
   }, []);
 
-  return (
+  return user && user.role.indexOf("admin") >= 0 ? (
     <ListNotifications
       user={user}
       newItemAnimation={newItemAnimation}
@@ -76,6 +88,8 @@ const Notifications = () => {
       onDelete={deleteNotification.onDelete}
       searchStatus={state.searchStatus}
     />
+  ) : (
+    <NoPermission />
   );
 };
 

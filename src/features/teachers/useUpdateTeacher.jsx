@@ -14,7 +14,11 @@ import { useTheme } from "@mui/material/styles";
 import * as yup from "yup";
 
 import formBg from "../../assets/form-bg.png";
-import { FormSelect, FormTextField } from "../../components/FormInput";
+import {
+  FormSelect,
+  FormSwitch,
+  FormTextField,
+} from "../../components/FormInput";
 import ArrowBack from "../../components/GoogleIcons/ArrowBack";
 import useClasses from "../../services/classes";
 import useTeachers from "../../services/teachers";
@@ -51,6 +55,7 @@ const useUpdateTeacher = ({
     name: yup.string().required("Please enter name of the teacher"),
     phone: yup.string().required("Please enter phone of the teacher"),
     class: yup.string().required("Please select a class"),
+    resetPassword: yup.boolean().required("Please select one"),
   });
 
   const {
@@ -63,6 +68,7 @@ const useUpdateTeacher = ({
       name: "",
       phone: "",
       class: "",
+      resetPassword: false,
     },
     resolver: yupResolver(updateTeacherSchema),
   });
@@ -70,6 +76,7 @@ const useUpdateTeacher = ({
   const handleUpdate = async data => {
     const modifiedData = data;
     delete modifiedData.id;
+    modifiedData.resetPassword = data.resetPassword.toString();
 
     loader.start();
     putTeacherExecute(sharedState.id, modifiedData);
@@ -151,6 +158,18 @@ const useUpdateTeacher = ({
                           value: data.id,
                         }))}
                         sx={{ marginBottom: "24px" }}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="caption">
+                        Reset Password? (Reset to current phone number set)
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <FormSwitch
+                        name="resetPassword"
+                        label=""
+                        control={controlUpdate}
                       />
                     </Grid>
                   </Grid>
@@ -242,6 +261,7 @@ const useUpdateTeacher = ({
         name: getTeacherData.name,
         phone: getTeacherData.phone,
         class: getTeacherData.class,
+        resetPassword: false,
       });
       sidebar.open();
       loader.end();
@@ -284,7 +304,7 @@ const useUpdateTeacher = ({
       loader.end();
       switch (getTeacherError.response.data) {
         case "INVALID_ID":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
 
         default:
@@ -299,10 +319,10 @@ const useUpdateTeacher = ({
     if (putTeacherError) {
       switch (putTeacherError.response.data) {
         case "ADMIN_ACTIONS_NOT_ALLOWED":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         case "EMPTY_REQUEST":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         case "DUPLICATED_TEACHER":
           snackbar.open(
@@ -311,7 +331,7 @@ const useUpdateTeacher = ({
           );
           break;
         case "INVALID_ID":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         case "UNAUTHORIZED_ACTION":
           snackbar.open("Please login again to proceed", true);

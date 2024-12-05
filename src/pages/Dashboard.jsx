@@ -37,6 +37,7 @@ import Popup from "../components/Popup";
 import { useAuth } from "../contexts/auth";
 import useStudentsFeatures from "../features/students/useStudentsFeatures";
 import usePopup from "../hooks/usePopup";
+import useBible from "../services/bible";
 import useNotifications from "../services/notifications";
 
 const Dashboard = () => {
@@ -64,7 +65,7 @@ const Dashboard = () => {
   };
   const slickSettings2 = {
     dots: true,
-    // infinite: true,
+    infinite: true,
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
@@ -77,6 +78,10 @@ const Dashboard = () => {
   const { user } = useAuth();
   const { fetch: fetchNotifications } = useNotifications();
   const [notification, setNotification] = useState(null);
+
+  const { fetch: fetchBible, post: postBible } = useBible();
+  const [{ data: fetchBibleData }, fetchBibleExecute] = fetchBible;
+  const [postBibleExecute] = postBible;
   const [info, setInfo] = useState(null);
   dayjs.extend(utc);
   const popupClockIn = usePopup();
@@ -90,10 +95,8 @@ const Dashboard = () => {
   });
 
   const { clockInStudent, clockOutStudent } = features;
-  const [
-    { data: fetchNotificationsData, error: fetchNotificationsError },
-    fetchNotificationsExecute,
-  ] = fetchNotifications;
+  const [{ data: fetchNotificationsData }, fetchNotificationsExecute] =
+    fetchNotifications;
   useEffect(() => {
     loader.start();
     fetchNotificationsExecute({
@@ -115,6 +118,7 @@ const Dashboard = () => {
         name: `Welcome back, ${user.name}.`,
       },
     });
+    fetchBibleExecute();
   }, []);
 
   useEffect(() => {
@@ -127,7 +131,7 @@ const Dashboard = () => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
   const renderBirthday = () => {
-    if (info.birthday) {
+    if (info.birthday.length !== 0) {
       if (info.birthday.length > 1) {
         return (
           <Box sx={{ textAlign: "center" }}>
@@ -141,7 +145,7 @@ const Dashboard = () => {
                       sx={{
                         width: {
                           xs: "80% !important",
-                          md: "50% !important",
+                          md: "80% !important",
                         },
                         borderRadius: "16px",
                       }}
@@ -149,7 +153,7 @@ const Dashboard = () => {
                       <Box sx={{ display: "flex", justifyContent: "center" }}>
                         <CardMedia
                           component="img"
-                          sx={{ width: 200 }}
+                          sx={{ width: "200px" }}
                           image={birthdayImageList[index]}
                           alt="birthday"
                         />
@@ -195,7 +199,7 @@ const Dashboard = () => {
             sx={{
               width: {
                 xs: "80% !important",
-                md: "50% !important",
+                md: "80% !important",
               },
               borderRadius: "16px",
             }}
@@ -203,7 +207,7 @@ const Dashboard = () => {
             <Box sx={{ display: "flex", justifyContent: "center" }}>
               <CardMedia
                 component="img"
-                sx={{ width: 200 }}
+                sx={{ width: "200px" }}
                 image={birthdayImageList[0]}
                 alt="birthday"
               />
@@ -233,7 +237,7 @@ const Dashboard = () => {
     return null;
   };
   const renderNotification = () => {
-    if (notification) {
+    if (notification && notification.length !== 0) {
       if (notification.length > 1) {
         return (
           <Box
@@ -250,7 +254,7 @@ const Dashboard = () => {
                       sx={{
                         width: {
                           xs: "80% !important",
-                          md: "50% !important",
+                          md: "80% !important",
                         },
                         borderRadius: "16px",
                       }}
@@ -258,7 +262,7 @@ const Dashboard = () => {
                       <Box sx={{ display: "flex", justifyContent: "center" }}>
                         <CardMedia
                           component="img"
-                          sx={{ width: 200 }}
+                          sx={{ width: "200px" }}
                           image={announcementImageList[index]}
                           alt="birthday"
                         />
@@ -305,7 +309,7 @@ const Dashboard = () => {
             sx={{
               width: {
                 xs: "80% !important",
-                md: "50% !important",
+                md: "80% !important",
               },
               borderRadius: "16px",
             }}
@@ -313,7 +317,7 @@ const Dashboard = () => {
             <Box sx={{ display: "flex", justifyContent: "center" }}>
               <CardMedia
                 component="img"
-                sx={{ width: 200 }}
+                sx={{ width: "200px" }}
                 image={announcementImageList[0]}
                 alt="birthday"
               />
@@ -347,142 +351,112 @@ const Dashboard = () => {
 
     return null;
   };
+
+  const [verse, setVerse] = useState({ reference: "", content: "" });
+
+  useEffect(() => {
+    if (fetchBibleData) {
+      if (
+        fetchBibleData.id &&
+        fetchBibleData.reference &&
+        fetchBibleData.text
+      ) {
+        setVerse({
+          reference: fetchBibleData.reference,
+          content: fetchBibleData.text,
+        });
+      } else {
+        const fetchVerseOfTheDay = async () => {
+          const response = await axios.get(
+            "https://beta.ourmanna.com/api/v1/get/?format=json",
+          );
+          const verseOfTheDay = response.data.verse.details;
+          setVerse({
+            reference: verseOfTheDay.reference,
+            content: verseOfTheDay.text,
+          });
+          postBibleExecute({
+            reference: verseOfTheDay.reference,
+            text: verseOfTheDay.text,
+          });
+        };
+        fetchVerseOfTheDay();
+      }
+    }
+  }, [fetchBibleData]);
   return (
     info && (
       <>
         <Box>
           <Box
             sx={{
-              backgroundColor: "primary.light",
-              padding: "24px 24px 24px 24px",
-              borderRadius: "8px",
-              position: "relative",
-              marginTop: "32px",
+              display: { xs: "block", sm: "flex" },
+              justifyContent: "space-between",
+              gap: "16px",
             }}
           >
             <Box
-              component="img"
               sx={{
-                width: { xs: 180, sm: 250 },
-                position: "absolute",
-                top: { xs: "-64px", sm: "-80px" },
-                right: { xs: "8px", sm: "24px" },
+                backgroundColor: "primary.light",
+                padding: "24px",
+                borderRadius: "8px",
+                position: "relative",
+                flex: 1,
+                gap: "16px",
+                marginBottom: { xs: "24px", sm: "0px" },
               }}
-              src={DashboardVideo}
-            />
-            <Box sx={{ maxWidth: { xs: "100%", sm: "80%" } }}>
-              <Typography variant="h6">Verse of the day </Typography>
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: "800", marginBottom: "16px" }}
-              >
-                Matthew 27:42
-              </Typography>
-              <Typography variant="h8">
-                He saved others; He cannot save Himself He is the King of
-                Israel; let Him now come down from the cross, and we will
-                believe in Him.
-              </Typography>
+            >
+              <Box
+                component="img"
+                sx={{
+                  width: { xs: 180, sm: 250 },
+                  position: "absolute",
+                  top: { xs: "-64px", sm: "unset" },
+                  bottom: { sm: "0px" },
+                  right: { xs: "8px", sm: "24px" },
+                }}
+                src={DashboardVideo}
+              />
+              <Box sx={{ maxWidth: { xs: "100%", sm: "50%" } }}>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: "800", marginBottom: "16px" }}
+                >
+                  {verse.reference || "Matthew 27:42"}
+                </Typography>
+                <Typography variant="h8">
+                  {verse.content ||
+                    "He saved others; He cannot save Himself He is the King of Israel; let Him now come down from the cross, and we will believe in Him."}
+                </Typography>
+              </Box>
             </Box>
 
             <Box
               sx={{
-                display: "flex",
-                gap: "10px",
-                flexWrap: "wrap",
+                backgroundColor: "#CCDFFB",
+                padding: "24px",
+                borderRadius: "8px",
+                width: { xs: "100%", sm: "50%" },
+                // flex: 1,
               }}
-            />
-          </Box>
-          <Grid container spacing={2}>
-            <Grid container item xs={12} lg={6}>
-              <Box
-                sx={{
-                  backgroundColor: "#FFF",
-                  flex: "1 1 100%",
-                  height: "100%",
-                  padding: "24px",
-                  margin: "24px 0px",
-                  borderRadius: "8px",
-                  position: "relative",
-                }}
-              >
+            >
+              <div>
                 <Typography
                   variant="h5"
                   color="textPrimary"
                   fontWeight={500}
                   sx={{ marginBottom: "24px" }}
                 >
-                  Teacher Quick Actions
+                  Announcements
                 </Typography>
-                <Grid container rowSpacing={4} columnSpacing={4}>
-                  <Grid item xs={6} sm={6}>
-                    <Box sx={{ marginBottom: "16px", width: "100%" }}>
-                      Clock in
-                    </Box>
-                    <Card>
-                      <CardActionArea
-                        onClick={() => {
-                          clockInStudent.onScan();
-                        }}
-                      >
-                        <Box
-                          component="img"
-                          src={ClockIn}
-                          sx={{ width: "100%", padding: "24px" }}
-                        />
-                      </CardActionArea>
-                    </Card>
-                  </Grid>
-                  <Grid item xs={6} sm={6}>
-                    <Box sx={{ marginBottom: "16px", width: "100%" }}>
-                      Clock out
-                    </Box>
-                    <Card>
-                      <CardActionArea
-                        onClick={() => {
-                          clockOutStudent.onScan();
-                        }}
-                      >
-                        <Box
-                          component="img"
-                          src={ClockOut}
-                          sx={{ width: "100%", padding: "24px" }}
-                        />
-                      </CardActionArea>
-                    </Card>
-                  </Grid>
-                </Grid>
-              </Box>
-            </Grid>
+              </div>
 
-            <Grid item xs={12} lg={6}>
-              <Box
-                sx={{
-                  backgroundColor: "#FFF",
-                  flex: "1 1 auto",
-                  minHeight: "100%",
-                  padding: "24px 24px 0px",
-                  margin: "24px 0px",
-                  borderRadius: "8px",
-                  position: "relative",
-                }}
-              >
-                <Box>
-                  <Typography
-                    gutterBottom
-                    variant="h5"
-                    color="textPrimary"
-                    fontWeight={500}
-                    sx={{ marginBottom: " 24px" }}
-                  >
-                    Upcoming Birthdays
-                  </Typography>
-                </Box>
-                {renderBirthday()}
-              </Box>
-            </Grid>
+              {renderNotification()}
+            </Box>
+          </Box>
+
+          <Grid container spacing={2}>
             <Grid container item xs={12} lg={6}>
-              <Grid item xs={6} />
               {user.role.indexOf("admin") >= 0 && (
                 <Box
                   sx={{
@@ -501,7 +475,7 @@ const Dashboard = () => {
                     fontWeight={500}
                     sx={{ marginBottom: "24px" }}
                   >
-                    Admin Actions
+                    Quick Actions
                   </Typography>
                   <Grid container rowSpacing={4} columnSpacing={4}>
                     <Grid item xs={6} sm={6}>
@@ -701,6 +675,136 @@ const Dashboard = () => {
                   </Grid>
                 </Box>
               )}
+              {user.role.indexOf("teacher") >= 0 && (
+                <Box
+                  sx={{
+                    backgroundColor: "#FFF",
+                    flex: "1 1 100%",
+                    height: "100%",
+                    padding: "24px",
+                    margin: "24px 0px",
+                    borderRadius: "8px",
+                    position: "relative",
+                  }}
+                >
+                  <Typography
+                    variant="h5"
+                    color="textPrimary"
+                    fontWeight={500}
+                    sx={{ marginBottom: "24px" }}
+                  >
+                    Quick Actions
+                  </Typography>
+                  <Grid container rowSpacing={4} columnSpacing={4}>
+                    <Grid item xs={12} md={4}>
+                      <Box sx={{ marginBottom: "16px", width: "100%" }}>
+                        Clock in
+                      </Box>
+                      <Card>
+                        <CardActionArea
+                          onClick={() => {
+                            clockInStudent.onScan();
+                          }}
+                          sx={{ textAlign: "center" }}
+                        >
+                          <Box
+                            component="img"
+                            src={ClockIn}
+                            sx={{
+                              width: { xs: "50%", sm: "100%" },
+                              padding: "24px",
+                            }}
+                          />
+                        </CardActionArea>
+                      </Card>
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                      <Box sx={{ marginBottom: "16px", width: "100%" }}>
+                        Clock out
+                      </Box>
+                      <Card>
+                        <CardActionArea
+                          onClick={() => {
+                            clockOutStudent.onScan();
+                          }}
+                          sx={{ textAlign: "center" }}
+                        >
+                          <Box
+                            component="img"
+                            src={ClockOut}
+                            sx={{
+                              width: { xs: "50%", sm: "100%" },
+                              padding: "24px",
+                            }}
+                          />
+                        </CardActionArea>
+                      </Card>
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                      <Box sx={{ marginBottom: "16px" }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              marginBottom: "16px",
+                              width: "100%",
+                              display: "flex",
+                              justifyContent: {
+                                xs: "flex-start",
+                                sm: "space-between",
+                              },
+                            }}
+                          >
+                            Students
+                            <Typography
+                              sx={{ marginLeft: "16px", fontSize: "24px" }}
+                            >
+                              {info.dashboardInfo.studentCount}
+                            </Typography>
+                            <IconButton
+                              onClick={() => {
+                                navigate("/students?add=true");
+                              }}
+                              sx={{
+                                padding: "0px",
+                                marginLeft: "8px",
+                                border: `1px solid ${theme.palette.primary.main}`,
+                              }}
+                            >
+                              <Add
+                                color={theme.palette.primary.main}
+                                fontSize="16px"
+                              />
+                            </IconButton>
+                          </Box>
+                        </Box>
+                        <Card>
+                          <CardActionArea
+                            onClick={() => {
+                              navigate("/students?add=true");
+                            }}
+                            sx={{ textAlign: "center" }}
+                          >
+                            <Box
+                              component="img"
+                              src={Student}
+                              sx={{
+                                width: { xs: "50%", sm: "100%" },
+                                padding: "24px",
+                              }}
+                            />
+                          </CardActionArea>
+                        </Card>
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </Box>
+              )}
             </Grid>
             <Grid item xs={12} lg={6}>
               <Box
@@ -708,23 +812,24 @@ const Dashboard = () => {
                   backgroundColor: "#FFF",
                   flex: "1 1 auto",
                   minHeight: "100%",
-                  padding: "24px",
+                  padding: "24px 24px 0px",
                   margin: "24px 0px",
                   borderRadius: "8px",
+                  position: "relative",
                 }}
               >
-                <div>
+                <Box>
                   <Typography
+                    gutterBottom
                     variant="h5"
                     color="textPrimary"
                     fontWeight={500}
-                    sx={{ marginBottom: "24px" }}
+                    sx={{ marginBottom: " 24px" }}
                   >
-                    Announcements
+                    Upcoming Birthdays
                   </Typography>
-                </div>
-
-                {renderNotification()}
+                </Box>
+                {renderBirthday()}
               </Box>
             </Grid>
           </Grid>

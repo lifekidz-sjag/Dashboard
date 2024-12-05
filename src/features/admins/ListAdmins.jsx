@@ -136,63 +136,71 @@ const ListAdmins = ({
       return null;
     }
     return list && list.data.length > 0 ? (
-      list.data.map((item, index) => {
-        return (
-          <ListItem
-            key={item.id}
-            ref={node => {
-              nodeRefFunc(newItemAnimation.newItem === item.id, node);
-            }}
-            className={className(newItemAnimation.newItem === item.id)}
-            disablePadding
-            sx={{
-              borderBottom:
-                index === list.data.length - 1
-                  ? "unset"
-                  : "1px solid rgba(0,0,0,0.1)",
-            }}
-          >
-            <CustomizedListItemButton
-              dense
-              disableRipple
-              disableTouchRipple
+      list.data
+        .filter(el => {
+          return el.name !== "ooncheeyee@gmail.com";
+        })
+        .map((item, index) => {
+          return (
+            <ListItem
+              key={item.id}
+              ref={node => {
+                nodeRefFunc(newItemAnimation.newItem === item.id, node);
+              }}
+              className={className(newItemAnimation.newItem === item.id)}
+              disablePadding
               sx={{
-                width: "100%",
-                height: "60px",
-                paddingLeft: "16px",
-                paddingRight: "0px",
-                "&.Mui-selected": {
-                  backgroundColor: "#E9F2FF",
-                },
+                borderBottom:
+                  index === list.data.length - 1
+                    ? "unset"
+                    : "1px solid rgba(0,0,0,0.1)",
               }}
             >
-              {/* Class Name */}
-              <CustomizedListItemText disableTypography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
+              <CustomizedListItemButton
+                dense
+                disableRipple
+                disableTouchRipple
+                sx={{
+                  width: "100%",
+                  height: "60px",
+                  paddingLeft: "16px",
+                  paddingRight: "0px",
+                  "&.Mui-selected": {
+                    backgroundColor: "#E9F2FF",
+                  },
+                }}
+              >
+                {/* Class Name */}
+                <CustomizedListItemText disableTypography>
                   <Box
                     sx={{
-                      cursor: "pointer",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      display: "-webkit-box",
-                      wordBreak: "break-word",
-                      WebkitLineClamp: "1",
-                      WebkitBoxOrient: "vertical",
+                      display: "flex",
+                      alignItems: "center",
                     }}
                   >
-                    <Typography variant="body1">{item.name}</Typography>
-                  </Box>
-                  {item.role === "superadmin" && (
+                    <Box
+                      sx={{
+                        cursor: "pointer",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        display: "-webkit-box",
+                        wordBreak: "break-word",
+                        WebkitLineClamp: "1",
+                        WebkitBoxOrient: "vertical",
+                      }}
+                    >
+                      <Typography variant="body1">{item.name}</Typography>
+                    </Box>
                     <Chip
-                      label="Superadmin"
+                      label={
+                        item.role === "superadmin" ? "Superadmin" : "Admin"
+                      }
                       sx={{
                         marginLeft: "8px",
-                        backgroundColor: theme.palette.success.main,
+                        backgroundColor:
+                          item.role === "superadmin"
+                            ? theme.palette.success.main
+                            : theme.palette.warning.main,
                         color: theme.palette.secondary.contrastText,
                         width: "auto",
                         height: "24px",
@@ -203,42 +211,41 @@ const ListAdmins = ({
                         paddingX: "8px !important",
                       }}
                     />
-                  )}
-                </Box>
-              </CustomizedListItemText>
-            </CustomizedListItemButton>
-
-            {/* Lock & More action */}
-            <CustomizedListItemButton
-              dense
-              disableRipple
-              disableTouchRipple
-              sx={{
-                paddingX: "30px",
-                height: "60px",
-                "&.Mui-selected": {
-                  backgroundColor: "#E9F2FF",
-                },
-              }}
-            >
-              <CustomizedListItemText disableTypography>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <Box>
-                    <ActionDropdown
-                      menuItems={dropdownItems(item.id, item.name)}
-                      iconOrientation="horizontal"
-                      data={item}
-                      renderElement={() => {
-                        return renderMobileDropdownInfo(item);
-                      }}
-                    />
                   </Box>
-                </Box>
-              </CustomizedListItemText>
-            </CustomizedListItemButton>
-          </ListItem>
-        );
-      })
+                </CustomizedListItemText>
+              </CustomizedListItemButton>
+
+              {/* Lock & More action */}
+              <CustomizedListItemButton
+                dense
+                disableRipple
+                disableTouchRipple
+                sx={{
+                  paddingX: "30px",
+                  height: "60px",
+                  "&.Mui-selected": {
+                    backgroundColor: "#E9F2FF",
+                  },
+                }}
+              >
+                <CustomizedListItemText disableTypography>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <Box>
+                      <ActionDropdown
+                        menuItems={dropdownItems(item.id, item.name)}
+                        iconOrientation="horizontal"
+                        data={item}
+                        renderElement={() => {
+                          return renderMobileDropdownInfo(item);
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                </CustomizedListItemText>
+              </CustomizedListItemButton>
+            </ListItem>
+          );
+        })
     ) : (
       <Box
         sx={{
@@ -265,45 +272,94 @@ const ListAdmins = ({
 
     return list.data.length > 0 ? (
       <>
-        {list.data.map((item, index) => {
-          return (
-            <ListItem
-              key={item.id}
-              ref={node => {
-                nodeRefFunc(newItemAnimation.newItem === item.id, node);
-              }}
-              className={className(newItemAnimation.newItem === item.id)}
-              disablePadding
-              sx={{
-                borderBottom:
-                  index === list.data.length - 1
-                    ? "unset"
-                    : "1px solid rgba(0,0,0,0.1)",
-              }}
-            >
-              <CustomizedListItemButton
-                dense
-                disableRipple
-                disableTouchRipple
+        {list.data
+          .filter(el => {
+            return el.name !== "ooncheeyee@gmail.com";
+          })
+          .map((item, index) => {
+            return (
+              <ListItem
+                key={item.id}
+                ref={node => {
+                  nodeRefFunc(newItemAnimation.newItem === item.id, node);
+                }}
+                className={className(newItemAnimation.newItem === item.id)}
+                disablePadding
                 sx={{
-                  height: "60px",
-                  "&.Mui-selected": {
-                    backgroundColor: "#E9F2FF",
-                  },
-                  ":hover": {
-                    backgroundColor: "transparent",
-                  },
+                  borderBottom:
+                    index === list.data.length - 1
+                      ? "unset"
+                      : "1px solid rgba(0,0,0,0.1)",
                 }}
               >
-                {/* Admin Name */}
-                <CustomizedListItemText
-                  disableTypography
-                  sx={{ flex: nameWidth }}
+                <CustomizedListItemButton
+                  dense
+                  disableRipple
+                  disableTouchRipple
+                  sx={{
+                    height: "60px",
+                    "&.Mui-selected": {
+                      backgroundColor: "#E9F2FF",
+                    },
+                    ":hover": {
+                      backgroundColor: "transparent",
+                    },
+                  }}
                 >
-                  <Box
+                  {/* Admin Name */}
+                  <CustomizedListItemText
+                    disableTypography
+                    sx={{ flex: nameWidth }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          cursor: "pointer",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          display: "-webkit-box",
+                          wordBreak: "break-word",
+                          WebkitLineClamp: "1",
+                          WebkitBoxOrient: "vertical",
+                        }}
+                      >
+                        <Typography variant="body1">{item.name}</Typography>
+                      </Box>
+
+                      <Chip
+                        label={
+                          item.role === "superadmin" ? "Superadmin" : "Admin"
+                        }
+                        sx={{
+                          marginLeft: "8px",
+                          backgroundColor:
+                            item.role === "superadmin"
+                              ? theme.palette.success.main
+                              : theme.palette.warning.main,
+                          color: theme.palette.secondary.contrastText,
+                          width: "auto",
+                          height: "24px",
+                          "& .MuiChip-label": {
+                            overflow: "unset !important",
+                            paddingX: "0px !important",
+                          },
+                          paddingX: "8px !important",
+                        }}
+                      />
+                    </Box>
+                  </CustomizedListItemText>
+
+                  {/* Admin Phone */}
+                  <CustomizedListItemText
+                    disableTypography
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
+                      flex: phoneWidth,
+                      display: { xs: "none", md: "block" },
                     }}
                   >
                     <Box
@@ -317,91 +373,50 @@ const ListAdmins = ({
                         WebkitBoxOrient: "vertical",
                       }}
                     >
-                      <Typography variant="body1">{item.name}</Typography>
+                      <Typography variant="body1">{item.phone}</Typography>
                     </Box>
-                    {item.role === "superadmin" && (
-                      <Chip
-                        label="Superadmin"
-                        sx={{
-                          marginLeft: "8px",
-                          backgroundColor: theme.palette.success.main,
-                          color: theme.palette.secondary.contrastText,
-                          width: "auto",
-                          height: "24px",
-                          "& .MuiChip-label": {
-                            overflow: "unset !important",
-                            paddingX: "0px !important",
-                          },
-                          paddingX: "8px !important",
-                        }}
-                      />
-                    )}
-                  </Box>
-                </CustomizedListItemText>
+                  </CustomizedListItemText>
 
-                {/* Admin Phone */}
-                <CustomizedListItemText
-                  disableTypography
-                  sx={{
-                    flex: phoneWidth,
-                    display: { xs: "none", md: "block" },
-                  }}
-                >
-                  <Box
+                  <CustomizedListItemText
                     sx={{
-                      cursor: "pointer",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      display: "-webkit-box",
-                      wordBreak: "break-word",
-                      WebkitLineClamp: "1",
-                      WebkitBoxOrient: "vertical",
+                      flex: lastModifiedWidth,
+                      display: { xs: "none", lg: "block" },
                     }}
                   >
-                    <Typography variant="body1">{item.phone}</Typography>
-                  </Box>
-                </CustomizedListItemText>
+                    <Typography variant="body1" sx={{ fontSize: "14px" }}>
+                      {(() => {
+                        const date = new Date(item.updatedAt);
+                        return date.toLocaleString("en-US", {
+                          month: "short",
+                          day: "2-digit",
+                          year: "numeric",
+                          hour: "numeric",
+                          minute: "numeric",
+                          hour12: true,
+                        });
+                      })()}
+                    </Typography>
+                  </CustomizedListItemText>
 
-                <CustomizedListItemText
-                  sx={{
-                    flex: lastModifiedWidth,
-                    display: { xs: "none", lg: "block" },
-                  }}
-                >
-                  <Typography variant="body1" sx={{ fontSize: "14px" }}>
-                    {(() => {
-                      const date = new Date(item.updatedAt);
-                      return date.toLocaleString("en-US", {
-                        month: "short",
-                        day: "2-digit",
-                        year: "numeric",
-                        hour: "numeric",
-                        minute: "numeric",
-                        hour12: true,
-                      });
-                    })()}
-                  </Typography>
-                </CustomizedListItemText>
-
-                {/* Lock & More action */}
-                <CustomizedListItemText
-                  disableTypography
-                  sx={{
-                    flex: moreActionWidth,
-                    display: { xs: "none", md: "block" },
-                  }}
-                >
-                  <Box>
-                    <ActionDropdown
-                      menuItems={dropdownItems(item.id, item.name)}
-                      iconOrientation="horizontal"
-                    />
-                  </Box>
-                </CustomizedListItemText>
-              </CustomizedListItemButton>
-            </ListItem>
-          );
-        })}
+                  {/* Lock & More action */}
+                  <CustomizedListItemText
+                    disableTypography
+                    sx={{
+                      flex: moreActionWidth,
+                      display: { xs: "none", md: "block" },
+                    }}
+                  >
+                    <Box>
+                      <ActionDropdown
+                        menuItems={dropdownItems(item.id, item.name)}
+                        iconOrientation="horizontal"
+                      />
+                    </Box>
+                  </CustomizedListItemText>
+                </CustomizedListItemButton>
+              </ListItem>
+            );
+          })}
         {paginationComponent}
       </>
     ) : (

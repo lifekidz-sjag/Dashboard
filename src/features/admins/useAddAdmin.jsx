@@ -14,7 +14,7 @@ import { useTheme } from "@mui/material/styles";
 import * as yup from "yup";
 
 import formBg from "../../assets/form-bg.png";
-import { FormTextField } from "../../components/FormInput";
+import { FormSelect, FormTextField } from "../../components/FormInput";
 import ArrowBack from "../../components/GoogleIcons/ArrowBack";
 import useAdmins from "../../services/admins";
 
@@ -40,6 +40,7 @@ const useAddAdmin = ({
   const createAdminSchema = yup.object({
     name: yup.string().required("Please enter name of the admin"),
     phone: yup.string().required("Please enter phone number of the admin"),
+    role: yup.string().required("Please select role"),
   });
 
   const {
@@ -50,13 +51,13 @@ const useAddAdmin = ({
     defaultValues: {
       name: "",
       phone: "",
+      role: "admin",
     },
     resolver: yupResolver(createAdminSchema),
   });
 
   const handleAdd = async data => {
     const modifiedData = data;
-    modifiedData.role = "admin";
     loader.start();
     postAdminExecute(modifiedData);
   };
@@ -121,6 +122,25 @@ const useAddAdmin = ({
                         name="phone"
                         label="Phone"
                         control={controlCreate}
+                        sx={{ marginBottom: "24px" }}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <FormSelect
+                        name="role"
+                        label="Role"
+                        control={controlCreate}
+                        options={[
+                          {
+                            label: "superadmin",
+                            value: "superadmin",
+                          },
+                          {
+                            label: "admin",
+                            value: "admin",
+                          },
+                        ]}
                         sx={{ marginBottom: "24px" }}
                       />
                     </Grid>
@@ -230,10 +250,10 @@ const useAddAdmin = ({
 
       switch (postAdminError.response.data) {
         case "ADMIN_ACTIONS_NOT_ALLOWED":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         case "EMPTY_REQUEST":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         case "DUPLICATED_ADMIN":
           snackbar.open(

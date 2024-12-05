@@ -22,6 +22,7 @@ import formBg from "../../assets/form-bg.png";
 import {
   FormDateTimePicker,
   FormSelect,
+  FormTextAreaField,
   FormTextField,
 } from "../../components/FormInput";
 import ArrowBack from "../../components/GoogleIcons/ArrowBack";
@@ -32,10 +33,9 @@ const useAddStudent = ({
   loader,
   sidebar,
   snackbar,
-  noPermissionConfirm,
-  user,
   setNewItemAnimation,
   fetchList,
+  sharedState,
   sharedFunction,
 }) => {
   const theme = useTheme();
@@ -59,12 +59,12 @@ const useAddStudent = ({
     age: yup
       .number("Must be a number type")
       .transform(value => (Number.isNaN(value) ? null : value))
-      .nullable()
-      .required("Please enter age of the student"),
+      .nullable(),
     class: yup.string().required("Please select a class"),
     type: yup.string().required("Please select one"),
     gender: yup.string().required("Please select gender of the student"),
     birthday: yup.string().required("Please enter birthday of student"),
+    allergies: yup.string(),
     famName: yup.string().required("Please enter main family member name"),
     famContact: yup
       .string()
@@ -81,17 +81,20 @@ const useAddStudent = ({
     control: controlCreate,
     handleSubmit: handleSubmitCreate,
     reset: resetAdd,
+    watch,
+    setValue,
     getValues,
   } = useForm({
     defaultValues: {
       name: "",
-      age: "",
+      age: 0,
       class: "",
       type: "",
       gender: "",
       birthday: new Date(new Date().setHours(new Date().getHours() + 8))
         .toISOString()
         .replace(/\.\d{3}Z$/, ""),
+      allergies: "",
       famName: "",
       famContact: "",
       famRelationship: "",
@@ -107,6 +110,7 @@ const useAddStudent = ({
       name: data.name,
       class: data.class,
     };
+    delete modifiedData.age;
     loader.start();
 
     const encryptedData = CryptoJS.AES.encrypt(
@@ -152,35 +156,27 @@ const useAddStudent = ({
             }}
           >
             {/* Top Bar */}
+
             <Box
               sx={{
-                position: "sticky",
-                top: 0,
-                background: "#fff",
-                zIndex: 2,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <IconButton
-                    onClick={() => {
-                      sidebar.close(() => {
-                        sharedFunction.setAction("View");
-                        resetAdd();
-                      });
-                    }}
-                  >
-                    <ArrowBack color="inherit" />
-                  </IconButton>
-                  <Box sx={{ marginLeft: "8px" }}>
-                    <Typography variant="subtitle1">Create Student</Typography>
-                  </Box>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <IconButton
+                  onClick={() => {
+                    sidebar.close(() => {
+                      sharedFunction.setAction("View");
+                      resetAdd();
+                    });
+                  }}
+                >
+                  <ArrowBack color="inherit" />
+                </IconButton>
+                <Box sx={{ marginLeft: "8px" }}>
+                  <Typography variant="subtitle1">Create Student</Typography>
                 </Box>
               </Box>
             </Box>
@@ -225,15 +221,7 @@ const useAddStudent = ({
                         sx={{ marginBottom: "24px" }}
                       />
                     </Grid>
-                    <Grid item xs={12} md={6}>
-                      <FormTextField
-                        required
-                        name="age"
-                        label="Age"
-                        control={controlCreate}
-                        sx={{ marginBottom: "24px" }}
-                      />
-                    </Grid>
+
                     <Grid item xs={12} md={6}>
                       <FormSelect
                         name="gender"
@@ -259,12 +247,30 @@ const useAddStudent = ({
                       />
                     </Grid>
                     <Grid item xs={12} md={6} sx={{ marginTop: "24px" }}>
+                      <FormTextField
+                        disabled
+                        name="age"
+                        label="Age"
+                        control={controlCreate}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={6} sx={{ marginTop: "24px" }}>
                       <FormDateTimePicker
                         label="Birthday"
                         name="birthday"
                         control={controlCreate}
                       />
                     </Grid>
+                    <Grid item xs={12}>
+                      <FormTextAreaField
+                        name="allergies"
+                        label="Allergies"
+                        control={controlCreate}
+                        rows={3}
+                        sx={{ marginBottom: "24px" }}
+                      />
+                    </Grid>
+
                     {/* Hidden QR Code element */}
                     <div style={{ display: "none" }}>
                       <QRCode
@@ -390,19 +396,27 @@ const useAddStudent = ({
   };
 
   const onAdd = () => {
-    if (user && user.role.indexOf("admin") >= 0) {
-      sharedFunction.setAction("Add");
-      resetAdd();
-      fetchClassesExecute({ params: { sort: "name" } });
-    } else {
-      noPermissionConfirm.open();
-      loader.end();
-    }
+    sharedFunction.setAction("Add");
+    resetAdd();
+    fetchClassesExecute({ params: { sort: "name" } });
   };
-
+  const calculateAge = dateString => {
+    const birthDate = new Date(dateString);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age -= 1;
+    }
+    return age;
+  };
   // Side Effects
   useEffect(() => {
     if (postStudentData) {
+      sharedFunction.setAction("View");
       setNewItemAnimation(prevState => {
         return {
           ...prevState,
@@ -410,19 +424,22 @@ const useAddStudent = ({
           callbackFunc: () => {
             snackbar.open("Student created successfully.", false);
             resetAdd();
-            sharedFunction.setAction("View");
           },
         };
       });
       fetchList({ params: { sort: "-updatedAt" } });
 
       sidebar.close();
+      setQRCodeData("");
     }
 
     return () => {};
   }, [postStudentData]);
 
   useEffect(() => {
+    if (sharedState.action !== "Add") {
+      return;
+    }
     if (fetchClassesData && fetchClassesData.data) {
       sidebar.setSidebar(prevState => {
         return {
@@ -454,9 +471,7 @@ const useAddStudent = ({
         postStudentExecute(data);
       }, 1000);
     }
-
-    return () => {};
-  }, [fetchClassesData, qrCodeData]);
+  }, [fetchClassesData, qrCodeData, sharedState.action]);
 
   useEffect(() => {
     if (fetchClassesError) {
@@ -472,11 +487,8 @@ const useAddStudent = ({
       loader.end();
 
       switch (postStudentError.response.data) {
-        case "ADMIN_ACTIONS_NOT_ALLOWED":
-          snackbar.open("Something went wrong. Plaese try again later", true);
-          break;
         case "EMPTY_REQUEST":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         case "DUPLICATED_STUDENT":
           snackbar.open(
@@ -494,6 +506,12 @@ const useAddStudent = ({
     loader.end();
     return () => {};
   }, [postStudentError]);
+
+  useEffect(() => {
+    if (watch("birthday")) {
+      setValue("age", calculateAge(watch("birthday")));
+    }
+  }, [watch("birthday")]);
 
   return {
     onAdd,

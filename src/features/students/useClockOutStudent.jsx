@@ -142,25 +142,17 @@ const useClockOutStudent = ({
             }}
           >
             {/* Top Bar */}
+
             <Box
               sx={{
-                position: "sticky",
-                top: 0,
-                background: "#fff",
-                zIndex: 2,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <Box sx={{ marginLeft: "8px" }}>
-                    <Typography variant="subtitle1">Create Student</Typography>
-                  </Box>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Box sx={{ marginLeft: "8px" }}>
+                  <Typography variant="subtitle1">Create Student</Typography>
                 </Box>
               </Box>
             </Box>
@@ -281,7 +273,7 @@ const useClockOutStudent = ({
       postStudentEvaluationExecute({
         classId: studentInfo.classId,
         studentName: studentInfo.studentName,
-        evaluation: postData.rating,
+        evaluation: postData.rating || [],
       });
     }
 

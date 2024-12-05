@@ -227,7 +227,7 @@ const useAddClassEvaluation = ({
 
       switch (postClassEvaluationError.response.data) {
         case "EMPTY_REQUEST":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         case "INVALID_ID":
           snackbar.open("Class ID incorrect", true);

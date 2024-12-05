@@ -82,6 +82,7 @@ const useSJAG = () => {
     sharedState: {
       loader,
       confirm,
+      noPermissionConfirm,
       sidebar,
       snackbar,
       popup,

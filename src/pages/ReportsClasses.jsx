@@ -6,7 +6,6 @@ import {
   Avatar,
   Box,
   Chip,
-  Divider,
   Tab,
   Tabs,
   Typography,
@@ -16,6 +15,7 @@ import { useTheme } from "@mui/material/styles";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import quarterOfYear from "dayjs/plugin/quarterOfYear";
 import utc from "dayjs/plugin/utc";
 // Import charts, all with Chart suffix
 import { LineChart, PieChart } from "echarts/charts";
@@ -66,7 +66,7 @@ function a11yProps(index) {
 }
 
 const ReportsClasses = () => {
-  const { loader, setActionBar, actionBarDefault } = useOutletContext();
+  const { user, loader, setActionBar, actionBarDefault } = useOutletContext();
   const [list, setList] = useState([]);
   const [classOptions, setClassOptions] = useState([]);
 
@@ -181,10 +181,13 @@ const ReportsClasses = () => {
               label={`${Math.abs(increment)}%`}
               variant="filled"
               sx={{
+                ".MuiChip-label": {
+                  paddingLeft: "12px",
+                },
                 display: showHideChanges,
                 justifyContent: "space-around",
                 height: "24px",
-                width: "64px",
+                width: "80px",
                 backgroundColor:
                   increment > 0
                     ? theme.palette.success.light
@@ -340,13 +343,19 @@ const ReportsClasses = () => {
       const opts = { ...options };
       const processed = key === "day" ? data : reducer(data, key);
 
-      opts.xAxis.data = processed.map(el =>
-        moment(el.date).format("MMM D, YYYY"),
-      );
+      // Filter data to include only Sundays
+      const filteredData = processed.filter(el => {
+        const date = moment(el.date);
+        return date.day() === 0; // 0 represents Sunday
+      });
+
+      opts.xAxis.data = filteredData.map(el => {
+        return moment(el.date).format("MMM D, YYYY");
+      });
       opts.series.push({
         type: "line",
         smooth: true,
-        data: processed.map(el => el.value),
+        data: filteredData.map(el => el.value),
         itemStyle: {
           color: "rgb(152, 178, 242)",
         },
@@ -380,7 +389,7 @@ const ReportsClasses = () => {
     };
   })();
 
-  const pieChart = (() => {
+  const pieChartAge = (() => {
     const options = {
       title: {
         text: "Age Distribution of Class",
@@ -419,13 +428,70 @@ const ReportsClasses = () => {
       });
 
       opts.legend = {
-        orient: "vertical",
-        left: 0,
+        orient: "horizontal",
+        left: "center",
         bottom: 0,
         data:
           processed &&
           processed.map(el => {
             return `${el.age} years old (${el.studentCount})`;
+          }),
+      };
+
+      return opts;
+    };
+
+    return {
+      setup,
+    };
+  })();
+
+  const pieChartGender = (() => {
+    const options = {
+      title: {
+        text: "Gender Distribution of Class",
+        left: "center",
+      },
+      tooltip: {
+        trigger: "item",
+      },
+      legend: {},
+
+      series: [],
+    };
+
+    const setup = data => {
+      const opts = { ...options };
+      const processed = data;
+
+      opts.series.push({
+        type: "pie",
+        radius: "50%",
+        data:
+          processed &&
+          processed.map(el => {
+            return {
+              value: el.studentCount,
+              name: `${el.gender} (${el.studentCount})`,
+            };
+          }),
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: "rgba(0, 0, 0, 0.5)",
+          },
+        },
+      });
+
+      opts.legend = {
+        orient: "horizontal",
+        left: "center",
+        bottom: 0,
+        data:
+          processed &&
+          processed.map(el => {
+            return `${el.gender} (${el.studentCount})`;
           }),
       };
 
@@ -448,12 +514,12 @@ const ReportsClasses = () => {
   // Select Set Up
   const filterByOptions = [
     { label: "Today", value: "today" },
-    { label: "Yesterday", value: "yesterday" },
     { label: "This Week", value: "thisWeek" },
     { label: "Last Week", value: "lastWeek" },
-    { label: "Last 7 days", value: "last7Days" },
-    { label: "Last 30 days", value: "last30Days" },
-    { label: "Last 90 days", value: "last90Days" },
+    { label: "This Month", value: "thisMonth" },
+    { label: "Last Month", value: "lastMonth" },
+    { label: "This Quarter", value: "thisQuarter" },
+    { label: "Last Quarter", value: "lastQuarter" },
     { label: "Custom", value: "custom" },
   ];
 
@@ -461,10 +527,10 @@ const ReportsClasses = () => {
   const { control, formState, getValues, setValue, watch, reset } = useForm({
     defaultValues: {
       classFilter: "",
-      dataFilter: "last30Days",
+      dataFilter: "thisMonth",
       dataDate: [
-        dayjs(new Date()).startOf("day").subtract(30, "day"),
-        dayjs(new Date()).startOf("day").subtract(1, "day"),
+        dayjs(new Date()).startOf("month"),
+        dayjs(new Date()).startOf("day"),
       ],
     },
     resolver: yupResolver(dataFilterSchema),
@@ -475,10 +541,11 @@ const ReportsClasses = () => {
   // API Callback
   const getFilterParam = ({ data, classId }) => {
     const dataDate = (data && data.dataDate) || [
-      dayjs(new Date()).startOf("day").subtract(30, "day"),
-      dayjs(new Date()).startOf("day").subtract(1, "day"),
+      dayjs(new Date()).startOf("month"),
+      dayjs(new Date()).startOf("day"),
     ];
     dayjs.extend(utc);
+    dayjs.extend(quarterOfYear);
 
     const startDate = `${
       dataDate[0].utc().format("YYYY-MM-DDTHH:mm:ssZ").split("+")[0]
@@ -513,18 +580,7 @@ const ReportsClasses = () => {
         );
 
         break;
-      case "yesterday":
-        setValue(
-          "dataDate",
-          [
-            dayjs(new Date()).startOf("day").subtract(1, "day"),
-            dayjs(new Date()).startOf("day").subtract(1, "day"),
-          ],
-          {
-            shouldValidate: true,
-          },
-        );
-        break;
+
       case "thisWeek":
         setValue(
           "dataDate",
@@ -549,36 +605,55 @@ const ReportsClasses = () => {
           },
         );
         break;
-      case "last7Days":
+      case "thisMonth":
         setValue(
           "dataDate",
           [
-            dayjs(new Date()).startOf("day").subtract(7, "day"),
-            dayjs(new Date()).startOf("day").subtract(1, "day"),
+            dayjs(new Date()).startOf("month"),
+            dayjs(new Date()).startOf("day"),
           ],
           {
             shouldValidate: true,
           },
         );
         break;
-      case "last30Days":
+      case "lastMonth":
         setValue(
           "dataDate",
           [
-            dayjs(new Date()).startOf("day").subtract(30, "day"),
-            dayjs(new Date()).startOf("day").subtract(1, "day"),
+            dayjs(new Date()).startOf("month").subtract(1, "month"),
+            dayjs(new Date())
+              .startOf("day")
+              .subtract(1, "month")
+              .endOf("month"),
           ],
           {
             shouldValidate: true,
           },
         );
         break;
-      case "last90Days":
+      case "thisQuarter":
         setValue(
           "dataDate",
           [
-            dayjs(new Date()).startOf("day").subtract(90, "day"),
-            dayjs(new Date()).startOf("day").subtract(1, "day"),
+            dayjs(new Date()).startOf("quarter"),
+            dayjs(new Date()).startOf("day"),
+          ],
+          {
+            shouldValidate: true,
+          },
+        );
+
+        break;
+      case "lastQuarter":
+        setValue(
+          "dataDate",
+          [
+            dayjs(new Date()).startOf("quarter").subtract(1, "quarter"),
+            dayjs(new Date())
+              .startOf("quarter")
+              .subtract(1, "quarter")
+              .endOf("quarter"),
           ],
           {
             shouldValidate: true,
@@ -605,17 +680,28 @@ const ReportsClasses = () => {
   const [secondDatePicked, setSecondDatePicked] = useState(dayjs(null));
 
   useEffect(() => {
-    loader.start();
+    if (user && user.role.indexOf("admin") < 0) {
+      setActionBar({
+        ...actionBarDefault,
+        title: {
+          enabled: true,
+          display: true,
+          name: "Report - Classes",
+        },
+      });
+    } else {
+      loader.start();
 
-    fetchClassesExecute({ params: { sort: "name" } });
-    setActionBar({
-      ...actionBarDefault,
-      title: {
-        enabled: true,
-        display: true,
-        name: "Report - Classes",
-      },
-    });
+      fetchClassesExecute({ params: { sort: "name" } });
+      setActionBar({
+        ...actionBarDefault,
+        title: {
+          enabled: true,
+          display: true,
+          name: "Report - Classes",
+        },
+      });
+    }
   }, []);
   useEffect(() => {
     if (fetchReportsClassesData) {
@@ -632,25 +718,34 @@ const ReportsClasses = () => {
 
   useEffect(() => {
     if (fetchClassesData && fetchClassesData.data) {
-      setClassOptions(
-        fetchClassesData.data.map(data => ({
-          label: data.name,
-          value: data.id,
-        })),
-      );
+      setClassOptions(() => {
+        const arr = [
+          {
+            label: "All",
+            value: "all",
+          },
+        ];
+        arr.push(
+          ...fetchClassesData.data.map(data => ({
+            label: data.name,
+            value: data.id,
+          })),
+        );
+        return arr;
+      });
     }
   }, [fetchClassesData]);
   useEffect(() => {
     if (classOptions.length > 0) {
       fetchReportsClassesExecute({
-        params: getFilterParam({ classId: classOptions[0].value }),
+        params: getFilterParam({ classId: "all" }),
       });
       reset({
-        classFilter: classOptions[0].value,
-        dataFilter: "last30Days",
+        classFilter: "all",
+        dataFilter: "thisMonth",
         dataDate: [
-          dayjs(new Date()).startOf("day").subtract(30, "day"),
-          dayjs(new Date()).startOf("day").subtract(1, "day"),
+          dayjs(new Date()).startOf("month"),
+          dayjs(new Date()).startOf("day"),
         ],
       });
     }
@@ -662,7 +757,7 @@ const ReportsClasses = () => {
   return (
     <>
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <Box sx={{ width: "180px" }}>
+        <Box sx={{ width: "180px", marginBottom: "16px" }}>
           <FormSelect
             name="classFilter"
             variant="outlined"
@@ -849,24 +944,7 @@ const ReportsClasses = () => {
                   "K",
                   list.summary.diffAverageAttendance,
                   "Average Attendance",
-                  `vs Previous ${list.summary.dayCount} Day${
-                    list.summary.dayCount > 1 ? "s" : ""
-                  }`,
-                  "flex",
-                )}
-                <Divider
-                  orientation="vertical"
-                  variant="middle"
-                  flexItem
-                  sx={{ display: { xs: "none", md: "block" } }}
-                />
-
-                {renderFigures(
-                  list.summary.newStudentCount,
-                  "K",
-                  list.summary.diffNewStudentCount,
-                  "New Student",
-                  `vs Previous ${list.summary.dayCount} Day${
+                  `vs Previous ${list.summary.dayCount} Week${
                     list.summary.dayCount > 1 ? "s" : ""
                   }`,
                   "flex",
@@ -874,27 +952,94 @@ const ReportsClasses = () => {
               </Box>
             </Box>
           </Box>
+          <Box sx={{ display: { xs: "block", md: "flex" }, columnGap: "16px" }}>
+            <Box
+              sx={{
+                flex: 1,
+                boxSizing: "border-box",
+                marginTop: "24px",
+                padding: "16px",
+                background: "rgba(255, 255, 255,1)",
+                borderRadius: "8px",
+              }}
+            >
+              <ReactEChartsCore
+                echarts={echarts}
+                option={pieChartAge.setup(list.summary.ageDistribution)}
+                notMerge
+                lazyUpdate
+                theme="theme_name"
+                style={{
+                  height: isSmallScreen ? "500px" : "500px",
+                  width: "100%",
+                }}
+              />
+            </Box>
+            <Box
+              sx={{
+                flex: 1,
+                boxSizing: "border-box",
+                marginTop: "24px",
+                padding: "16px",
+                background: "rgba(255, 255, 255,1)",
+                borderRadius: "8px",
+              }}
+            >
+              <ReactEChartsCore
+                echarts={echarts}
+                option={pieChartGender.setup(list.summary.genderDistribution)}
+                notMerge
+                lazyUpdate
+                theme="theme_name"
+                style={{
+                  height: isSmallScreen ? "500px" : "500px",
+                  width: "100%",
+                }}
+              />
+            </Box>
+          </Box>
+
           <Box
             sx={{
-              boxSizing: "border-box",
+              width: { xs: "100%", sm: "calc(50% - 8px)" },
               marginTop: "24px",
+              boxSizing: "border-box",
               padding: "24px 36px",
               background: "rgba(255, 255, 255,1)",
               borderRadius: "8px",
-              paddingBottom: { xs: "24px", md: "24px" },
             }}
           >
-            <ReactEChartsCore
-              echarts={echarts}
-              option={pieChart.setup(list.summary.ageDistribution)}
-              notMerge
-              lazyUpdate
-              theme="theme_name"
-              style={{
-                height: isSmallScreen ? "280px" : "400px",
-                width: "100%",
-              }}
-            />
+            <Typography
+              variant="h5"
+              sx={{ fontSize: "20px", fontWeight: 700, marginBottom: "16px" }}
+            >
+              List of students of age 12
+            </Typography>
+            <Box>
+              {classOptions.length > 0 &&
+                list.summary.age12Distribution.map(e => {
+                  return (
+                    <Box
+                      key={e.name}
+                      sx={{
+                        display: "flex",
+                        flex: "50%",
+                        marginBottom: "16px",
+                      }}
+                    >
+                      <Typography>{e.name}</Typography>
+                      <Typography
+                        sx={{ marginLeft: "24px", fontWeight: "600" }}
+                      >
+                        {
+                          classOptions.filter(el => el.value === e.class)[0]
+                            .label
+                        }
+                      </Typography>
+                    </Box>
+                  );
+                })}
+            </Box>
           </Box>
         </>
       ) : null}

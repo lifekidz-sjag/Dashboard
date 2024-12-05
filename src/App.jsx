@@ -1,4 +1,6 @@
+import { useEffect, useRef, useState } from "react";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import { Box, Typography } from "@mui/material";
 
 import { AuthProvider } from "./contexts/auth";
 import useSJAG from "./hooks/useSJAG";
@@ -127,6 +129,62 @@ const router = createBrowserRouter(
   { basename: "/Dashboard" },
 );
 
-const App = () => <RouterProvider router={router} />;
+const App = () => {
+  const [loaded, setLoaded] = useState(false);
+  const timeInterval = useRef(null);
+  const timeoutRef = useRef(null);
+  const loadFonts = () => {
+    document.fonts.ready.then(fontFaceSet => {
+      // Any operation that needs to be done only after all used fonts
+      // have finished loading can go here.
+      const fontFaces = [...fontFaceSet];
+      // some fonts may still be unloaded if they aren't used on the site
+      const allLoaded = fontFaces
+        .filter(f => {
+          return (
+            f.family === "Material Symbols Outlined" ||
+            (f.family === "Inter" && f.weight === "100 900")
+          );
+        })
+        .every(s => {
+          return s.status === "loaded";
+        });
+
+      if (allLoaded) {
+        setLoaded(true);
+      }
+    });
+  };
+
+  useEffect(() => {
+    timeInterval.current = setInterval(() => {
+      loadFonts();
+    }, 300);
+
+    timeoutRef.current = setTimeout(() => {
+      setLoaded(true);
+      clearInterval(timeInterval.current);
+    }, 3000);
+
+    // Cleanup the interval when the component unmounts
+    return () => {
+      clearInterval(timeInterval.current);
+      // clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (loaded) {
+      clearInterval(timeInterval.current);
+    }
+  }, [loaded]);
+  return loaded ? (
+    <RouterProvider router={router} />
+  ) : (
+    <Box sx={{ opacity: 0 }}>
+      <Typography>Test</Typography>
+    </Box>
+  );
+};
 
 export default App;

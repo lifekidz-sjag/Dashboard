@@ -8,7 +8,7 @@ import utc from "dayjs/plugin/utc";
 import PropTypes from "prop-types";
 
 dayjs.extend(utc);
-const FormDateTimePicker = ({ name, control, label, disableTime }) => {
+const FormDateTimePicker = ({ name, control, label }) => {
   return (
     <Controller
       name={name}
@@ -18,7 +18,7 @@ const FormDateTimePicker = ({ name, control, label, disableTime }) => {
           <FormControl fullWidth error={!!error}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                shouldDisableTime={disableTime}
+                $shouldDisableTime
                 value={dayjs.utc(value)}
                 label={label}
                 onChange={onChange}
@@ -27,7 +27,7 @@ const FormDateTimePicker = ({ name, control, label, disableTime }) => {
                 }}
                 format="DD MMM YYYY"
                 sx={{ marginBottom: "24px" }}
-                minutesStep={1}
+                $minutesStep={1}
               />
             </LocalizationProvider>
           </FormControl>
@@ -40,9 +40,6 @@ FormDateTimePicker.propTypes = {
   name: PropTypes.string.isRequired,
   control: PropTypes.shape().isRequired,
   label: PropTypes.string.isRequired,
-  disableTime: PropTypes.bool.isRequired,
 };
-
-FormDateTimePicker.defaultProps = {};
 
 export default FormDateTimePicker;

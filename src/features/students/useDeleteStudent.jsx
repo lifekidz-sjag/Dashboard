@@ -73,7 +73,7 @@ const useDeleteStudent = ({
       loader.end();
       switch (deleteStudentError.response.data) {
         case "INVALID_ID":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
 
         default:
@@ -88,10 +88,10 @@ const useDeleteStudent = ({
     if (deleteStudentError) {
       switch (deleteStudentError.response.data) {
         case "ADMIN_ACTIONS_NOT_ALLOWED":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         case "INVALID_ID":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         case "UNAUTHORIZED_ACTION":
           snackbar.open("Please login again to proceed", true);

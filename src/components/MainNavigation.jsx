@@ -278,15 +278,6 @@ const navigationItems = user => {
         },
       ],
     },
-    {
-      id: "344d925d-7397-4cd9-bd97-689d07a37dc7",
-      name: "Teachers",
-      path: `/teachers`,
-      icon: currentPage => {
-        return <School currentpage={currentPage.toString()} />;
-      },
-      mobile: "first",
-    },
   );
   if (user.role.indexOf("admin") >= 0) {
     list.push(
@@ -316,6 +307,15 @@ const navigationItems = user => {
           return <Notifications currentpage={currentPage.toString()} />;
         },
         mobile: "second",
+      },
+      {
+        id: "344d925d-7397-4cd9-bd97-689d07a37dc7",
+        name: "Teachers",
+        path: `/teachers`,
+        icon: currentPage => {
+          return <School currentpage={currentPage.toString()} />;
+        },
+        mobile: "first",
       },
     );
   }

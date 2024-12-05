@@ -265,7 +265,7 @@ const useUpdateNotification = ({
       loader.end();
       switch (getNotificationsError.response.data) {
         case "INVALID_ID":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         default:
           break;
@@ -279,10 +279,10 @@ const useUpdateNotification = ({
     if (putNotificationError) {
       switch (putNotificationError.response.data) {
         case "EMPTY_REQUEST":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         case "INVALID_ID":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
 
         case "UNAUTHORIZED_ACTION":

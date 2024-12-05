@@ -6,6 +6,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 
+import NoPermission from "../components/NoPermission";
 import ListClasses from "../features/classes/ListClasses";
 import useClassesFeatures from "../features/classes/useClassesFeatures";
 
@@ -33,46 +34,55 @@ const Classes = () => {
 
   // Page load
   useEffect(() => {
-    if (id) {
-      navigate(`/classes/${id}/evaluation`);
-    }
-    loader.start();
-
-    if (searchParams.get("add") === "true") {
-      addClass.onAdd();
-    }
-    setActionBar({
-      ...actionBarDefault,
-      title: {
-        enabled: true,
-        display: true,
-        name: "Classes",
-      },
-      fab: {
-        enabled: true,
-        display: true,
-        action: () => {
-          addClass.onAdd();
+    if (user && user.role.indexOf("admin") < 0) {
+      setActionBar({
+        ...actionBarDefault,
+        title: {
+          enabled: true,
+          display: true,
+          name: "Classes",
         },
-      },
-      search: {
-        enabled: true,
-        display: true,
-        isOpen: false,
-        renderContent: searchClasses.searchBarContent,
-        searchFunc: searchClasses.searchFunc,
-        submitFunc: searchClasses.submitFunc,
-        backFunc: searchClasses.backFunc,
-      },
-    });
+      });
+    } else {
+      if (id) {
+        navigate(`/classes/${id}/evaluation`);
+      }
+      loader.start();
 
-    // Load list
-    fetchClasses.onFetch({ params: { sort: "-updatedAt" } });
+      if (searchParams.get("add") === "true") {
+        addClass.onAdd();
+      }
+      setActionBar({
+        ...actionBarDefault,
+        title: {
+          enabled: true,
+          display: true,
+          name: "Classes",
+        },
+        fab: {
+          enabled: true,
+          display: true,
+          action: () => {
+            addClass.onAdd();
+          },
+        },
+        search: {
+          enabled: true,
+          display: true,
+          isOpen: false,
+          renderContent: searchClasses.searchBarContent,
+          searchFunc: searchClasses.searchFunc,
+          submitFunc: searchClasses.submitFunc,
+          backFunc: searchClasses.backFunc,
+        },
+      });
 
-    return () => {};
+      // Load list
+      fetchClasses.onFetch({ params: { sort: "-updatedAt" } });
+    }
   }, []);
 
-  return (
+  return user && user.role.indexOf("admin") >= 0 ? (
     <ListClasses
       user={user}
       newItemAnimation={newItemAnimation}
@@ -87,6 +97,8 @@ const Classes = () => {
       onDelete={deleteClass.onDelete}
       searchStatus={state.searchStatus}
     />
+  ) : (
+    <NoPermission />
   );
 };
 

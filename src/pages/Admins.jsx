@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 
+import NoPermission from "../components/NoPermission";
 import ListAdmins from "../features/admins/ListAdmins";
 import useAdminsFeatures from "../features/admins/useAdminsFeatures";
 
@@ -25,39 +26,48 @@ const Admins = () => {
 
   // Page load
   useEffect(() => {
-    loader.start();
-    setActionBar({
-      ...actionBarDefault,
-      title: {
-        enabled: true,
-        display: true,
-        name: "Admins",
-      },
-      fab: {
-        enabled: true,
-        display: true,
-        action: () => {
-          addAdmin.onAdd();
+    if (user && user.role.indexOf("superadmin") < 0) {
+      setActionBar({
+        ...actionBarDefault,
+        title: {
+          enabled: true,
+          display: true,
+          name: "Admins",
         },
-      },
-      search: {
-        enabled: true,
-        display: true,
-        isOpen: false,
-        renderContent: searchAdmins.searchBarContent,
-        searchFunc: searchAdmins.searchFunc,
-        submitFunc: searchAdmins.submitFunc,
-        backFunc: searchAdmins.backFunc,
-      },
-    });
+      });
+    } else {
+      loader.start();
+      setActionBar({
+        ...actionBarDefault,
+        title: {
+          enabled: true,
+          display: true,
+          name: "Admins",
+        },
+        fab: {
+          enabled: true,
+          display: true,
+          action: () => {
+            addAdmin.onAdd();
+          },
+        },
+        search: {
+          enabled: true,
+          display: true,
+          isOpen: false,
+          renderContent: searchAdmins.searchBarContent,
+          searchFunc: searchAdmins.searchFunc,
+          submitFunc: searchAdmins.submitFunc,
+          backFunc: searchAdmins.backFunc,
+        },
+      });
 
-    // Load list
-    fetchAdmins.onFetch({ params: { sort: "-updatedAt" } });
-
-    return () => {};
+      // Load list
+      fetchAdmins.onFetch({ params: { sort: "-updatedAt" } });
+    }
   }, []);
 
-  return (
+  return user && user.role.indexOf("superadmin") >= 0 ? (
     <ListAdmins
       user={user}
       newItemAnimation={newItemAnimation}
@@ -72,6 +82,8 @@ const Admins = () => {
       onDelete={deleteAdmin.onDelete}
       searchStatus={state.searchStatus}
     />
+  ) : (
+    <NoPermission />
   );
 };
 

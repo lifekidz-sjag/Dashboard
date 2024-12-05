@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useOutletContext, useSearchParams } from "react-router-dom";
 
+import NoPermission from "../components/NoPermission";
 import ListTeachers from "../features/teachers/ListTeachers";
 import useTeachersFeatures from "../features/teachers/useTeachersFeatures";
 
@@ -27,43 +28,53 @@ const Teachers = () => {
 
   // Page load
   useEffect(() => {
-    loader.start();
-
-    if (searchParams.get("add") === "true") {
-      addTeacher.onAdd();
-    }
-    setActionBar({
-      ...actionBarDefault,
-      title: {
-        enabled: true,
-        display: true,
-        name: "Teachers",
-      },
-      fab: {
-        enabled: true,
-        display: true,
-        action: () => {
-          addTeacher.onAdd();
+    if (user && user.role.indexOf("superadmin") < 0) {
+      setActionBar({
+        ...actionBarDefault,
+        title: {
+          enabled: true,
+          display: true,
+          name: "Teachers",
         },
-      },
-      search: {
-        enabled: true,
-        display: true,
-        isOpen: false,
-        renderContent: searchTeachers.searchBarContent,
-        searchFunc: searchTeachers.searchFunc,
-        submitFunc: searchTeachers.submitFunc,
-        backFunc: searchTeachers.backFunc,
-      },
-    });
+      });
+    } else {
+      loader.start();
+      if (searchParams.get("add") === "true") {
+        addTeacher.onAdd();
+      }
+      setActionBar({
+        ...actionBarDefault,
+        title: {
+          enabled: true,
+          display: true,
+          name: "Teachers",
+        },
+        fab: {
+          enabled: true,
+          display: true,
+          action: () => {
+            addTeacher.onAdd();
+          },
+        },
+        search: {
+          enabled: true,
+          display: true,
+          isOpen: false,
+          renderContent: searchTeachers.searchBarContent,
+          searchFunc: searchTeachers.searchFunc,
+          submitFunc: searchTeachers.submitFunc,
+          backFunc: searchTeachers.backFunc,
+        },
+      });
 
-    // Load list
-    fetchTeachers.onFetch({ params: { sort: "-updatedAt" } });
+      // Load list
+      fetchTeachers.onFetch({ params: { sort: "-updatedAt" } });
+    }
 
     return () => {};
   }, []);
 
-  return (
+  return user && user.role.indexOf("superadmin") >= 0 ? (
     <ListTeachers
       user={user}
       newItemAnimation={newItemAnimation}
@@ -79,6 +90,8 @@ const Teachers = () => {
       onDelete={deleteTeacher.onDelete}
       searchStatus={state.searchStatus}
     />
+  ) : (
+    <NoPermission />
   );
 };
 

@@ -55,12 +55,12 @@ const UserLogin = () => {
     stateMachines: STATE_MACHINE_NAME,
   });
 
-  const stateSuccess = useStateMachineInput(
-    rive,
-    STATE_MACHINE_NAME,
-    "success",
-  );
-  const stateFail = useStateMachineInput(rive, STATE_MACHINE_NAME, "fail");
+  // const stateSuccess = useStateMachineInput(
+  //   rive,
+  //   STATE_MACHINE_NAME,
+  //   "success",
+  // );
+  // const stateFail = useStateMachineInput(rive, STATE_MACHINE_NAME, "fail");
   const stateHandUp = useStateMachineInput(
     rive,
     STATE_MACHINE_NAME,
@@ -104,16 +104,16 @@ const UserLogin = () => {
     setLook();
   }, [watch("name")]);
 
-  const triggerSuccess = () => {
-    if (stateSuccess) {
-      stateSuccess.fire();
-    }
-  };
-  const triggerFail = () => {
-    if (stateFail) {
-      stateFail.fire();
-    }
-  };
+  // const triggerSuccess = () => {
+  //   if (stateSuccess) {
+  //     stateSuccess.fire();
+  //   }
+  // };
+  // const triggerFail = () => {
+  //   if (stateFail) {
+  //     stateFail.fire();
+  //   }
+  // };
 
   return (
     <Box>
@@ -197,7 +197,7 @@ const UserLogin = () => {
             name="password"
             type="password"
             control={control}
-            label="Phone Number"
+            label="Phone / Password"
             customOnChange={() => {
               setHandUp(true);
             }}

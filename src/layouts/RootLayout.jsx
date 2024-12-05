@@ -1,7 +1,16 @@
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
+import Slider from "react-slick";
 import {
   Box,
+  Button,
+  Card,
+  CardContent,
+  CardMedia,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Fab,
   IconButton,
   Paper,
@@ -11,6 +20,9 @@ import {
 import { useTheme } from "@mui/material/styles";
 import PropTypes from "prop-types";
 
+import AnnouncementV1 from "../assets/announcement-v1.gif";
+import AnnouncementV2 from "../assets/announcement-v2.gif";
+import AnnouncementV3 from "../assets/announcement-v3.gif";
 import ClockIn from "../assets/time.png";
 import ClockOut from "../assets/time-out.png";
 import Appbar from "../components/Appbar";
@@ -20,9 +32,10 @@ import Download from "../components/GoogleIcons/Download";
 import Search from "../components/GoogleIcons/Search";
 import MainNavigation from "../components/MainNavigation";
 import { useAuth } from "../contexts/auth";
+import useConfirm from "../hooks/useConfirm";
+import useNotifications from "../services/notifications";
 
 const RootLayout = () => {
-  console.log("RUNNING ROOT LAYOUT");
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
@@ -42,31 +55,18 @@ const RootLayout = () => {
     setMobileSubNav(bool);
   };
 
+  const { fetch: fetchNotifications } = useNotifications();
+
+  const [{ data: fetchNotificationsData }, fetchNotificationsExecute] =
+    fetchNotifications;
+  const [notifications, setNotifications] = useState(null);
+
+  const confirm = useConfirm();
+
   const props = useOutletContext();
   const { loader, actionBar, setActionBar } = props;
   const ab = actionBar;
   const sab = setActionBar;
-
-  useEffect(() => {
-    if (!checkAuthenticated()) {
-      navigate("/user");
-    } else if (!user) {
-      getUserExecute();
-    }
-  }, [isAuthenticated, user]);
-
-  useEffect(() => {
-    loader.start();
-  }, []);
-
-  useEffect(() => {
-    if (user && user.userId) {
-      // do something
-      loader.start();
-    }
-
-    return () => {};
-  }, [user]);
 
   // Search Panel
   const renderSearchButton = () => {
@@ -162,6 +162,188 @@ const RootLayout = () => {
     }
     return null;
   };
+
+  const slickSettings2 = {
+    dots: true,
+    // infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    waitForAnimate: false,
+    autoplay: true,
+    autoplaySpeed: 4000,
+  };
+
+  const announcementImageList = [
+    AnnouncementV1,
+    AnnouncementV2,
+    AnnouncementV3,
+  ];
+
+  const renderNotification = notification => {
+    if (notification && notification.length !== 0) {
+      if (notification.length > 1) {
+        return (
+          <Box
+            sx={{
+              textAlign: "center",
+            }}
+          >
+            <Slider {...slickSettings2}>
+              {notification &&
+                notification.map((item, index) => {
+                  return (
+                    <Card
+                      key={item.id}
+                      sx={{
+                        width: {
+                          xs: "80% !important",
+                          md: "50% !important",
+                        },
+                        borderRadius: "16px",
+                      }}
+                    >
+                      <Box sx={{ display: "flex", justifyContent: "center" }}>
+                        <CardMedia
+                          component="img"
+                          sx={{ width: "100px" }}
+                          image={announcementImageList[index]}
+                          alt="birthday"
+                        />
+                      </Box>
+                      <CardContent>
+                        <Typography
+                          variant="h5"
+                          color="textPrimary"
+                          fontWeight={500}
+                          sx={{ marginBottom: "24px" }}
+                        >
+                          {item.title}
+                        </Typography>
+                        {item.description.split("\n\n").map(e => {
+                          return (
+                            <Typography
+                              key={e}
+                              variant="body1"
+                              color="textPrimary"
+                              fontWeight={500}
+                            >
+                              {e}
+                            </Typography>
+                          );
+                        })}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+            </Slider>
+          </Box>
+        );
+      }
+      return (
+        <Box
+          sx={{
+            textAlign: "center",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <Card
+            key={notification[0].id}
+            sx={{
+              width: {
+                xs: "80% !important",
+                sm: "80% !important",
+              },
+              borderRadius: "16px",
+            }}
+          >
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <CardMedia
+                component="img"
+                sx={{ width: "100px" }}
+                image={announcementImageList[0]}
+                alt="birthday"
+              />
+            </Box>
+            <CardContent>
+              <Typography
+                variant="h5"
+                color="textPrimary"
+                fontWeight={500}
+                sx={{ marginBottom: "24px" }}
+              >
+                {notification[0].title}
+              </Typography>
+              {notification[0].description.split("\n\n").map(e => {
+                return (
+                  <Typography
+                    key={e}
+                    variant="body1"
+                    color="textPrimary"
+                    fontWeight={500}
+                  >
+                    {e}
+                  </Typography>
+                );
+              })}
+            </CardContent>
+          </Card>
+        </Box>
+      );
+    }
+
+    return null;
+  };
+
+  useEffect(() => {
+    if (!checkAuthenticated()) {
+      navigate("/user");
+    } else if (!user) {
+      getUserExecute();
+    }
+  }, [isAuthenticated, user]);
+
+  useEffect(() => {
+    loader.start();
+    fetchNotificationsExecute({
+      params: {
+        "filter[status]": "active",
+        sort: "-updatedAt",
+      },
+    });
+  }, []);
+
+  useEffect(() => {
+    if (user && user.userId) {
+      // do something
+      loader.start();
+    }
+
+    return () => {};
+  }, [user]);
+
+  useEffect(() => {
+    if (fetchNotificationsData && fetchNotificationsData.data) {
+      setNotifications(fetchNotificationsData.data);
+
+      const readNotifications =
+        JSON.parse(localStorage.getItem("sjag_notifications")) || [];
+      const unread = fetchNotificationsData.data.some(
+        notification => !readNotifications.includes(notification.id),
+      );
+      if (unread) {
+        confirm.open();
+        const notArray = fetchNotificationsData.data.map(el => {
+          return el.id;
+        });
+        localStorage.setItem("sjag_notifications", JSON.stringify(notArray));
+        loader.end();
+      }
+    }
+
+    return () => {};
+  }, [fetchNotificationsData]);
 
   return (
     isAuthenticated &&
@@ -356,6 +538,35 @@ const RootLayout = () => {
             </Box>
           </Box>
         </Box>
+
+        {/* Popup */}
+        <Dialog
+          fullWidth
+          maxWidth="xs"
+          open={confirm.isOpen}
+          onClose={() => {}}
+          disableEscapeKeyDown
+          onBackdropClick={() => {}}
+          sx={{ zIndex: 1502 }}
+        >
+          <DialogTitle>Notifications</DialogTitle>
+          <DialogContent>
+            <Box sx={{ width: "100%" }}>
+              {renderNotification(notifications)}
+            </Box>
+          </DialogContent>
+          <DialogActions sx={{ padding: 0 }}>
+            <Button
+              variant="text"
+              onClick={() => {
+                confirm.close();
+              }}
+              sx={{ color: theme.palette.primary.main }}
+            >
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     )
   );

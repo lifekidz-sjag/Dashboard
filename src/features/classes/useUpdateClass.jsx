@@ -115,6 +115,7 @@ const useUpdateClass = ({
                   <Grid container spacing={2}>
                     <Grid item xs={12}>
                       <FormTextField
+                        disabled
                         required
                         name="name"
                         label="Name"
@@ -253,7 +254,7 @@ const useUpdateClass = ({
       loader.end();
       switch (getClassError.response.data) {
         case "INVALID_ID":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
 
         default:
@@ -268,10 +269,10 @@ const useUpdateClass = ({
     if (putClassError) {
       switch (putClassError.response.data) {
         case "ADMIN_ACTIONS_NOT_ALLOWED":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         case "EMPTY_REQUEST":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         case "DUPLICATED_CLASS":
           snackbar.open(
@@ -280,7 +281,7 @@ const useUpdateClass = ({
           );
           break;
         case "INVALID_ID":
-          snackbar.open("Something went wrong. Plaese try again later", true);
+          snackbar.open("Something went wrong. Please try again later", true);
           break;
         case "UNAUTHORIZED_ACTION":
           snackbar.open("Please login again to proceed", true);

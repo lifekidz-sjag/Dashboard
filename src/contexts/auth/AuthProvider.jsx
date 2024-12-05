@@ -214,6 +214,23 @@ const AuthProvider = ({ children, sharedState }) => {
     },
     error => Promise.reject(error),
   );
+
+  let isRefreshing = false;
+  let refreshSubscribers = [];
+
+  function onRefreshed(t) {
+    setTimeout(() => {
+      refreshSubscribers.forEach(obj => {
+        obj.callback(t);
+      });
+      refreshSubscribers = [];
+    }, 500);
+  }
+
+  function addRefreshSubscriber(callback, config) {
+    refreshSubscribers.push({ callback, config });
+  }
+
   // response interceptor intercepting 401 responses, refreshing token and retrying the request
   axios.interceptors.response.use(
     response => response,
@@ -223,26 +240,42 @@ const AuthProvider = ({ children, sharedState }) => {
       if (error.response?.status === 401 && !config._retry) {
         // we use this flag to avoid retrying indefinitely if
         // getting a refresh token fails for any reason
-        // eslint-disable-next-line no-underscore-dangle
-        config._retry = true;
 
-        if (config.url !== "Auth/Refresh1") {
-          const newAccessToken = await SJAGRefreshAccessToken();
-          if (!newAccessToken) {
-            logoutExecute({
-              refreshToken: retrieveAuthKeyValue("refreshToken"),
-            });
+        if (!isRefreshing) {
+          isRefreshing = true;
+          // eslint-disable-next-line no-underscore-dangle
+          config._retry = true;
 
-            reset(["accessToken", "refreshToken", "expiration"]);
+          try {
+            const newAccessToken = await SJAGRefreshAccessToken();
+            if (!newAccessToken) {
+              logoutExecute({
+                refreshToken: retrieveAuthKeyValue("refreshToken"),
+              });
 
-            window.location.href = `/Dashboard/user/login?redirectUrl=${window.location.pathname.replace(
-              "Dashboard",
-              "",
-            )}`;
+              reset(["accessToken", "refreshToken", "expiration"]);
+
+              window.location.href = `/Dashboard/user/login?redirectUrl=${window.location.pathname.replace(
+                "Dashboard",
+                "",
+              )}`;
+              return Promise.reject(error);
+            }
+
+            isRefreshing = false;
+            onRefreshed(newAccessToken);
+          } catch (re) {
+            isRefreshing = false;
+            return Promise.reject(re);
           }
         }
 
-        return axios(config);
+        return new Promise(resolve => {
+          addRefreshSubscriber(t => {
+            config.headers.Authorization = `Bearer ${t}`;
+            resolve(axios(config));
+          }, config);
+        });
       }
 
       return Promise.reject(error);

@@ -197,10 +197,10 @@ const FormDateRangePicker = ({
   control,
   getValues,
   customOnChange,
-  firstDatePicked,
-  setFirstDatePicked,
-  secondDatePicked,
-  setSecondDatePicked,
+  firstDatePicked = {},
+  setFirstDatePicked = () => {},
+  secondDatePicked = {},
+  setSecondDatePicked = () => {},
   dateFilterOnChange,
 }) => {
   const [firstDatePickedDisplay, setFirstDatePickedDisplay] = useState(
@@ -356,14 +356,7 @@ FormDateRangePicker.propTypes = {
   secondDatePicked: PropTypes.shape(),
   setFirstDatePicked: PropTypes.func,
   setSecondDatePicked: PropTypes.func,
-  dateFilterOnChange: PropTypes.bool.isRequired,
-};
-
-FormDateRangePicker.defaultProps = {
-  firstDatePicked: {},
-  secondDatePicked: {},
-  setFirstDatePicked: () => {},
-  setSecondDatePicked: () => {},
+  dateFilterOnChange: PropTypes.string.isRequired,
 };
 
 export default FormDateRangePicker;

@@ -31,6 +31,7 @@ const useStudentsFeatures = ({ contextProps, popupClockIn, popupClockOut }) => {
     paging,
     setActionBar,
   } = contextProps;
+
   // Shared state
   const [action, setAction] = useState("View");
   const [id, setId] = useState("");
