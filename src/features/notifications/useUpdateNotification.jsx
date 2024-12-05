@@ -8,12 +8,9 @@ import {
   IconButton,
   Stack,
   Typography,
-  useMediaQuery,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 import * as yup from "yup";
 
-import formBg from "../../assets/form-bg.png";
 import {
   FormSwitch,
   FormTextAreaField,
@@ -30,9 +27,6 @@ const useUpdateNotification = ({
   sharedState,
   sharedFunction,
 }) => {
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
-
   // API service
   const { get: getNotifications, put: putNotification } = useNotifications();
   const [
@@ -92,6 +86,11 @@ const useUpdateNotification = ({
           onSubmit={handleSubmitUpdate(data => {
             handleUpdate(data);
           })}
+          sx={{
+            overflow: "auto",
+            maxHeight: { xs: "80vh", md: "100vh" },
+            paddingBottom: "80px",
+          }}
         >
           <Box
             sx={{
@@ -157,49 +156,33 @@ const useUpdateNotification = ({
 
           <Box
             sx={{
-              position: "absolute",
-              width: "100%",
-              bottom: { xs: "75px", md: "0px" },
-              right: "0px",
-              background: "white",
-              zIndex: 1,
-              borderTop: "1px solid rgba(0,0,0,0.1)",
+              padding: "16px 24px 24px 24px",
+              display: "flex",
+              justifyContent: "flex-end",
             }}
           >
-            {!isSmallScreen && (
-              <Box component="img" src={formBg} sx={{ width: "100%" }} />
-            )}
-
-            <Box
-              sx={{
-                padding: "16px 24px 24px 24px",
-                display: "flex",
-                justifyContent: "flex-end",
-              }}
-            >
-              <Stack spacing={5} direction="row">
-                <Button
-                  variant="text"
-                  size="large"
-                  style={{
-                    borderRadius: "100px",
-                  }}
-                  onClick={sidebar.close}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="contained"
-                  size="large"
-                  type="submit"
-                  style={{
-                    borderRadius: "100px",
-                  }}
-                >
-                  Update
-                </Button>
-              </Stack>
-            </Box>
+            <Stack spacing={5} direction="row">
+              <Button
+                variant="text"
+                size="large"
+                style={{
+                  borderRadius: "100px",
+                }}
+                onClick={sidebar.close}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                size="large"
+                type="submit"
+                style={{
+                  borderRadius: "100px",
+                }}
+              >
+                Update
+              </Button>
+            </Stack>
           </Box>
         </Box>
       </Box>

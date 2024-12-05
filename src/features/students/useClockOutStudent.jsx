@@ -11,15 +11,12 @@ import {
   Rating,
   Stack,
   Typography,
-  useMediaQuery,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 import axios from "axios";
 import CryptoJS from "crypto-js";
 import { Html5QrcodeScanner, Html5QrcodeScanType } from "html5-qrcode";
 import * as yup from "yup";
 
-import formBg from "../../assets/form-bg.png";
 import useAttendances from "../../services/attendances";
 import useStudentEvaluation from "../../services/studentEvaluation";
 
@@ -30,9 +27,6 @@ const useClockOutStudent = ({
   snackbar,
   sharedFunction,
 }) => {
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
-
   const [studentInfo, setStudentInfo] = useState(null);
   const [step, setStep] = useState(0);
   const [cId, setCId] = useState("");
@@ -131,7 +125,8 @@ const useClockOutStudent = ({
           onSubmit={handleSubmitRating(handleRating)}
           sx={{
             overflow: "auto",
-            maxHeight: { xs: "calc(80vh - 140px)", md: "100vh" },
+            maxHeight: { xs: "80vh", md: "100vh" },
+            paddingBottom: "80px",
           }}
         >
           <Box
@@ -161,13 +156,6 @@ const useClockOutStudent = ({
             <Box
               sx={{
                 flex: "1 1 auto",
-                minHeight: {
-                  xs: "calc(100vh - 400px)",
-                },
-                height: {
-                  xs: "calc(100vh - 400px)",
-                },
-                padding: "0px 0px 160px",
                 boxSizing: "border-box",
                 position: "relative",
                 zIndex: 1,
@@ -219,49 +207,33 @@ const useClockOutStudent = ({
 
           <Box
             sx={{
-              position: "absolute",
-              width: "100%",
-              bottom: { xs: "75px", md: "0px" },
-              right: "0px",
-              background: "white",
-              zIndex: 1,
-              borderTop: "1px solid rgba(0,0,0,0.1)",
+              padding: "16px 24px 24px 24px",
+              display: "flex",
+              justifyContent: "flex-end",
             }}
           >
-            {!isSmallScreen && (
-              <Box component="img" src={formBg} sx={{ width: "100%" }} />
-            )}
-
-            <Box
-              sx={{
-                padding: "16px 24px 24px 24px",
-                display: "flex",
-                justifyContent: "flex-end",
-              }}
-            >
-              <Stack spacing={5} direction="row">
-                <Button
-                  variant="text"
-                  size="large"
-                  style={{
-                    borderRadius: "100px",
-                  }}
-                  onClick={sidebar.close}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="contained"
-                  size="large"
-                  type="submit"
-                  style={{
-                    borderRadius: "100px",
-                  }}
-                >
-                  Create
-                </Button>
-              </Stack>
-            </Box>
+            <Stack spacing={5} direction="row">
+              <Button
+                variant="text"
+                size="large"
+                style={{
+                  borderRadius: "100px",
+                }}
+                onClick={sidebar.close}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                size="large"
+                type="submit"
+                style={{
+                  borderRadius: "100px",
+                }}
+              >
+                Create
+              </Button>
+            </Stack>
           </Box>
         </Box>
       </Box>
@@ -372,6 +344,7 @@ const useClockOutStudent = ({
           },
           fps: 5,
           supportedScanTypes: isMobile ? mobileArr : desktopArr,
+          facingMode: { exact: "environment" }, // Use the back camera
         });
 
         let isScanning = true;
