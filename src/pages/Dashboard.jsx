@@ -421,10 +421,14 @@ const Dashboard = () => {
                 }}
                 src={DashboardVideo}
               />
-              <Box sx={{ maxWidth: { xs: "100%", sm: "50%" } }}>
+              <Box sx={{ maxWidth: { xs: "100%", sm: "80%" } }}>
                 <Typography
                   variant="h6"
-                  sx={{ fontWeight: "800", marginBottom: "16px", width: "60%" }}
+                  sx={{
+                    fontWeight: "800",
+                    marginBottom: "16px",
+                    width: { xs: "60%", sm: "100%" },
+                  }}
                 >
                   {verse.reference || "Matthew 27:42"}
                 </Typography>

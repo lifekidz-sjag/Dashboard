@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import { Box, Typography } from "@mui/material";
 
+import AccountsIcon from "./components/GoogleIcons/Account";
 import { AuthProvider } from "./contexts/auth";
 import useSJAG from "./hooks/useSJAG";
 import ReportsLayout from "./layouts/ReportsLayout";
@@ -183,6 +184,7 @@ const App = () => {
   ) : (
     <Box sx={{ opacity: 0 }}>
       <Typography>Test</Typography>
+      <AccountsIcon />
     </Box>
   );
 };
