@@ -415,7 +415,7 @@ const Dashboard = () => {
                 sx={{
                   width: { xs: 180, sm: 250 },
                   position: "absolute",
-                  top: { xs: "-64px", sm: "unset" },
+                  top: { xs: "-90px", sm: "unset" },
                   bottom: { sm: "0px" },
                   right: { xs: "8px", sm: "24px" },
                 }}
@@ -424,7 +424,7 @@ const Dashboard = () => {
               <Box sx={{ maxWidth: { xs: "100%", sm: "50%" } }}>
                 <Typography
                   variant="h6"
-                  sx={{ fontWeight: "800", marginBottom: "16px" }}
+                  sx={{ fontWeight: "800", marginBottom: "16px", width: "60%" }}
                 >
                   {verse.reference || "Matthew 27:42"}
                 </Typography>
@@ -438,7 +438,7 @@ const Dashboard = () => {
             <Box
               sx={{
                 backgroundColor: "#CCDFFB",
-                padding: "40px",
+                padding: { xs: "30px", sm: "40px" },
                 borderRadius: "8px",
                 width: { xs: "100%", sm: "50%" },
                 // flex: 1,
