@@ -257,27 +257,6 @@ const navigationItems = user => {
       },
       mobile: "first",
     },
-    {
-      id: "59993f82-a00f-430c-be43-13e51c7e8ef3",
-      name: "Reports",
-      path: `/reports`,
-      mobile: "first",
-      icon: currentPage => {
-        return <Report currentpage={currentPage.toString()} />;
-      },
-      subNav: [
-        {
-          id: "8af7d595-c305-4aa8-a7d9-d2fae2538968",
-          name: "Classes",
-          path: `/reports/classes`,
-        },
-        {
-          id: "5031b6df-985f-4cf6-8909-c8c4b546f3ab",
-          name: "Students",
-          path: `/reports/students`,
-        },
-      ],
-    },
   );
   if (user.role.indexOf("admin") >= 0) {
     list.push(
@@ -316,6 +295,28 @@ const navigationItems = user => {
           return <School currentpage={currentPage.toString()} />;
         },
         mobile: "first",
+      },
+
+      {
+        id: "59993f82-a00f-430c-be43-13e51c7e8ef3",
+        name: "Reports",
+        path: `/reports`,
+        mobile: "first",
+        icon: currentPage => {
+          return <Report currentpage={currentPage.toString()} />;
+        },
+        subNav: [
+          {
+            id: "8af7d595-c305-4aa8-a7d9-d2fae2538968",
+            name: "Classes",
+            path: `/reports/classes`,
+          },
+          {
+            id: "5031b6df-985f-4cf6-8909-c8c4b546f3ab",
+            name: "Students",
+            path: `/reports/students`,
+          },
+        ],
       },
     );
   }
@@ -443,18 +444,20 @@ const MainNavigation = ({
                   icon={item.icon(currentPage === item.id)}
                 />
               ))}
-            <BottomNavigationAction
-              label="Show more"
-              onClick={() => {
-                setIsMobileMenuExpanded(true);
-                setIsDelayedMobileMenuExpanded(true);
-              }}
-              sx={{
-                opacity: isMobileMenuExpanded ? "0" : "100",
-                cursor: isMobileMenuExpanded ? "none" : "pointer",
-              }}
-              icon={<MoreHoriz currentPage={false} />}
-            />
+            {user.role.indexOf("admin") >= 0 && (
+              <BottomNavigationAction
+                label="Show more"
+                onClick={() => {
+                  setIsMobileMenuExpanded(true);
+                  setIsDelayedMobileMenuExpanded(true);
+                }}
+                sx={{
+                  opacity: isMobileMenuExpanded ? "0" : "100",
+                  cursor: isMobileMenuExpanded ? "none" : "pointer",
+                }}
+                icon={<MoreHoriz currentPage={false} />}
+              />
+            )}
           </BottomNavigation>
           {/* Second row */}
           <BottomNavigation

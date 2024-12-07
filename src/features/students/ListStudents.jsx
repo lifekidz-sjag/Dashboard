@@ -136,7 +136,7 @@ const ListStudents = ({
               textOverflow: "ellipsis",
             }}
           >
-            Age: <b>{data.age}</b>, Class:{" "}
+            Class:{" "}
             <b>
               {classes &&
                 classes.data &&
